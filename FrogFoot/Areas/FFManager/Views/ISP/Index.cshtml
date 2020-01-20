@@ -1,0 +1,32 @@
+﻿@model IEnumerable<FrogFoot.Entities.ISP>
+@{
+    ViewBag.Title = "ISPs";
+}
+
+<h2>ISPs</h2>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Landline</th>
+            <th>Cell</th>
+            <th>ISP Code</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var isp in Model)
+        {
+            <tr>
+                <td>@isp.Name</td>
+                <td>@isp.EmailAddress</td>
+                <td>@isp.LandlineNo</td>
+                <td>@isp.CellNo</td>
+                <td>@isp.ISPCode</td>
+                <td>@Html.ActionLink("Products", "Products", new { id = isp.ISPId}, new { @class = "btn btn-default"} )</td>
+            </tr>
+        }
+    </tbody>
+</table>

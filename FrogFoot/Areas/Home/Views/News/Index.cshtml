@@ -1,0 +1,332 @@
+﻿@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Areas.Home.Models.NewsViewModel
+
+@{
+    ViewBag.Title = "News";
+}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/Swiper/3.1.0/css/swiper.min.css">
+<style type="text/css">
+    .swiper-wrapper {
+        margin: 0 auto;
+        background-color: rgb(241, 241, 241);
+    }
+
+    .previewContainer {
+        padding: 10px 0 0 10px;
+        color: rgb(141, 141, 141);
+        background-color: rgb(241, 241, 241);
+        height: 270px;
+        position: relative;
+    }
+
+    .hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-color: lightgrey;
+    }
+
+    .postTitle {
+        margin-top: 10px;
+        font-weight: bold;
+        font-size: 25px;
+        text-align: center;
+        color: rgb(117, 115, 115);
+    }
+
+    .swipeNav {
+        position: absolute;
+        top: 120px;
+        background-color: green !important;
+        opacity: 0.7;
+        z-index: 999;
+        padding: 3px 5px 3px 5px;
+        color: white;
+        font-weight: normal;
+        cursor: pointer;
+    }
+
+    .swipeLeft {
+        float: left;
+        left: -5px;
+    }
+
+    .swipeRight {
+        float: right;
+        right: 3px;
+    }
+
+    .moreButton {
+        color: white;
+        background: green;
+        width: 120px;
+        height: 30px;
+        text-align: center;
+        z-index: 998 !important;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        padding: 5px 15px;
+        font-weight: bolder;
+        text-decoration: none;
+        display: block;
+    }
+
+        .moreButton:hover {
+            background: rgb(1, 118, 1);
+            text-decoration: none;
+            color: white;
+        }
+
+    /*------------ list of posts ------------*/
+    .headingPrimary {
+        text-align: center;
+        color: rgb(93, 93, 93);
+        font-weight: bolder;
+        margin-top: 30px;
+    }
+
+    .articleImage {
+        float: left;
+        margin-right: 15px;
+        margin-bottom: 15px;
+    }
+
+    .articleTitle {
+        margin-top: 10px;
+        font-weight: bold;
+        color: rgb(117, 115, 115);
+    }
+
+    .articleBody {
+        float: left;
+    }
+
+    .articleDate, .articleDay {
+        position: relative;
+        color: #fff;
+        font-weight: 700;
+        background-color: rgb(158, 158, 158);
+        z-index: 999;
+        text-align: center;
+    }
+
+    .articleDay {
+        text-decoration: underline;
+        font-size: 20px;
+        padding: 0 5px;
+    }
+
+    .articleDate {
+        font-size: 13px;
+        padding: 0 5px;
+    }
+
+    .dateContainer {
+        width: 40px;
+        margin-top: 45px;
+    }
+
+    .line {
+        width: 1.5px;
+        background-color: #C7C7C7;
+        position: absolute;
+        margin-left: 20px;
+        z-index: 0;
+    }
+
+    .lineTop {
+        height: 45px;
+    }
+
+    .lineBottom {
+        height: 100px;
+        top: 80px;
+    }
+
+    .loadMoreButton {
+        width: 200px;
+        background: green;
+        color: white;
+        padding: 5px 15px;
+        text-align: center;
+        font-weight: bolder;
+        cursor: pointer;
+    }
+
+        .loadMoreButton:hover {
+            background: rgb(2, 107, 2);
+        }
+
+    @@media screen and (max-width: 767px) {
+
+        .timelineBottom {
+            height: 190px;
+        }
+    }
+
+    .fibreDateTitle {
+        color: rgb(117, 115, 115);
+        margin-top: 0;
+    }
+</style>
+
+@{
+    var sliderPosts = Model.Posts.Where(p => p.Type == PostType.Article).Take(3);
+}
+
+<h3 class="headingPrimary">NEWS</h3>
+
+<hr class="hr" />
+
+<div class="row">
+    <div class="col-sm-8">
+        <div class="row" style="margin-bottom: 60px;">
+            <div class="col-sm-12">
+                @if (Model.Posts.Any(p => p.Type == PostType.Article))
+                {
+                    <div class="swiperContainer">
+
+                        <div class="swipeNav swipeLeft"><span class="glyphicon glyphicon-chevron-left"></span></div>
+
+                        <div class="swiper-container">
+                            <div class="swiper-wrapper">
+                                @foreach (var p in sliderPosts)
+                                {
+                                    var imgUrl = "";
+                                    if (p.PostImage != null)
+                                    {
+                                        imgUrl = "\'../../Assets/PostImage/" + p.PostImage.AssetPath + "\'";
+                                    }
+
+                                    var postBody = HtmlStripper.Strip(p.Body);
+
+                                    <div class="swiper-slide" data-postid="@p.PostId">
+
+                                        @*Article Preview for larger screens*@
+                                        <div class="col-md-5 hidden-sm hidden-xs" style="height: 270px; padding-left: 0; padding-right: 0;">
+                                            <div class="previewContainer">
+                                                <a href="@Url.Action("Post", "News", new {postId = p.PostId})" style="text-decoration: none">
+                                                    <h4 class="postTitle">@p.Title</h4>
+                                                </a>
+                                                <hr class="hr" />
+                                                <div>
+                                                    @Html.Raw(postBody.Truncate(250))...
+                                                </div>
+                                                <a href="@Url.Action("Post", "News", new {postId = p.PostId})" class="moreButton">
+                                                    MORE
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        @*Post image for larger screens*@
+                                        <div class="col-md-7 hidden-sm hidden-xs" style="background: url(@imgUrl) no-repeat center center; background-size: cover; height: 270px">
+                                        </div>
+
+                                        @*Post image for smaller screens*@
+                                        <div class="col-md-7 hidden-md hidden-lg" style="background: url(@imgUrl) no-repeat center center; background-size: cover; height: 270px">
+                                        </div>
+
+                                        @*Post Preview for smaller screens*@
+                                        <div class="col-md-5 hidden-md hidden-lg" style="height: 270px; padding-left: 0; padding-right: 0;">
+                                            <div class="previewContainer">
+                                                <a href="@Url.Action("Post", "News", new {postId = p.PostId})" style="text-decoration: none">
+                                                    <h4 class="postTitle">@p.Title</h4>
+                                                </a>
+                                                <hr class="hr" />
+                                                <div>
+                                                    @Html.Raw(postBody.Truncate(250))...
+                                                </div>
+                                            </div>
+                                            <a href="@Url.Action("Post", "News", new {postId = p.PostId})" class="moreButton">
+                                                MORE
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+
+                        <div class="swipeNav swipeRight"><span class="glyphicon glyphicon-chevron-right"></span></div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12 form-group">
+                <div id="newsResults" class="form-group">
+                    @Html.Action("NewsPage", "News", new { postIdsToExclude = sliderPosts.Select(p => p.PostId).ToArray() })
+                </div>
+
+                <div class="col-sm-offset-4 form-group">
+                    <div id="loadMore" class="loadMoreButton">
+                        <span>MORE</span>
+                        <span class="glyphicon glyphicon-chevron-down" style="padding-top: 3px; margin-left: 5px;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="fb-page"
+             data-href="https://www.facebook.com/frogfootfibre/?fref=ts"
+             data-height="800"
+             data-tabs="timeline"
+             data-small-header="true"
+             data-adapt-container-width="true"
+             data-hide-cover="true"
+             data-show-facepile="true">
+            <div class="fb-xfbml-parse-ignore">
+                <blockquote cite="https://www.facebook.com/frogfootfibre/?fref=ts"><a href="https://www.facebook.com/frogfootfibre/?fref=ts">Frogfoot Fibre</a></blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="fb-root"></div>
+
+@section scripts
+{
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Swiper/3.1.0/js/swiper.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var swiper = new Swiper('.swiper-container', {
+                //pagination: '.swiper-pagination',
+                paginationClickable: true,
+                nextButton: '.swipeRight',
+                prevButton: '.swipeLeft'
+            });
+
+            var checkIfShowMore = function () {
+                if ($('#hideShowMore').length) {
+                    $('#loadMore').hide();
+                }
+            }
+
+            var page = 2;
+
+            $('#loadMore').on('click', function () {
+                var idsToExclude = [];
+                $('.swiper-slide').each(function () {
+                    idsToExclude.push($(this).data('postid'));
+                });
+
+                $.ajax({
+                    url: '@Url.Action("NewsPage", "News")',
+                    type: "GET",
+                    dataType: "html",
+                    traditional: true,
+                    data: { postIdsToExclude: idsToExclude, pageNo: page, pageSize: 5 },
+                    success: function (data) {
+                        $('#newsResults').append(data);
+                        checkIfShowMore();
+                        page++;
+                    }
+                });
+            });
+        })
+    </script>
+}
+

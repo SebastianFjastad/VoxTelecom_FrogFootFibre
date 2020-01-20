@@ -1,0 +1,109 @@
+﻿@using FrogFoot.Utilities
+@model  FrogFoot.Areas.Admin.Models.ZoneViewModel
+@{
+    ViewBag.Title = "Zones";
+}
+
+<h2>Zones</h2>
+
+<div class="row form-group" style="margin-top: 30px;">
+    <div class="col-sm-4">
+        @Html.ActionLink("Create Zone", "Create", null, new { @class = "btn btn-success" })
+    </div>
+
+    <div class="col-sm-3">
+        <select id="precinctSelect" class="form-control">
+            <option value="All">Sync All Precincts</option>
+            @foreach (var p in Model.Precincts)
+            {
+                <option value="@p.PrecinctCode">@p.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-5">
+        <input id="syncPrecinct" class="btn btn-primary" type="button" value="Sync Precinct Users"/>
+        <div id="syncResult" style="display: none; color: green;">
+            <span class="glyphicon glyphicon-check" ></span><label>Sync process started</label>
+        </div>
+    </div>
+</div>
+
+<table id="zonesTable" class="table table-striped table-responsive">
+    <thead>
+        <tr>
+            <td>Code</td>
+            <td>Precinct Code</td>
+            <td>Status</td>
+            <td>Allow Order</td>
+            <td>Allow Special</td>
+            <td>Allow Leads</td>
+            <td>No. Houses</td>
+            <td>First Fibre Date</td>
+            <td>Last Fibre Date</td>
+            <td>Node Id</td>
+            <td>Node Name</td>
+            <td>Node Lat.</td>
+            <td>Node Long.</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var zone in Model.Zones)
+            {
+                <tr>
+                    <td>@zone.Code</td>
+                    <td>@zone.PrecinctCode</td>
+                    <td>@(zone.Status != 0 ? zone.Status.GetDisplayName() : zone.Status.ToString())</td>
+                    <td>@zone.AllowOrder</td>
+                    <td>@zone.AllowSpecial</td>
+                    <td>@zone.AllowLeads</td>
+                    <td>@zone.NoHousesInZone</td>
+                    <td>@(zone.FirstDateOfFibre != null ? zone.FirstDateOfFibre.Value.ToString("dd/MM/yyyy") : "")</td>
+                    <td>@(zone.LastDateOfFibre != null ? zone.LastDateOfFibre.Value.ToString("dd/MM/yyyy") : "")</td>
+                    <td>@zone.NodeId</td>
+                    <td>@zone.NodeName</td>
+                    <td>@zone.NodeLatitude</td>
+                    <td>@zone.NodeLongitude</td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { zoneId = zone.ZoneId }) |
+                        @Html.ActionLink("Delete", "Delete", new { zoneId = zone.ZoneId }, new { @class = "delete" })
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#zonesTable').DataTable({
+                "paging": true,
+                "ordering": true
+            });
+
+            $('#zonesTable').on('click', '.delete', function () {
+                if (confirm("Are you sure you want to delete this Zone?")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            $('#syncPrecinct').click(function() {
+                var precinctCode = $('#precinctSelect').val();
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("SyncPrecinct", "Zone")',
+                    data: { precinctCode: precinctCode },
+                    success: function () {
+                        $('#syncResult').show().delay(3000).fadeOut("slow");
+                    }
+                });
+            });
+        })
+    </script>
+}

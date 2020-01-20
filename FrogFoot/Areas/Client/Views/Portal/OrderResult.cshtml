@@ -1,0 +1,45 @@
+﻿@model FrogFoot.Areas.Client.Models.OrderResultViewModel
+@{
+    ViewBag.Title = "Order Result";
+}
+
+@if (Model.OrderResult)
+{
+    <div class="row">
+        <div class="col-sm-8 col-md-6 text-center">
+            <div class="form-group" style="margin-top: 30px;">
+                <img src="@Url.Content("~/Content/captainfibre_256.jpg")" class="form-group" alt="Frogfoot Champ"/>
+                <p>
+                    <strong>Thank you</strong>
+                    <br/>for ordering Fibre to the Home, <strong>@Model.User.FirstName</strong>!
+                </p>
+
+                <p>If you have not heard from @Model.ISP.Name within 5 working days please notify us at ftth@frogfoot.com</p>
+
+                <p>
+                    Please note that the current turn-around time on orders is @(Model.User.Zone != null ? Model.User.Zone.TimeToInstallation : "6 to 8 weeks" ) once the fibre distribution has been completed.
+                </p>
+
+                <p>
+                    For those who have taken advantage of Early Bird or Head-Start special offers
+                    for pre-orders, please be aware that the distribution network needs to be
+                    built past your gate before the access link to your home can be scheduled.
+                </p>
+            </div>
+            @Html.ActionLink("Home", "Index", "Portal", null, new {@class = "btn btn-success"})
+        </div>
+    </div>
+}
+else
+{
+        <div class="col-sm-8 col-md-6 text-center">
+            <h3>Error</h3>
+            <p>We do not know how you got this far but you should not be able to order yet!</p>
+            <p>Either you are not in a zone, or your zone is not able to place orders yet.</p>
+            <p>Please keep an eye on the portal for updates.</p>
+            <p>Kind regards</p>
+            <p>The Frogfoot Fibre team</p>
+        </div>
+}
+
+

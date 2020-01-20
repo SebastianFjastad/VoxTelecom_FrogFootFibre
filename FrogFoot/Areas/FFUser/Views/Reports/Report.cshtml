@@ -1,0 +1,145 @@
+﻿@using FrogFoot.Utilities
+@model FrogFoot.Areas.Admin.Models.ReportViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+<h2>Report</h2>
+
+@using (Html.BeginForm("Report", "Reports", FormMethod.Post, new { @id = "reportForm", @role = "form" }))
+{
+    <div class="row form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-md-1" for="LocationId">Precinct</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.LocationId, new SelectList(Model.Locations, "LocationId", "Name", 1), "All Precincts", new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.LocationId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.From, new { @class = "control-label col-sm-1" })
+            <div class="input-group date col-sm-3">
+                @Html.TextBoxFor(f => f.From, new { @id = "timePickerFrom", @class = "form-control" })
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.To, new { @class = "control-label col-sm-1" })
+            <div class="input-group date col-sm-3">
+                @Html.TextBoxFor(f => f.To, new { @id = "timePickerTo", @class = "form-control" })
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="form-group" style="margin-top: 30px;">
+        <div class="col-sm-offset-1 col-sm-2">
+            <button id="generateReport" type="button" class="btn btn-success">Generate</button>
+        </div>
+    </div>
+</div>
+
+<hr />
+<div class="form-group">
+    @using (Html.BeginForm("ExportSalesReportToExcel", "Reports", FormMethod.Post, new { @id = "reportFormExcel" }))
+    {
+        <div style="display: none;">
+            <input id="locId" name="locationId" type="text" />
+            <input id="from" name="from" type="text" />
+            <input id="to" name="to" type="text" />
+        </div>
+
+        <input id="generateExcel" type="submit" class="btn btn-primary col-sm-offset-1" value="Export to Excel" />
+    }
+</div>
+
+<div id="reportTable">
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Precinct</th>
+                <th>Zone</th>
+                <th>Earliest Fibre Date</th>
+                <th>Status</th>
+                <th>ISP Name</th>
+                <th>Line Speed</th>
+                <th>Prod. Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Cell No.</th>
+                <th>Landline</th>
+                <th>Owner</th>
+                <th>Order Id</th>
+                <th>Up Speed</th>
+                <th>Capped</th>
+                <th>Created By Role</th>
+                <th>Monthly Cost</th>
+                <th>Setup Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var x in Model.Reports)
+            {
+                <tr>
+                    <td>@x.Email</td>
+                    <td>@x.Precinct</td>
+                    <td>@x.Zone</td>
+                    <td>@x.FirstDateOfFibre</td>
+                    <td>@x.Status.ToString()</td>
+                    <td>@x.ISPName</td>
+                    <td>@x.LineSpeed.GetDisplayName()</td>
+                    <td>@x.ProductName</td>
+                    <td>@x.FirstName</td>
+                    <td>@x.LastName</td>
+                    <td>@x.PhoneNumber</td>
+                    <td>@x.Landline</td>
+                    <td>@x.IsOwner</td>
+                    <td>@x.OrderId</td>
+                    <td>@x.UpSpeed</td>
+                    <td>@x.IsCapped</td>
+                    <td>@x.CreatedByRole</td>
+                    <td>@x.MonthlyCost</td>
+                    <td>@x.SetupCost</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#timePickerFrom').datetimepicker({
+                format: "MM-DD-YYYY"
+            });
+            $('#timePickerTo').datetimepicker({
+                format: "MM-DD-YYYY"
+            });
+
+            $("#timePickerFrom").on("dp.change", function (e) {
+                $('#timePickerTo').data("DateTimePicker").minDate(e.date);
+            });
+            $("#timePickerTo").on("dp.change", function (e) {
+                $('#timePickerFrom').data("DateTimePicker").maxDate(e.date);
+            });
+
+            $('#generateReport').click(function () {
+                $('#reportForm').submit();
+            });
+
+            $("#reportFormExcel").submit(function () {
+                $('#locId').val($('#LocationId').val());
+                $('#from').val($('#timePickerFrom').val());
+                $('#to').val($('#timePickerTo').val());
+            });
+        })
+    </script>
+}

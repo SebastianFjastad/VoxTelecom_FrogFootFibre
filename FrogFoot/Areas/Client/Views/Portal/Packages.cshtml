@@ -1,0 +1,846 @@
+﻿@using System.Linq
+@using FrogFoot.Areas.Client.Models
+@using FrogFoot.Models
+@model ProductViewModel
+@{
+    ViewBag.Title = "Packages";
+}
+
+<style type="text/css">
+    .stepCircle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50px;
+        font-size: 30px;
+        font-weight: bolder;
+        color: #fff;
+        line-height: 60px;
+        display: inline-block;
+        text-align: center;
+        background: green;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .stepCircleActive {
+        color: gold;
+    }
+
+    .stepContainer {
+        margin-bottom: 15px;
+    }
+
+    .stepLabel {
+        color: grey;
+        font-weight: bolder;
+        margin-top: 10px;
+    }
+
+    .stepLabelActive {
+        color: green;
+    }
+
+    .stepArrow {
+        color: green;
+        margin: 0 20px;
+        font-size: 25px;
+    }
+
+    .stepArrowContainer {
+        margin-top: 15px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .prodContainer {
+        float: left;
+        margin-top: 30px;
+        min-height: 450px;
+        width: 100%;
+        font-size: 16px;
+        text-align: center;
+        color: rgb(120, 120, 120);
+        border: 1px solid lightgray;
+    }
+
+    .filter {
+        margin-bottom: 10px;
+    }
+
+    .logo {
+        margin-top: 15px;
+        margin-left: 15px;
+        margin-right: 15px;
+        min-height: 50px;
+        min-width: 60px;
+    }
+
+    .prodName {
+        margin-top: 10px;
+        height: 20px;
+        font-weight: bolder;
+    }
+
+    .info {
+        min-height: 125px;
+        font-size: 16px;
+    }
+
+    .upDownSpeed {
+        background-color: rgb(227, 227, 227);
+        font-size: 15px;
+    }
+
+    .downSpeed {
+        margin-right: 10px;
+        font-size: 17px;
+    }
+
+    .downSpeedIcon {
+        font-size: 17px;
+    }
+
+    .specialInfo {
+        color: Red;
+        font-weight: bolder;
+        margin-bottom: 10px;
+    }
+
+    .downSpeedSpecial {
+        color: Red;
+        font-weight: bolder;
+    }
+
+    .capped {
+        float: right;
+        background-color: lightblue;
+        padding: 3px 10px;
+        font-weight: bolder;
+    }
+
+    .attr {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .attrAlt {
+        background-color: white;
+    }
+
+    .padding {
+        padding: 10px 15px;
+    }
+
+    .cost {
+        font-size: 22px;
+        font-weight: bolder;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    #lineSpeedTabs > li {
+        width: 20%;
+        border-right: solid 1px white;
+        text-align: center;
+    }
+
+        #lineSpeedTabs > li > a {
+            color: white;
+            margin-right: 0;
+            font-size: 16px;
+            font-weight: bolder;
+            background-color: green;
+            border-radius: 0;
+            cursor: pointer;
+        }
+
+    .nav-tabs > li > a:hover {
+        border: 1px solid green;
+    }
+
+    .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+        border: 1px solid green;
+    }
+
+    .nav-tabs > li.active > a {
+        background-color: rgb(0, 157, 0) !important;
+        border-color: green;
+    }
+
+    .nav-tabs {
+        border-bottom: green;
+    }
+
+    .roundedLeftCorners {
+        border-radius: 10px 0 0 10px !important;
+    }
+
+    .roundedRightCorners {
+        border-radius: 0 10px 10px 0 !important;
+    }
+
+    .glyphicon-download, .glyphicon-upload {
+        margin-right: 5px;
+    }
+
+    .logoPlaceholder {
+        margin-top: 25px;
+        min-height: 50px;
+        min-width: 60px;
+        margin-bottom: 0;
+    }
+
+    .infoButton {
+        background-color: white;
+        width: 100%;
+        border-radius: 0;
+        /*color: rgb(120, 120, 120);*/
+        color: green;
+        font-weight: bolder;
+    }
+
+        .infoButton:hover {
+            color: green;
+            background-color: rgb(224, 223, 223);
+            font-weight: bolder;
+        }
+
+    .orderButton {
+        color: white;
+        width: 100%;
+        border-radius: 0;
+        background-color: green;
+    }
+
+    .m2mCost {
+        display: none;
+    }
+
+    /*jqurey UI override styles for radio buttons*/
+
+    .ui-state-default {
+        color: darkgrey;
+        background: white;
+        border: solid 1px darkgrey;
+    }
+
+    .ui-state-active {
+        color: green;
+        background: rgba(0, 128, 0, .1);
+        border: solid 1px darkgrey;
+    }
+
+    #manageISPContactDialog .modal-dialog {
+        width: 700px;
+    }
+
+    #manageISPContactDialog label {
+        cursor: pointer;
+    }
+</style>
+
+@{
+    var showEarlyBirdSpecialNotification = ViewBag.EarlyBirdSpecial;
+    var showNoEarlyBirdSpecialNotification = ViewBag.NoEarlyBirdSpecial;
+    var showHeadStartSpecialNotification = ViewBag.HeadStartSpecial;
+    var showNoHeadStartSpecialNotification = ViewBag.NoHeadStartSpecial;
+    var showWorkInProgressNotification = ViewBag.WorkInProgress;
+    var showCompleteNotification = ViewBag.Completed;
+
+    var isQuickOrder = ViewBag.IsQuickOrder;
+}
+
+@if (isQuickOrder == true)
+{
+    <div class="row">
+        <div class="col-sm-12" style="margin-top: 30px">
+            <div class="col-md-offset-1 col-md-11" style="text-align: center;">
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle" data-step="1">1</div>
+                    <div class="stepLabel stepLabelActive">Provide Your Details</div>
+                </div>
+                <div class="stepArrowContainer col-sm-1">
+                    <span class="glyphicon glyphicon-arrow-right stepArrow"></span>
+                </div>
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle stepCircleActive">2</div>
+                    <div class="stepLabel">Choose Your Package</div>
+                </div>
+                <div class="stepArrowContainer col-sm-1">
+                    <span class="glyphicon glyphicon-arrow-right stepArrow"></span>
+                </div>
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle">3</div>
+                    <div class="stepLabel">Done!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="text-center">
+    <h2 style="margin-top: 15px;">Packages</h2>
+    <h4 style="color: grey; margin-bottom: 30px;">Choose your Fibre package to your home</h4>
+</div>
+
+@if (!Model.UserCanOrder)
+{
+    <h3 class="text-center">We are currently unable to accept orders for your suburb or zone.</h3>
+    <h4 class="text-center">Once we have confirmed fibre rollout dates, we'll open for orders.</h4>
+}
+@functions
+{
+    private ProductPartialViewModel GetLineSpeedProduct(LineSpeed lineSpeed, Random rnd)
+    {
+        return new ProductPartialViewModel
+        {
+            UserZone = Model.User.Zone,
+            User = Model.User,
+            Specials = Model.Specials,
+            Products = Model.Products.Where(p => p.LineSpeed == lineSpeed).OrderBy(i => rnd.Next()).ToList()
+        };
+    }
+}
+@{
+    var rnd = new Random();
+
+    var tenMegModel = GetLineSpeedProduct(LineSpeed.TenMbps, rnd);
+    var twentyMegModel = GetLineSpeedProduct(LineSpeed.TwentyMbps, rnd);
+    var fiftyMegModel = GetLineSpeedProduct(LineSpeed.FiftyMbps, rnd);
+    var hundredMegModel = GetLineSpeedProduct(LineSpeed.HundredMbps, rnd);
+    var oneGigModel = GetLineSpeedProduct(LineSpeed.OneGps, rnd);
+
+    var userZone = Model.User.Zone;
+}
+
+@Html.HiddenFor(x => x.UserCanOrder)
+
+<div id="filterContainer" class="row">
+    <div class="col-md-4 col-sm-6 col-xs-12 filter">
+        <div id="cappedFilter" class="btn-group" data-toggle="buttons">
+            <label for="all" class="btn btn-default">
+                <input type="radio" id="all" name="radio" autocomplete="off" data-capped="">All
+            </label>
+            <label for="uncapped" class="btn btn-default active">
+                <input type="radio" id="uncapped" name="radio" checked="checked" autocomplete="off" data-capped="False">Uncapped
+            </label>
+
+            <label for="capped" class="btn btn-default">
+                <input type="radio" id="capped" name="radio" autocomplete="off" data-capped="True">Capped
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3 filter">
+        <div id="contractFilter" class="btn-group" data-toggle="buttons">
+            <label for="M2MRadio" class="btn btn-default active">
+                <input id="M2MRadio" data-contract="m2m" type="radio" name="radio2" autocomplete="off" checked="checked">Monthly
+            </label><label for="24MRadio" class="btn btn-default">
+                <input id="24MRadio" data-contract="24m" type="radio" name="radio2" autocomplete="off">24 Month
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-3 filter">
+        <select id="ispFilter" class="form-control filter">
+            <option value="">All ISPs</option>
+            <!-- Filter out ISPs which have no products to show -->
+            @foreach (var isp in Model.Products.GroupBy(o => o.ISPId).Select(grp => grp.First().ISP).ToList())
+            {
+                <option value="@isp.ISPId">@isp.Name</option>
+            }
+        </select>
+    </div>
+</div>
+
+@if (userZone != null && userZone.AllowSpecial)
+{
+    if (userZone.Status == TrenchingStatus.Undefined)
+    {
+        <div class="specialInfo">Order now to get the Early Bird special on selected packages below: 100% off setup cost</div>
+    }
+
+    if (userZone.Status == TrenchingStatus.HasDates)
+    {
+        <div class="specialInfo">Order now to get the Head Start special on selected packages below: 50% off setup cost</div>
+    }
+}
+<ul id="lineSpeedTabs" class="nav nav-tabs">
+    <li><a data-toggle="tab" class="roundedLeftCorners" href="#10meg">10 Mbps</a></li>
+    <li><a data-toggle="tab" href="#20meg">20 Mbps</a></li>
+    <li><a data-toggle="tab" href="#50meg">50 Mbps</a></li>
+    <li class="active"><a data-toggle="tab" href="#100meg">100 Mbps</a></li>
+    <li><a data-toggle="tab" class="roundedRightCorners" href="#1gig">1 Gbps</a></li>
+</ul>
+
+<div class="row">
+    <div id="productTabs" class="tab-content">
+        <div id="10meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", tenMegModel)
+        </div>
+
+        <div id="20meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", twentyMegModel)
+        </div>
+
+        <div id="50meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", fiftyMegModel)
+        </div>
+
+        <div id="100meg" class="tab-pane fade in active">
+            @Html.Partial("ProductPartial", hundredMegModel)
+        </div>
+
+        <div id="1gig" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", oneGigModel)
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12" style="text-align: center; margin-top: 45px;">
+        <span style="color: grey;">Pricing defined by each ISP. Terms and Conditions apply. Errors & Omissions Excepted.</span>
+    </div>
+</div>
+
+<!-- Modals -->
+<div id="stopUserOrder" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Unable to order yet</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Thank you for your interest.
+                </p>
+                <p>
+                    We'd love to process your order, but right now, we don't have scheduled dates for when the fibre is due to pass your house.
+                    We'd rather be sure of that before taking your order.
+                    <br /><br />Keep an eye on the Portal and <a href="https://www.facebook.com/frogfootfibre/?fref=ts" target="_blank">Facebook</a> page for updates.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (showEarlyBirdSpecialNotification == true)
+{
+    <div id="earlyBirdSpecial" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>Special offers available for those ordering early!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        While we don’t as yet have the exact date that the fibre will pass your door,
+                        we would be only too happy to take your order and contact you as soon as it does.
+                    </p>
+                    <p>
+                        While ordering, keep an eye out for Early Bird special offers in the packages below."
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showNoEarlyBirdSpecialNotification == true)
+{
+    <div id="noEarlyBirdSpecial" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>Ordering early places you at the front of the queue!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        While we don’t as yet have the exact date that the fibre will pass your gate,
+                        we would be only too happy to take your order and contact you the minute it
+                        does.
+                    </p>
+
+                    <p>Keep an eye on the portal here for updates.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showHeadStartSpecialNotification == true)
+{
+    <div id="headStartSpecial" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>Special offers available for those ordering early!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        While the fibre does not yet pass your gate, construction is scheduled to start
+                        shortly. Until it does start, we have some special offers available and would
+                        be only too happy to take your order.
+                    </p>
+                    <p>While ordering, keep an eye out for Head Start special offers in the packages below.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showNoHeadStartSpecialNotification == true)
+{
+    <div id="noHeadStartSpecial" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>Ordering early places you at the front of the queue!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        While the fibre does not yet pass your gate, we would be only too happy to
+                        take your order and contact you as soon as it does.
+                    </p>
+                    <p>Keep an eye on the portal here for updates.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showWorkInProgressNotification == true)
+{
+    <div id="workInProgress" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>The fibre is on its way to you!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Construction of the fibre network in your area has started. If you place your
+                        order now, as soon as the team building the access link to your home are
+                        ready, they will contact you to arrange a site visit.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (showCompleteNotification == true)
+{
+    <div id="workComplete" class="modal fade statusDialog" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><strong>The fibre is at your gate!</strong></h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Construction of the fibre distribution network for your area is now complete
+                        and the fibre should be running past your gate. If you place your order now,
+                        as soon as the team building the access link to your home are ready, they will
+                        contact you to arrange a site visit.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@Html.Partial("_ManageContactDialog", Model.ISPs)
+
+<!--End Modals-->
+
+@section scripts{
+    <script src="~/Scripts/js-cookie/js.cookie-2.1.3.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            //show the modal that has been rendered (there should only be one)
+            if ($('.statusDialog').length) {
+                $('.statusDialog').modal('show');
+            }
+
+            //fit the products so their outer row height is the same
+            //function regulateProductMaxHeight() {
+            //    var maxHeight = 0;
+            //    $('.prodContainer:visible').each(function () {
+            //        if ($(this).height() > maxHeight) {
+            //            maxHeight = $(this).height();
+            //        }
+            //    });
+            //    $('.prodContainer').height(maxHeight);
+            //}
+
+            //regulateProductMaxHeight();
+
+            $('#productTabs').on('click', '.orderButton', function (e) {
+                if ($('#UserCanOrder').val() == "False") {
+                    $('#stopUserOrder').modal('show');
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+            });
+
+            function filterProducts() {
+                var ispId = $('#ispFilter').val();
+                var capped = $('#cappedFilter label.active > input').data('capped');
+                var isM2M = $('#contractFilter label.active > input').data('contract') == 'm2m' ? true : false;
+
+                $.ajax({
+                    url: '@Url.Action("GetFilteredProducts", "Portal")',
+                    type: "GET",
+                    dataType: "json",
+                    data: { ispId: ispId, capped: capped, isM2MClientContract: isM2M },
+                    success: function (data) {
+                        $('[data-prodid]').hide();
+
+                        //for each line speed tab find all the products
+                        $('.tab-pane').each(function () {
+                            var isps = [];
+                            var $productsInTab = $(this).find('[data-prodid]');
+
+                            //check each product to see if it should be visible or not
+                            $productsInTab.each(function () {
+                                var $this = $(this);
+
+                                //check if the product is included by the filters
+                                var id = $this.data('prodid');
+                                var visible = $.grep(data.ids, function (n) {
+                                    return n == id;
+                                });
+
+                                visible = visible.length ? true : false;
+
+                                if (visible) {
+                                    var prodISPId = $this.data('ispid');
+                                    var isp = $.grep(isps, function (x) {
+                                        return x.ispId === prodISPId;
+                                    });
+
+                                    isp = isp[0];
+
+                                    //if the isp exists in array then check if prod count >= 2
+                                    if (typeof isp !== 'undefined' && isp !== null) {
+                                        if (isp.prods === 1) {
+                                            //set visible length to 0 for evaluation further down
+                                            visible = false;
+                                        } else {
+                                            isp.prods++;
+                                        }
+                                    } else {
+                                        isps.push({ 'ispId': prodISPId, prods: 0 });
+                                    }
+                                }
+
+                                //show the relevant contractTerm pricing
+                                if (isM2M) {
+                                    $this.find('.m24Cost').hide();
+                                    $this.find('.m24SetupCost').hide();
+                                    $this.find('.m2mCost').show();
+                                    $this.find('.m2mSetupCost').show();
+                                } else {
+                                    $this.find('.m2mCost').hide();
+                                    $this.find('.m2mSetupCost').hide();
+                                    $this.find('.m24Cost').show();
+                                    $this.find('.m24SetupCost').show();
+                                }
+
+                                if (visible) {
+                                    $this.addClass('visible').show();
+                                } else {
+                                    $this.removeClass('visible').hide();
+                                }
+                            });
+                        });
+
+                        //hide or show the no product message for each tab
+                        $('.tab-pane').each(function () {
+                            var visibleProds = $(this).find('[data-prodid].visible');
+                            if (!visibleProds.length) {
+                                $(this).find('.noProdMessage').addClass('visible').show();
+                            } else {
+                                $(this).find('.noProdMessage').removeClass('visible').hide();
+                            }
+                        });
+                    }
+                });
+            }
+
+            filterProducts();
+
+            $('#filterContainer').on('change', 'input[type=radio], select', function () { setTimeout(filterProducts, 100); });
+
+            $('#productTabs').on('click', '.infoButton, .orderButton', function (e) {
+                BuildUrl($(this), e);
+            });
+
+            function BuildUrl($button, e) {
+                e.preventDefault();
+                var $this = $button;
+                var href = $this.attr("href");
+                var selectedOption = $('#contractFilter label.active > input').data('contract') == 'm2m' ? 1 : 2;;
+                var isTwoOptions = $this.data('istwocontractoptions');
+                window.location = href + '&contractTerm=' + selectedOption + '&isTwoOptions=' + isTwoOptions;
+            }
+
+            //comments were breaking the code below inside the if block -> check Register.cshtml for the same code block with comments
+            @if (isQuickOrder == true)
+            {
+                <text>
+
+            var mouseLastYPos = null;
+            $(document).mousemove(function (e) {
+                if (mouseLastYPos) {
+                    if (e.pageY < mouseLastYPos && e.pageY <= 30) {
+                        if (typeof Cookies.get('hideManageContactsDialog') == "undefined") {
+                            $('#notifyUserToManageContact').modal('show');
+                        }
+                    }
+                }
+                mouseLastYPos = e.pageY;
+            });
+
+            $('#manageContactsBtn').click(function () {
+                $('#manageISPContactDialog').modal('show');
+            });
+
+            $('input[name=contactOption]').change(function () {
+                switch ($(this).val()) {
+                    case "1":
+                        option1();
+                        break;
+                    case "2":
+                        option2();
+                        break;
+                    case "3":
+                        option3();
+                        break;
+                }
+            });
+
+            $('#okModalBtn').click(function () {
+                if (resolveISPContacts()) {
+                    $('#manageISPContactDialog').modal('toggle');
+                }
+            });
+
+            function option1() {
+                $('#option3').hide();
+                $('#option2').hide();
+                $('#option1').show();
+            }
+
+            function option2() {
+                $('#option3').hide();
+                $('#option1').hide();
+                $('#option2').show();
+            }
+
+            function option3() {
+                $('#option1').hide();
+                $('#option2').hide();
+                $('#option3').show();
+            }
+
+            function resolveISPContacts() {
+                var selectedOption = $('input[name=contactOption]:checked').val();
+
+                if (!selectedOption.length) {
+                    alert('Please select a contact option.');
+                    return false;
+                }
+
+                if (selectedOption == "1") {
+                    $('.option2ISP').val('');
+                    if (!$('#option1ISP').val()) {
+                        alert('Please select an ISP');
+                        return false;
+                    }
+                    saveISPContacts([$('#option1ISP').val()]);
+                    return true;
+                }
+
+                if (selectedOption == "2") {
+                    $('#option1ISP').val('');
+
+                    var invalidItems = $('.option2ISP').filter(function () {
+                        return !this.value;
+                    });
+
+                    if (invalidItems.length) {
+                        alert('Please select three ISPs');
+                        return false;
+                    }
+
+                    var ispIds = $('.option2ISP').map(function () { return this.value }).get();
+                    saveISPContacts(ispIds);
+                    return true;
+                }
+
+                if (selectedOption == "3") {
+                    $('#option1ISP').val('');
+                    $('.option2ISP').val('');
+                    return true;
+                }
+
+                return false;
+            }
+
+            function saveISPContacts(ids) {
+                $.ajax({
+                    url: '@Url.Action("SaveISPContacts", "Portal")',
+                    dataType: 'json',
+                    type: 'GET',
+                    data: { ids: ids },
+                    traditional: true,
+                    success: function (data) {
+                        if (data) {
+                            $('#notifyUserToManageContact').modal('toggle');
+                            Cookies.set('hideManageContactsDialog', true, { expires: 1 });
+                        }
+                    }
+                });
+            }
+            </text>
+            }
+        })
+    </script>
+}

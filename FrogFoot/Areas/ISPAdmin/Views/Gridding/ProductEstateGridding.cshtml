@@ -1,0 +1,74 @@
+﻿@model FrogFoot.Areas.ISPAdmin.Models.GriddingViewModel
+
+<table class="prodGridTable">
+    <thead>
+        <tr>
+            <td style="border: none;"><input id="backBtn" type="button" class="btn btn-primary" value="< Back"/></td>
+            @foreach (var prod in Model.ISPProducts)
+            {
+                <th class="rotate"><div><span>@prod.ProductName @prod.LineSpeed @(prod.IsCapped ? "capped" : "uncapped") @prod.MonthlyCost</span></div></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+
+    @{
+        var loc = Model.Estates.First().Location;
+    }
+
+        <!-- Show Location Gridding for Child Estate comparison-->
+        <tr class="suburbHeader">
+            <td class="name">
+                <span>@loc.Name</span>
+                <span>(suburb)</span>
+            </td>
+
+            @foreach (var prod in Model.ISPProducts)
+            {
+                <td>
+                    @{
+                        var ispProdLoc = loc.ISPLocationProducts.FirstOrDefault(x => x.ISPProductId == prod.ISPProductId);
+                    }
+                    @if (ispProdLoc == null)
+                    {
+                        <div class="gridBlock" data-prodgridid="" data-locationid="@loc.LocationId" data-prodid="@prod.ISPProductId">
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="gridBlock glyphicon glyphicon-ok" data-prodgridid="@ispProdLoc.ISPLocationProductId" data-locationid="@loc.LocationId" data-prodid="@prod.ISPProductId">
+                        </div>
+                    }
+                </td>
+            }
+        </tr>
+
+        @foreach (var est in Model.Estates)
+        {
+            <tr>
+                <td class="name">
+                    <span>@est.Name</span>
+                </td>
+
+                @foreach (var prod in Model.ISPProducts)
+                {
+                    <td>
+                        @{
+                            var ispProdEst = est.ISPEstateProducts.FirstOrDefault(x => x.ISPProductId == prod.ISPProductId);
+                        }
+                        @if (ispProdEst == null)
+                        {
+                            <div class="gridBlock" data-prodgridid="" data-estateid="@est.EstateId" data-prodid="@prod.ISPProductId">
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="gridBlock glyphicon glyphicon-ok" data-prodgridid="@ispProdEst.ISPEstateProductId" data-estateid="@est.LocationId" data-prodid="@prod.ISPProductId">
+                            </div>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

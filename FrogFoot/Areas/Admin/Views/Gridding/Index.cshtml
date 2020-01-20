@@ -1,0 +1,166 @@
+﻿@model FrogFoot.Areas.Admin.Models.GriddingViewModel
+@{
+    ViewBag.Title = "Gridding";
+}
+<style type="text/css">
+    .prodGridTable {
+        margin-top: 60px;
+    }
+
+     th.rotate {
+         height: 140px;
+         white-space: nowrap;
+         /*width: 15px;*/
+     }
+
+    th.rotate > div {
+        transform: translate(20px, 51px) rotate(315deg);
+        width: 30px;
+        margin-left: -5px;
+    }
+
+    th.rotate > div > span {
+        margin-top: 3px;   
+        border-bottom: 1px solid #ccc;
+    }
+
+    .name {
+        padding-left: 5px;
+        padding-right: 5px;
+        font-weight: bolder;
+        min-width: 100px;
+    }
+
+    .suburbHeader {
+        background-color: lightblue;
+    }
+
+    .gridBlock {
+        height: 30px;
+        font-size: 17px;
+        cursor: pointer;
+        padding-top: 3px;
+        padding-left: 3px;
+    }
+
+    .gridBlock:hover {
+        background-color: lightgray;   
+    }
+
+    td {
+        border: solid grey 1px
+    }
+
+    .loading {
+        background-image: url('/Content/ajax-loader.gif');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        opacity: 0.7;
+    }
+</style>
+
+<h2>ISP/Product Gridding</h2>
+
+<div class="row">
+    <div class="col-xs-12 form-group">
+        @Html.DropDownListFor(x => x.ISPId, new SelectList(Model.ISPs, "ISPId", "Name", Model.ISPId), "Select ISP", new { @class = "form-control" })
+    </div>
+</div>
+
+<div id="loadingSpinner" class="col-sm-offset-5 col-sm-1" style="display: none;">
+    <img src="~/Content/ajax-loader.gif" alt="Loading..." />
+</div>
+
+<div id="griddingResults">
+    @* Ajax gridding table results *@
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+
+            function LoadLocationGridding() {
+                $('#loadingSpinner').show();
+                $.ajax({
+                    type: "GET",
+                    dataType: "html",
+                    url: '@Url.Action("ProductLocationGridding", "Gridding")',
+                    contentType: 'application/json',
+                    data: { ispId: $('#ISPId').val() },
+                    success: function (data) {
+                        $('#loadingSpinner').hide();
+                        $('#griddingResults').html(data);
+                    }
+                });
+            }
+
+            $('#ISPId').change(function () {
+                LoadLocationGridding();
+            });
+
+            $('#griddingResults').on('click', '#backBtn', function() {
+                LoadLocationGridding();
+            });
+
+            $('#griddingResults').on('click', '.estateBtn', function () {
+                $('#loadingSpinner').show();
+                $.ajax({
+                    type: "GET",
+                    dataType: "html",
+                    url: '@Url.Action("ProductEstateGridding", "Gridding")',
+                    contentType: 'application/json',
+                    data: { locId: $(this).data('locid'), ispId: $('#ISPId').val() },
+                    success: function (data) {
+                        $('#loadingSpinner').hide();
+                        $('#griddingResults').html(data);
+                    }
+                });
+            });
+
+            //update product gridding
+            $('#griddingResults').on('click', '.gridBlock', function () {
+                var block = $(this);
+                var prodId = block.data('prodid');
+                var locId = block.data('locationid');
+                var estId = block.data('estateid');
+                var ispId = $('#ISPId').val();
+                var prodGridId = block.data('prodgridid');
+
+                //if locId is null then we are looking at the Estate grid
+                var url = locId != null ?
+                    '@Url.Action("UpdateProductLocationGridding", "Gridding")' :
+                    '@Url.Action("UpdateProductEstateGridding", "Gridding")';
+
+                block.addClass('loading');
+
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: url,
+                    contentType: 'application/json',
+                    data: {
+                        prodId: prodId,
+                        locId: locId,
+                        estId: estId,
+                        ispId: ispId,
+                        prodGridId: prodGridId
+                    },
+                    success: function (data) {
+                        block.removeClass('loading');
+                        if (data.gridId != null) {
+                            //adds new id to the block
+                            block.data('prodgridid', data.gridId);
+                            block.addClass('glyphicon glyphicon-ok');
+                        } else {
+                            //removes id from deleted gridded item
+                            block.data('prodgridid', '');
+                            block.removeClass('glyphicon glyphicon-ok');
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+}

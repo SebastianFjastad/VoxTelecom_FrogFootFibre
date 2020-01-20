@@ -1,0 +1,74 @@
+﻿@model FrogFoot.Abstract.IEstateDiscountViewModel
+
+@{
+    ViewBag.Title = "Estate discount";
+}
+
+<h2>@Model.Estate.Name ISP Discounts</h2>
+
+<div class="form-group">
+    <table class="table table-striped table-responsive">
+        <thead>
+            <tr>
+                <td><label>Name</label></td>
+                <td>Discount</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Estate.ISPEstateDiscounts != null)
+            {
+                foreach (var disc in Model.Estate.ISPEstateDiscounts)
+                {
+                    @Html.Partial("_DiscountRow", disc)
+                }
+            }
+
+            @foreach (var isp in Model.ISPs)
+            {
+                <tr class="discountRow">
+                    <td>@Html.TextBoxFor(x => isp.Name, new { @class = "form-control" })</td>
+                    <td>
+                        @Html.EnumDropDownListFor(d => d.Discount, new { @class = "form-control discount" })
+                    </td>
+                    <td>
+                        <input type="button" class="btn btn-default saveDiscount" value="Save"
+                               data-discountid=""
+                               data-ispid="@isp.ISPId"
+                               data-estateid="@Model.Estate.EstateId" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('.saveDiscount').click(function () {
+                var $this = $(this);
+                var discountId = $this.data('discountid');
+                var estateId = $this.data('estateid');
+                var ispId = $this.data('ispid');
+                var discount = $this.closest('.discountRow').find('.discount').val();
+
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("SaveDiscount", "Gridding")',
+                    contentType: 'application/json',
+                    data: { discountId: discountId, estateId: estateId, ispid: ispId, discount: discount },
+                    success: function (result) {
+                        if (result.success) {
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+}
+
+

@@ -1,0 +1,527 @@
+﻿@using FrogFoot.Entities
+@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model Order
+
+@{
+    ViewBag.Title = "Details";
+}
+
+@functions
+{
+    private string FormatAmount(decimal? amount)
+    {
+        if (amount == null) return "0";
+        return string.Format("{0:#,##0.00}", amount);
+    }
+}
+
+@{
+    FFProduct lineProd = Model.OrderFFProducts.First(p => p.FFProduct.Type == ProductType.LineSpeed).FFProduct;
+    decimal? _unitPriceMonthly = 0;
+    //estate discount
+    var discount = Model.ISP.ISPEstateDiscounts.FirstOrDefault(d => d.EstateId == Model.Client.EstateId);
+    decimal? setupCost = 0;
+    decimal? ffSetupCost = 0;
+    var setupCostInitial = Model.ISPProduct.Is24MClient ? Model.ISPProduct.SetupCost : Model.ISPProduct.M2MSetupCost;
+    //if estate discount
+    if (discount != null)
+    {
+        setupCost = (Convert.ToDecimal(setupCostInitial)) - (Convert.ToDecimal(discount.Discount) / (decimal)100.0) * Convert.ToDecimal(setupCostInitial);
+        ffSetupCost = (Convert.ToDecimal(lineProd.UnitPriceOnceOff)) - (Convert.ToDecimal(discount.Discount) / (decimal)100.0) * Convert.ToDecimal(lineProd.UnitPriceOnceOff);
+    }
+    else
+    {
+        setupCost = setupCostInitial;
+        ffSetupCost = lineProd.UnitPriceOnceOff;
+    }
+
+    decimal? onceOffSub = 0;
+    decimal? monthlySub = 0;
+
+    if (Model.ISPProduct.IsM2MFrogfootLink)
+    {
+        //if the link is month to month, if it m2m is paid upfront then use 24 month price
+        monthlySub = Model.ISPProduct.OnceOfFFPaymentForM2M ? Model.OrderFFProducts.Sum(p => p.FFProduct.M2MUnitPriceMonthly * p.Quantity) : Model.OrderFFProducts.Sum(p => p.FFProduct.UnitPriceMonthly * p.Quantity);
+        onceOffSub = Model.ISPProduct.OnceOfFFPaymentForM2M ?
+            Model.OrderFFProducts.Where(p => p.FFProduct.Type != ProductType.LineSpeed).Sum(p => p.FFProduct.UnitPriceOnceOff * p.Quantity) + ffSetupCost + lineProd.M2MUnitPriceOnceOff
+            : Model.OrderFFProducts.Where(p => p.FFProduct.Type != ProductType.LineSpeed).Sum(p => p.FFProduct.UnitPriceOnceOff * p.Quantity) + ffSetupCost;
+        _unitPriceMonthly = lineProd.M2MUnitPriceMonthly;
+    }
+    else
+    {
+        monthlySub = Model.OrderFFProducts.Sum(p => p.FFProduct.UnitPriceMonthly * p.Quantity);
+        _unitPriceMonthly = lineProd.UnitPriceMonthly;
+        onceOffSub = Model.OrderFFProducts.Where(p => p.FFProduct.Type != ProductType.LineSpeed).Sum(p => p.FFProduct.UnitPriceOnceOff * p.Quantity) + ffSetupCost;
+    }
+
+    var onceOffVat = (decimal) 0.14*onceOffSub;
+    var monthlyVat = (decimal) 0.14*monthlySub;
+
+    var onceOffTot = onceOffSub + onceOffVat;
+    var monthlyTot = monthlySub + monthlyVat;
+
+   
+
+   
+
+    //special
+    var special = Model.IsSpecial == true ? Model.Special : null;
+
+    //if special
+    if (special != null)
+    {
+        setupCost = setupCost - ((int)special.Discount)*setupCost/100;
+    }
+}
+
+<style type="text/css">
+    .orderTable td, .orderTable th {
+                text-align: right;
+            }
+
+        .orderTable td:first-of-type, .orderTable th:first-of-type {
+            text-align: left;
+        }
+
+    .col-md-9 {
+        padding-top: 7px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-xs-4">
+        <h2>Service Order</h2>
+    </div>
+    <div class="col-xs-2">
+        <h2>
+            @Model.ISP.Name
+        </h2>
+    </div>
+    <div class="col-xs-5">
+        <div class="form-group" style="font-size: 26px; margin-top: 20px;">
+            <div class="col-md-8">
+                @Html.LabelFor(model => model.Status, new { @class = "control-label" })
+                @Html.DisplayFor(model => model.Status, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="form-group">
+    <div class="row">
+        <label class="control-label col-md-2" for="ISPOrderNo">
+            @Model.ISP.Name Order no
+            <span class="glyphicon glyphicon-info-sign" style="margin-top: 7px; color: green;" data-toggle="tooltip" title="This refers to the unique identifier allocated to this order in the ISP's information system"></span>
+        </label>
+
+        <div class="col-sm-2">
+            @Html.DisplayFor(model => model.ISPOrderNo, new { htmlAttributes = new { @class = "form-control", placeholder = "Please provide" } })
+        </div>
+
+        <label class="control-label col-sm-2" for="FFOrderNo">Frogfoot Order no.</label>
+        <div class="col-sm-4">
+            @Html.DisplayFor(model => model.FFOrderNo, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="row">
+        <label class="control-label col-sm-2" for="CreateDate">Created date</label>
+        <div class="col-sm-2">
+            @Model.CreatedDate.Date()
+        </div>
+        
+        <label class="control-label col-sm-2" for="CreateByRole">Created by</label>
+        <div class="col-sm-2">
+            @Html.DisplayFor(model => model.CreatedByRole, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+</div>
+
+<h3>Client details</h3>
+<hr />
+<input id="orderStatus" style="display: none;" value="@Model.Status" />
+<input id="orderId" style="display: none;" value="@Model.OrderId" />
+
+<div class="row">
+    <div class="form-horizontal">
+        <div class="col-sm-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.FirstName, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.LastName, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.Email, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Email, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="Client_PhoneNumber">Cell no.</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.Landline, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Landline, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            @if (!Model.Client.IsOwner)
+    {
+                <div class="form-group">
+                    <label for="Client_OwnerName" class="control-label col-md-3">Owner name</label>
+                    <div class="col-md-9">
+                        @Html.DisplayFor(m => m.Client.OwnerName, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Client_OwnerPhoneNumber" class="control-label col-md-3">Owner ph no.</label>
+                    <div class="col-md-9">
+                        @Html.DisplayFor(m => m.Client.OwnerPhoneNumber, new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="control-label col-md-3" for="Client_Location_Name">Precinct</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Location.Name, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            @if (Model.Client.Estate != null)
+    {
+                <div class="form-group">
+                    <label class="control-label col-md-3" for="Client_Estate_Name">Estate</label>
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.Estate.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.Latitude, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Latitude, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.Longitude, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Longitude, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Client.Address, new { @class = "control-label col-md-3" })
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Client.Address, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            @if (!Model.Client.IsOwner)
+    {
+                <div class="form-group">
+                    <label for="Client_OwnerEmail" class="control-label col-md-3">Owner email</label>
+                    <div class="col-md-9">
+                        @Html.DisplayFor(m => m.Client.OwnerEmail, new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.Client.HasAltContact)
+    {
+    <div class="row">
+        <div class="form-horizontal">
+            <div class="col-xs-12">
+                <h4>On-site contact</h4>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Client.AltFirstName, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.AltFirstName, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Client.AltLastName, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.AltLastName, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Client.AltEmail, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.AltEmail, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Client.AltCellNo, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.AltCellNo, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Client.AltLandline, new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.Client.AltLandline, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Product</h3>
+<hr />
+<div class="row">
+    <div class="form-horizontal">
+
+        <div class="col-sm-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISP.ISPCode, new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.ISP.ISPCode, new {htmlAttributes = new {@class = "form-control"}})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISPProduct.ProductName, new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.ISPProduct.ProductName, new {htmlAttributes = new {@class = "form-control"}})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISPProduct.LineSpeed, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.ISPProduct.LineSpeed, new {htmlAttributes = new {@class = "form-control"}})
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISPProduct.UpSpeed, new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.ISPProduct.UpSpeed, new {@class = "form-control", @style = "width: 200px!important; display: inline"})
+                    <label style="display: inline;">Mbps</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISPProduct.IsCapped, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.CheckBoxFor(model => model.ISPProduct.IsCapped, new {htmlAttributes = new {@class = "checkbox"}})
+                </div>
+            </div>
+
+            <div id="capAmount" class="form-group" style="display: none;">
+                @Html.LabelFor(model => model.ISPProduct.Cap, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.ISPProduct.Cap, new {htmlAttributes = new {@class = "form-control", @style = "width: 200px!important; display: inline", @type = "number"}})
+                    <label style="display: inline;">Gb</label>
+                </div>
+            </div>
+
+            @if (Model.ClientContractTerm == ContractTerm.Month24)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.MonthlyCost, htmlAttributes: new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.ISPProduct.MonthlyCost, new {htmlAttributes = new {@class = "form-control"}}) (VAT incl.)
+                    </div>
+                </div>
+            }
+            else if (Model.ClientContractTerm == ContractTerm.MonthToMonth)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.M2MMonthlyCost, htmlAttributes: new {@class = "control-label col-md-3"})
+                    <div class="col-md-9">
+                        @Html.DisplayFor(model => model.ISPProduct.M2MMonthlyCost, new {htmlAttributes = new {@class = "form-control"}}) (VAT incl.)
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <label class="control-label col-md-3" for="ISPProduct_SetupCost">Setup cost</label>
+                <div class="col-md-9">
+                    @FormatAmount(setupCost)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.IsSpecial == true && Model.Special != null)
+{
+    <div class="alert alert-info"><strong>@Model.Special.SpecialType.GetDisplayName() special applied</strong></div>
+}
+
+<h3>Frogfoot order</h3>
+<hr />
+<div class="row">
+    <div class="col-md-9">
+        <table class="table table-bordered orderTable">
+            <thead>
+                <tr>
+                    <th><label>Product / Service</label></th>
+                    <th><label>Quantity</label></th>
+                    <th><label>Once-off Fee</label></th>
+                    <th><label>Monthly Fee</label></th>
+                    <th><label>Once-off Total</label></th>
+                    <th><label>Monthly Total</label></th>
+                </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>@Html.DisplayFor(model => lineProd.Name)</td>
+                <td>1</td>
+                <td>@FormatAmount(ffSetupCost)</td>
+                <td>@FormatAmount(_unitPriceMonthly)</td>
+                <td>@FormatAmount(ffSetupCost)</td>
+                <td>@FormatAmount(_unitPriceMonthly)</td>
+            </tr>
+
+                <tr>
+                    <td>Once Off Link Cost</td>
+                    <td>@(Model.ISPProduct.OnceOfFFPaymentForM2M ? 1 : 0)</td>
+                    <td>@FormatAmount(lineProd.M2MUnitPriceOnceOff)</td>
+                    <td>0</td>
+                    <td>@(Model.ISPProduct.OnceOfFFPaymentForM2M ? FormatAmount(lineProd.M2MUnitPriceOnceOff) : "0")</td>
+                    <td>0</td>
+                </tr>
+
+            @foreach (var p in Model.OrderFFProducts.Where(p => p.FFProduct.Type == ProductType.Quantity))
+            {
+                    <tr>
+                        <td>@p.FFProduct.Name</td>
+                        <td>
+                            @p.Quantity
+                        </td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceOnceOff)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceMonthly)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceOnceOff * p.Quantity)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceMonthly * p.Quantity)</td>
+                    </tr>
+                }
+
+                @foreach (var p in Model.OrderFFProducts.Where(p => p.FFProduct.Type == ProductType.Option))
+            {
+                    <tr>
+                        <td>@p.FFProduct.Name</td>
+                        <td>
+                            @p.Quantity
+                        </td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceOnceOff)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceMonthly)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceOnceOff)</td>
+                        <td>@FormatAmount(p.FFProduct.UnitPriceMonthly)</td>
+                    </tr>
+                }
+
+                <tr>
+                    <td colspan="4">Sub-Total (VAT excl.)</td>
+                    <td>@FormatAmount(onceOffSub)</td>
+                    <td>@FormatAmount(monthlySub)</td>
+                </tr>
+                <tr>
+                    <td colspan="4">VAT (14%)</td>
+                    <td>@FormatAmount(onceOffVat)</td>
+                    <td>@FormatAmount(monthlyVat)</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Total  (VAT incl.)</td>
+                    <td>@FormatAmount(onceOffTot)</td>
+                    <td>@FormatAmount(monthlyTot)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<h3>Order PDFs</h3>
+<hr />
+<div class="row">
+    <table class="table table-striped table-condensed col-sm-8">
+        <thead>
+        <tr>
+            <td>PDF Name</td>
+            <td></td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var doc in Model.PDFs.OrderBy(d => d.CreatedDate))
+        {
+            <tr>
+                <td>@doc.Name</td>
+                <td>
+                    @Html.ActionLink("View", "ViewPDF", new {id = doc.AssetId}, new {@target = "_blank"})
+                </td>
+                <td>
+                    @Html.ActionLink("Download", "DownloadPDF", new {id = doc.AssetId})
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+</div>
+
+@Html.Partial("_UserActions", Model)
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            if ($('#ISPProduct_IsCapped').is(':checked')) {
+                $('#capAmount').show();
+            } else {
+                $('#capAmount').hide();
+            }
+
+            $('#saveMessage').click(function () {
+                var message = $('#orderMessage').val();
+                var orderId = @Model.OrderId;
+
+                if (!message.length) return alert("Please enter a message");
+                $.ajax({
+                    url: '@Url.Action("SaveMessage", "Order")',
+                    type: "GET",
+                    dataType: "json",
+                    data: { orderId: orderId, message: $('#orderMessage').val() },
+                    success: function (data) {
+                        $('#orderMessage').val('');
+                        $('#logTableRows').append('<tr><td>Message</td><td></td><td>' + data.User.FirstName + ' ' + data.User.LastName + '</td><td> ' + data.User.Email + '</td><td> ' + moment(data.TimeStamp).format("dddd, MMMM D YYYY, h:mm:ss a") + '</td><td> ' + data.Message + '</td></tr>');
+                        $('#saveMessageSuccessResult').show().delay(3000).fadeOut('slow');
+                    }
+                });
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

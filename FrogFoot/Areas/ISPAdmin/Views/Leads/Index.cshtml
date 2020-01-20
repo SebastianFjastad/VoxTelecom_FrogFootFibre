@@ -1,0 +1,268 @@
+﻿@model FrogFoot.Entities.ISP
+@{
+    ViewBag.Title = "Leads";
+}
+<link href="~/Content/toastr.min.css" rel="stylesheet" />
+<style>
+    .show {
+        display: block;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .ordered {
+        font-weight: bolder;
+        color: red; 
+    }
+</style>
+
+<h2>Leads</h2>
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Leads Terms & Conditions
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <div class="col-sm-8">
+                    <p>
+                        Ongoing access to leads from the Frogfoot portal is provided at Frogfoot’s discretion. Frogfoot takes no responsibility for the accuracy and integrity of the information. In registering on the portal, residents have acknowledged that their contact information will be provided to Frogfoot affiliated ISPs, but only for the purpose of supplying the residents with fibre broadband.
+                    </p>
+                    <p>
+                        Frogfoot reserves the right to temporarily or permanently restrict any ISP’s access to these leads should Frogfoot receive sufficient negative feedback from residents claiming that the ISP in question is :
+                        <ol type="a">
+                            <li>ignoring the fact that a resident has already placed an order with another ISP</li>
+                            <li>ignoring the fact that a resident has requested that the ISP cease and desist from contacting them</li>
+                            <li>spamming residents, or</li>
+                            <li>otherwise abusing the information provided here.</li>
+                        </ol>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p style="margin: 15px 0;"><strong>Read the T&Cs above</strong>. If we have reason to believe you are abusing this facility and causing damage to the Frogfoot brand, we will terminate ​your ​access to the leads.</p>
+<hr/>
+
+@if (Model.AllowViewLeads)
+{
+    <div class="row form-group">
+        <div class="col-xs-12">
+            <table id="clientsTable" class="table">
+                <thead>
+                    <tr>
+                        <th data-orderable="false">FirstName</th>
+                        <th data-orderable="false">LastName</th>
+                        <th data-orderable="false">Address</th>
+                        <th>Precinct</th>
+                        <th>Zone</th>
+                        <th>ZoneStatus</th>
+                        <th data-orderable="false">Select</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Ajax table row results-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <h3>You do not currently have any leads to view.</h3>
+    <label>Either Admin has not made any available yet or you have been blocked for abuse.</label>
+}
+
+<h3>Clients To Contact</h3>
+@if (Model.AllowViewLeads)
+{
+    <div class="form-group">
+        <table id="leadsTable">
+            <thead>
+                <tr>
+                    <th data-orderable="false">FirstName</th>
+                    <th data-orderable="false">LastName</th>
+                    <th data-orderable="false">Address</th>
+                    <th>Precinct</th>
+                    <th>Zone</th>
+                    <th>ZoneStatus</th>
+                    <th>Email</th>
+                    <th>Cell</th>
+                    <th>Landline</th>
+                    <th>SMS</th>
+                    <th>Ordered</th>
+                    <th data-orderable="false">Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Ajax table row results-->
+            </tbody>
+        </table>
+    </div>
+}
+
+@section scripts
+{
+<script src="~/Scripts/toastr.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            //if ISP is allowed to see leads then initalize both tables
+            if ($('#clientsTable').length) {
+                var clientsTable = $('#clientsTable').DataTable({
+                    "paging": true,
+                    "serverSide": true,
+                    "order": [],
+                    "ajax": {
+                        "type": "POST",
+                        "url": '@Url.Action("ClientDataHandler")',
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function(data) { return data = JSON.stringify(data) }
+                    },
+                    "processing": true,
+                    "deferRender": true,
+                    "columns": [
+                        { "data": "FirstName" },
+                        { "data": "LastName" },
+                        { "data": "Address" },
+                        { "data": "Precinct" },
+                        { "data": "Zone" },
+                        { "data": "ZoneStatus" },
+                        { "data": "Id" }
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [6],
+                            "render": function(data) {
+                                return '<button class="btn btn-primary selectBtn" data-userid="' + data + '">Select</button>';
+                            }
+                        }
+                    ]
+                });
+
+                var leadsTable = $('#leadsTable').DataTable({
+                    "paging": true,
+                    "serverSide": true,
+                    "order": [],
+                    "ajax": {
+                        "type": "POST",
+                        "url": '@Url.Action("LeadsDataHandler")',
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function(data) { return data = JSON.stringify(data) }
+                    },
+                    "processing": true,
+                    "deferRender": true,
+                    "columns": [
+                        { "data": "FirstName" },
+                        { "data": "LastName" },
+                        { "data": "Address" },
+                        { "data": "Precinct" },
+                        { "data": "Zone" },
+                        { "data": "ZoneStatus" },
+                        { "data": "Email" },
+                        { "data": "PhoneNumber" },
+                        { "data": "Landline" },
+                        { "data": "IsSMS" },
+                        { "data": "Ordered" },
+                        { "data": "Id" }
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [6], //Email
+                            "render": function(data, type, row) {
+                                var allowed = row["ShowEmail"];
+                                var visibility = row["IsClientContacted"] ? 'show' : 'hide';
+                                var tdData = row["Ordered"] != "Yes" && allowed ? data : '';
+                                return '<span class="' + visibility + '">' + tdData + '</span>';
+                            }
+                        },
+                        {
+                            "targets": [7], //PhoneNumber
+                            "render": function(data, type, row) {
+                                var allowed = row["ShowCell"];
+                                return renderCell(data, row, allowed);
+                            }
+                        },
+                        {
+                            "targets": [8], //Landline
+                            "render": function(data, type, row) {
+                                var allowed = row["ShowLandline"];
+                                return renderCell(data, row, allowed);
+                            }
+                        },
+                        {
+                            "targets": [9], //SMS
+                            "render": function(data, type, row) {
+                                var allowed = row["IsSMS"] == "Yes";
+                                return renderCell(data, row, allowed);
+                            }
+                        },
+                        {
+                            "targets": [10], //Ordered
+                            "render": function(data) {
+                                var orderedClass = data == "Yes" ? "ordered" : '';
+                                return '<span class="' + orderedClass + '">' + data + '</span>';
+                            }
+                        },
+                        {
+                            "targets": [11], //Contact button
+                            "render": function(data, type, row) {
+                                return row["IsClientContacted"] == false ? '<button class="btn btn-primary makeContact" data-userid="' + data + '">Show Details</button>' : '';
+                            }
+                        }
+                    ]
+                });
+            }
+
+            function renderCell(data, row, allowed) {
+                if (data == null) return ''; 
+                var visibility = row["IsClientContacted"] ? 'show' : 'hide';
+                var tdData = row["Ordered"] != "Yes" && allowed ? data : '';
+                return '<span class="' + visibility +'">' + tdData + '</span>';
+            }
+
+            //create ISP Client Contact
+            $('#clientsTable').on('click', '.selectBtn', function() {
+                var $addLeadBtn = $(this);
+                $.ajax({
+                    url: '@Url.Action("CreateISPClientContact")',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { clientId: $addLeadBtn.data('userid'), ispId: @Model.ISPId },
+                    success: function() {
+                        //reload the leads table to fetch the new addition
+                        leadsTable.ajax.reload(null, false);
+
+                        //hide the existing user from user's table
+                        $addLeadBtn.closest('tr').remove();
+
+                        toastr["success"]('Successfully added a client to your leads group.', 'Added!');
+                    }
+                });
+            });
+
+            $('#leadsTable').on('click', '.makeContact', function() {
+                var $contactBtn = $(this);
+                $.ajax({
+                    url: '@Url.Action("MakeISPContact")',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: { clientId: $contactBtn.data('userid'), ispId: @Model.ISPId },
+                    success: function() {
+                        //show the selected td by hiding the classes
+                        $contactBtn.closest('tr').find('.hide').removeClass('hide').addClass('show');
+                        $contactBtn.hide();
+                        toastr["info"]('We have logged that you have made contact.', 'Contact details loaded');
+                    }
+                });
+            });
+        })
+    </script>
+}
+

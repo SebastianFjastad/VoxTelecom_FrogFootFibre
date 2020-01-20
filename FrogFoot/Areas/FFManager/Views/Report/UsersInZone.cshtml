@@ -1,0 +1,68 @@
+﻿@model FrogFoot.Areas.Admin.Models.UsersInZoneViewModel
+@{
+    ViewBag.Title = "Users In Zone";
+}
+
+<h2>Users In Zone</h2>
+
+@using (Html.BeginForm("ExportUsersInZoneReport", "Report", FormMethod.Get, new { id = "usersInZoneForm" }))
+{
+    <div class="row form-group">
+        <div class="col-sm-3">
+            <select id="precinctSelect" name="precinctCode" class="form-control">
+                <option value="">Select Precinct</option>
+                @foreach (var p in Model.Precincts)
+                {
+                    <option value="@p.PrecinctCode">@p.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-sm-3">
+            <select id="zoneSelect" class="form-control" name="zoneId" style="display: none;">
+                <option value="">Select a Zone</option>
+                @foreach (var z in Model.Zones)
+                {
+                    <option class="hasVal" value="@z.ZoneId" data-precinctcode="@z.PrecinctCode">@z.Code</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-sm-2">
+            <input type="submit" value="Submit" class="btn btn-primary" />
+        </div>
+    </div>
+}
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#precinctSelect').change(function () {
+                var precinctCode = $(this).val();
+                $('#zoneSelect').val('');
+                if (precinctCode.length) {
+                    var zoneList = [];
+                    zoneList = $('#zoneSelect > option').filter(function () {
+                        return $(this).data('precinctcode') == precinctCode;
+                    });
+                    $('#zoneSelect > option.hasVal').hide();
+                    zoneList.show();
+                    $('#zoneSelect').show();
+                } else {
+                    $('#zoneSelect').hide();
+                }
+            });
+
+            $('#usersInZoneForm').submit(function () {
+                if ($('#precinctSelect').val() == '') {
+                    alert("Please make sure you at least select a Precinct.");
+                    return false;
+                }
+            });
+        })
+    </script>
+}
+
+
+

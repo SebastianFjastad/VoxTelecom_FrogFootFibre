@@ -1,0 +1,279 @@
+﻿@using FrogFoot.Utilities
+@model FrogFoot.Entities.ISPProduct
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<style type="text/css">
+    .productContainer {
+        margin-top: 20px;
+        font-size: 20px;
+        padding: 30px;
+        color: rgb(120, 120, 120);
+        border: 1px solid lightgray;
+    }
+
+    .hr {
+        border-color: lightgrey;
+    }
+
+    .logo {
+        min-height: 50px;
+        width: 230px;
+    }
+
+    .prodName {
+        font-size: 24px;
+    }
+
+    .cost {
+        font-size: 24px;
+    }
+
+    .description {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .bandwidthContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .upDownSpeed {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .glyphicon {
+        top: 3px;
+        margin-right: 15px;
+    }
+
+    .attrContainer {
+        padding-top: 15px;
+    }
+
+    .subheadingContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .infoBox {
+        margin-top: 15px;
+        font-size: 18px;
+    }
+
+    .orderButton {
+        height: 50px;
+        margin-top: 15px;
+        color: white;
+        width: 100%;
+        border-radius: 0;
+        background-color: green;
+        font-size: 20px;
+    }
+
+    .backButtonContainer {
+        margin-top: 30px;
+        font-size: 20px;
+    }
+
+    .backButton {
+        color: green;
+        cursor: pointer;
+    }
+
+    .title {
+        color: rgb(120, 120, 120);
+    }
+
+    .chevron {
+        color: green;
+    }
+</style>
+
+<div class="row">
+    <div class="col-xs-2">
+        <div class="backButtonContainer">
+            <span class="glyphicon glyphicon-menu-left chevron"></span>
+            <span class="backButton">Back</span>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="productContainer col-sm-10">
+        <div class="row">
+            <div class="col-sm-4">
+                @if (Model.ISPLogo != null)
+                {
+                    <div class="logo" style="background: url('/Assets/ISPProductLogo/@Model.ISPLogo.AssetPath') center no-repeat;"></div>
+                }
+                else
+                {
+                    <h3 class="logo">@Model.ISP.Name</h3>
+                }
+            </div>
+            <div class="col-sm-4">
+                <div class="prodName">@Model.ProductName</div>
+            </div>
+            <div class="col-sm-2">
+                <div>
+                    <div class="cost">R@(Model.Is24MClient ? Model.MonthlyCost : Model.M2MMonthlyCost)</div>
+                    <span style="font-size: 16px;">per month</span>
+                </div>
+            </div> <div class="col-sm-2">
+                <div>
+                    <div class="cost">R@(Model.Is24MClient ? Model.SetupCost : Model.M2MSetupCost)</div>
+                    <span style="font-size: 16px;">setup</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="hr" />
+
+        <div class="description">
+            @Model.Description
+        </div>
+
+        <div class="bandwidthContainer">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-download"></span><span class="downSpeed">@Model.LineSpeed.GetDisplayName()</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-cloud-download"></span><span class="upSpeed">@(Model.IsCapped ? "Capped" : "Uncapped")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bandwidthContainer" style="margin-top: 5px;">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-upload"></span><span class="upSpeed">@Model.UpSpeed Mbps</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-step-forward"></span><span class="downSpeed">@(Model.IsCapped ? Model.Cap + " GB" : "n/a")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="attrContainer"></div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@Model.Attr1</li>
+                    <li>@Model.Attr2</li>
+                </ul>
+            </div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@Model.Attr3</li>
+                    <li>@Model.Attr4</li>
+                </ul>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Info1Heading) || !string.IsNullOrEmpty(Model.Info2Heading))
+        {
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(Model.Info1Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info1Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.Info2Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info2Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info1
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info2
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Info3Heading) || !string.IsNullOrEmpty(Model.Info4Heading))
+        {
+            <div class="col-xs-12" style="margin-top: 15px; margin-bottom: 15px;">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(Model.Info3Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info3Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.Info4Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info4Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info3
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info4
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-sm-offset-4 col-xs-4">
+                <input class="btn btn-success orderButton" type="button" value="Order now" />
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('.backButton').click(function () {
+                history.go(-1);
+                return false;
+            });
+        })
+    </script>
+}
+

@@ -1,0 +1,88 @@
+﻿@model List<FrogFoot.Areas.Home.Models.User>
+@{
+    ViewBag.Title = "Users";
+}
+
+@{
+    var notification = TempData["Notification"] as string;
+}
+
+<h2>Users</h2>
+
+@if (!string.IsNullOrEmpty(notification))
+{
+    <div id="notification" class="alert alert-success">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        @notification
+    </div>
+}
+
+<p class="form-group">
+    @Html.ActionLink("Create New", "Create", null, new {@class = "btn btn-success"})
+</p>
+
+
+<table id="usersTable" class="table">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Cell No.
+            </th>
+            <th>
+                Is Admin
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(u => user.FirstName)
+                    @Html.DisplayFor(u => user.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(u => user.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(u => user.PhoneNumber)
+                <td>
+                    @Html.DisplayFor(u => user.IsUserTypeAdmin)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new {userId = user.Id}) |
+                    @Html.ActionLink("Delete", "Delete", new { userId = user.Id}, new { @class = "delete"})
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#usersTable').DataTable({
+                "paging": true,
+                "ordering": true
+            });
+
+            $("#usersTable").on('click', '.delete', function() {
+                if (confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+                    return true;
+                }
+                return false;
+            });
+
+            $('#notification').delay(3000).fadeOut('fast');
+        })
+    </script>
+}
+

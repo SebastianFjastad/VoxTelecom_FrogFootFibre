@@ -1,0 +1,45 @@
+﻿@model FrogFoot.Areas.Home.Models.User
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "User", FormMethod.Post, new { role = "form" }))
+{
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.Email, new { @class = "form-control", placeholder = "Email address" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.FirstName, new { @class = "form-control", placeholder = "First name" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.LastName, new { @class = "form-control", placeholder = "Last name" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.PhoneNumber, new { @class = "form-control", placeholder = "Phone No" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(n => n.IsUserTypeAdmin)
+        @Html.CheckBoxFor(n => n.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+    </div>
+
+    if (!string.IsNullOrEmpty(ViewBag.UserExistsMessage))
+    {
+        <div class="col-sm-6">
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                @ViewBag.UserExistsMessage
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <input type="submit" class="btn btn-success" value="Save" />
+            </div>
+        </div>
+    </div>
+}
+

@@ -1,0 +1,933 @@
+﻿@using System.Linq
+@using FrogFoot.Models
+@model FrogFoot.Areas.Admin.Models.OrderViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<style type="text/css">
+    .formLabel {
+        background-color: lightgray;
+        font-weight: bolder;
+    }
+
+    .selectLine {
+        border: 0px;
+        outline: 0px;
+        width: 300px;
+    }
+
+    .colWidth {
+        width: 80px;
+    }
+
+    .checkColWidth {
+        width: 40px;
+    }
+
+    input[type=checkbox] {
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(1.5); /* IE */
+        -moz-transform: scale(1.5); /* FF */
+        -webkit-transform: scale(1.5); /* Safari and Chrome */
+        -o-transform: scale(1.5); /* Opera */
+        padding: 10px;
+    }
+
+    .numberCol {
+        text-align: right;
+    }
+
+    /*autocomplete styling*/
+    .ui-autocomplete {
+        background: white;
+        border-radius: 0;
+        width: 160px;
+    }
+
+    ul.ui-autocomplete {
+        padding-left: 10px;
+        border: green 1px solid;
+        list-style-type: none;
+        padding-bottom: 10px;
+    }
+
+        ul.ui-autocomplete.ui-menu li {
+            font-size: 16px !important;
+            color: #4a4a4a;
+            padding-top: 6px;
+            cursor: pointer;
+        }
+
+            ul.ui-autocomplete.ui-menu li:hover {
+                font-weight: bolder;
+            }
+
+    .ui-helper-hidden-accessible {
+        display: none;
+    }
+</style>
+
+<h2>Service Order</h2>
+
+@if (TempData["IsAbleToOrderForUser"] as bool? == false)
+{
+    <div class="row">
+        <div class="col-sm-12 form-group">
+            <div class="alert alert-danger"><strong>Unable to place order:</strong> the Zone you are trying to order for is not open for ordering</div>
+        </div>
+    </div>
+}
+
+@using (Html.BeginForm("Create", "Order", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @*Form header info*@
+
+    <div class="row">
+        <div class="form-horizontal">
+
+            <input id="EstateId" name="Order.Client.EstateId" style="display: none;" value="" />
+            <input id="userId" name="Order.Client.Id" style="display: none;" value="" />
+            <input id="ispProductId" name="Order.ISPProductId" style="display: none;" value="" />
+            <input id="ispProductClientContractTerm" name="Order.ClientContractTerm" style="display: none;" value="" />
+            <input id="isM2MLink" type="text" style="display: none;" />
+            <input id="suburbName" name="SuburbName" type="text" style="display: none;" />
+
+            <select class="form-control" style="display: none;">
+                <option class="estate default" value="-1">Not in estate</option>
+
+                @foreach (var estate in Model.Estates)
+                {
+                    <option class="estate" data-locationid="@estate.LocationId" value="@estate.EstateId">@estate.Name</option>
+                }
+            </select>
+
+            <div class="row">
+                <div class="form-group">
+                    <div class="col-sm-4">
+                        @if (Model.Order.Client == null)
+                        {
+                        <input id="Order_Client_LocationId" name="Order.Client.LocationId" style="display: none;" value="" />
+
+                        <label for="clientSearch" class="control-label col-md-3">Email Address</label>
+                        <div class="col-md-9">
+                            <input type="text" id="clientSearch" data-val="true" data-val-required="The Email field is required." data-val-email="The Email field is not a valid e-mail address." name="Order.Client.Email" class="form-control" />
+                            <span class="field-validation-valid text-danger" data-valmsg-for="Order.Client.Email" data-valmsg-replace="true"></span>
+                        </div>
+                        }
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.EditorFor(model => model.Order.Client.Latitude, new { htmlAttributes = new { @class = "form-control", @placeholder = "-33.932291", @data_val = "true", @data_val_required = "The Latitude field is required." } })
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Order.Client.Latitude" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-sm-2">
+                        @Html.EditorFor(model => model.Order.Client.Longitude, new { htmlAttributes = new { @class = "form-control", @placeholder = "18.451312", @data_val = "true", @data_val_required = "The Longitude field is required." } })
+                        @Html.ValidationMessageFor(model => model.Order.Client.Longitude, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-sm-2">
+                        <input id="checkUserOrderStatus" class="btn btn-primary" type="button" value="Check User Status">
+                    </div>
+                </div>
+
+                <div id="userOrderStatusResult" class="col-sm-12" ></div>
+                <div id="zoneSpecialCheckResult"></div>
+
+                <div class="col-sm-12">
+                    <hr />
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+
+                <div class="form-group">
+                    <label class="control-label col-md-2" for="Order_LocationId">Precinct</label>
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.Order.LocationId, new SelectList(Model.Locations, "LocationId", "Name", 1), "Select Precinct", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Order.LocationId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div id="estateSelectConatiner" class="form-group" style="display: none;">
+                    <input id="estateId" name="Order.Client.EstateId" style="display: none;" value="" />
+                    <label class="control-label col-md-2" style="margin-right: 15px;" for="estatesSelect">Estate</label>
+                    <select id="estatesSelect" class="form-control"></select>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.Client.FirstName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Order.Client.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Order.Client.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.Client.LastName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Order.Client.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Order.Client.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <div class="col-md-1 col-md-offset-2">
+                        @Html.CheckBoxFor(m => m.Order.Client.IsOwner, new { @class = "checkbox" })
+                    </div>
+                    <div class="col-xs-9">
+                        Client is property owner
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Order_Client_OwnerName" class="control-label col-md-2">Owner name</label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.OwnerName, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div id="hasAltContactContainer" class="form-group" style="margin-top: 30px;">
+                    <div class="col-xs-2  col-sm-offset-2">
+                        @Html.CheckBoxFor(m => m.Order.Client.HasAltContact, new { @class = "checkbox" })
+                    </div>
+                    <div class="col-xs-8">
+                        Specify on-site contact details for the fibre installation teams.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.Client.Address, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Order.Client.Address, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @data_val_required = "The Address field is required." } })
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Order.Client.Address" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label col-xs-2" for="Order_Client_PhoneNumber">Cell No.</label>
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Order.Client.PhoneNumber, new { htmlAttributes = new { @class = "form-control", @data_val = "true", @data_val_required = "The Phone Number field is required." } })
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Order.Client.PhoneNumber" data-valmsg-replace="true"></span>
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Order.Client.Landline, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Order.Client.Landline, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 55px;">
+                    <label for="Order_Client_OwnerPhoneNumber" class="control-label col-md-2">Owner ph no.</label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.OwnerPhoneNumber, new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Order_Client_OwnerEmail" class="control-label col-md-2">Owner email</label>
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.OwnerEmail, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="altContactContainer" class="form-horizontal" style="display: none;">
+            <div class="col-xs-12">
+                <h3>On-site contact</h3>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Order.Client.AltFirstName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.AltFirstName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Order.Client.AltLastName, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.AltLastName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Order.Client.AltEmail, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.AltEmail, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Order.Client.AltEmail, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Order.Client.AltCellNo, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.AltCellNo, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Order.Client.AltLandline, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Order.Client.AltLandline, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3>ISP products</h3>
+    <hr />
+
+    <table id="productTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Prod name</th>
+                <th>Down speed</th>
+                <th>Up speed</th>
+                <th>ISP</th>
+                <th>Cost/pm</th>
+                <th>Capped</th>
+                <th style="max-width: 80px;">ISP Once Off Payment</th>
+                <th>M2M Link</th>
+                <th>ISP Client Contract</th>
+                <th>Selected</th>
+            </tr>
+        </thead>
+        <tbody id="productTableBody">
+            @{
+                if (Model.ISPProducts != null && Model.ISPProducts.Any())
+                {
+                    foreach (var prod in Model.ISPProducts.OrderBy(p => p.ISPId))
+                    {
+                        <tr>
+                            <td>@prod.ProductName</td>
+                            <td>@prod.LineSpeed</td>
+                            <td>@prod.UpSpeed</td>
+                            <td>@prod.ISP.Name</td>
+                            <td>@prod.MonthlyCost</td>
+                            <td><input type="radio" @(prod.IsCapped ? "checked='checked'" : "") /></td>
+                            <td><input type="radio" @(prod.OnceOfFFPaymentForM2M ? "checked='checked'" : "") /></td>
+                            <td><input type="radio" @(prod.IsM2MFrogfootLink ? "checked='checked'" : "") /></td>
+                            <td class="contractOptionContainer">
+                                @if (prod.IsM2MClient)
+                                {
+                                    //default to checked if only option
+                                    var isChecked = prod.IsM2MClient && !prod.Is24MClient;
+                                    <input class="radio radio-inline" data-contract="1" type="radio" @(isChecked ? "checked='checked'" : "") name="@("contractOption" + prod.ISPProductId)"><label>Monthly</label>
+                                }
+
+                                @if (prod.Is24MClient)
+                                {
+                                    //default to checked if only option
+                                    var isChecked = prod.Is24MClient && !prod.IsM2MClient;
+                                    <input class="radio radio-inline" data-contract="2" type="radio" @(isChecked ? "checked='checked'" : "") name="@("contractOption" + prod.ISPProductId)"><label>24 Month</label>
+                                }
+                            </td>
+                            <td>
+                                <input type="checkbox" class="checkbox selectedProd"
+                                       data-prodid="@prod.ISPProductId"
+                                       data-linespeed="@((int) prod.LineSpeed)"
+                                       data-ism2mlink="@prod.IsM2MFrogfootLink"
+                                       data-isonceoffpayment="@prod.OnceOfFFPaymentForM2M" />
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </tbody>
+    </table>
+
+    <h3>Frogfoot products</h3>
+    <hr />
+                //Product info
+                foreach (var p in Model.Products)
+                {
+                    <div id="prod@(p.FFProductId)" class="hidden"
+                         data-onceoff="@p.UnitPriceOnceOff"
+                         data-monthly="@p.UnitPriceMonthly"
+                         data-m2mlink="@p.M2MUnitPriceMonthly"
+                         data-m2monceoff="@p.M2MUnitPriceOnceOff"></div>
+                }
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <td><label>Product / Service</label></td>
+                                    <td class="numberCol"><label>Quantity</label></td>
+                                    <td class="numberCol"><label>Once-off Fee</label></td>
+                                    <td class="numberCol"><label>Monthly Fee</label></td>
+                                    <td class="numberCol"><label>Once-off Total</label></td>
+                                    <td class="numberCol"><label>Monthly Total</label></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        @Html.DropDownListFor(model => model.Order.FFProductId, new SelectList(Model.Products.Where(p => p.Type == ProductType.LineSpeed), "FFProductId", "Name", 0), "Select Line Speed", new { @class = "selectLine", @disabled = "disabled" })
+                                        <br />@Html.ValidationMessageFor(model => model.Order.FFProductId, "", new { @class = "text-danger", style = "margin-top: 5px;" })
+                                    </td>
+                                    <td>1</td>
+                                    <td class="colWidth onceoff">0</td>
+                                    <td class="colWidth monthly">0</td>
+                                    <td class="onceoffAmount">0</td>
+                                    <td class="monthlyAmount">0</td>
+                                </tr>
+                                <tr id="onceOffCostRow">
+                                    <td>Once Off Link Cost</td>
+                                    <td id="onceOffLinkQty">0</td>
+                                    <td id="onceOffLinkCost">0</td>
+                                    <td>0</td>
+                                    <td class="onceoffAmount">0</td>
+                                    <td class="monthlyAmount">0</td>
+                                </tr>
+                                @foreach (var p in Model.Products.Where(p => p.Type == ProductType.Quantity))
+                                {
+                                    <tr>
+                                        <td>@p.Name</td>
+                                        <td>
+                                            @Html.Hidden("QuantityId", p.FFProductId)
+                                            @Html.TextBox("QuantityQty", 0, new { @class = "form-control", type = "number", min = 0 })
+                                        </td>
+                                        <td class="onceoff">@(p.UnitPriceOnceOff ?? 0)</td>
+                                        <td class="monthly">@p.UnitPriceMonthly</td>
+                                        <td class="onceoffAmount">0</td>
+                                        <td class="monthlyAmount">0</td>
+                                    </tr>
+                                }
+
+                                @foreach (var p in Model.Products.Where(p => p.Type == ProductType.Option))
+                                {
+                                    <tr>
+                                        <td>@p.Name</td>
+                                        <td>
+                                            @Html.Hidden("OptionId", p.FFProductId)
+                                            @Html.CheckBox("Option", new { @class = "checkbox" })
+                                        </td>
+                                        <td class="onceoff">@(p.UnitPriceOnceOff ?? 0)</td>
+                                        <td class="monthly">@(p.UnitPriceMonthly ?? 0)</td>
+                                        <td>
+                                            <div class="onceoffAmount">0</div>
+                                        </td>
+                                        <td>
+                                            <div class="monthlyAmount">0</div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                <tr>
+                                    <td colspan="4">Sub-Total (VAT excl.)</td>
+                                    <td id="onceOffSubtotal">0</td>
+                                    <td id="monthlySubtotal">0</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">VAT (14%)</td>
+                                    <td id="onceOffVat">0</td>
+                                    <td id="monthlyVat">0</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">Total (VAT incl.)</td>
+                                    <td id="onceOffTotal">0</td>
+                                    <td id="monthlyTotal">0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <div class="col-xs-4 form-group">
+                            <input id="createOrder" type="submit" value="Create" class="btn btn-success" />
+                        </div>
+                    </div>
+                </div>
+                }
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(function () {
+            $('#productTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "fnDrawCallback": function () {
+                    SetSelectedProd();
+                }
+            });
+
+            //#region Alt Contact
+            $('#Order_Client_HasAltContact').click(function () {
+                if (this.checked) {
+                    $('#altContactContainer').show();
+                } else {
+                    $('#altContactContainer').hide();
+                    $('#altContactContainer').find('input:text').val('');
+                }
+            });
+
+            function ValidateAltContact() {
+                if ($('#Order_Client_HasAltContact').is(':checked')) {
+                    var altVals = $('#altContactContainer').find('input');
+                    for (var i = 0; i < altVals.length; i++) {
+                        if (!$(altVals[i]).val()) {
+                            alert("Please fill all on-site contact fields if on-site contact specified.");
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            //#endregion
+
+            $('#createOrder').click(function () {
+                if (CheckIsOwnerCanSubmit() && ValidateAltContact()) {
+                    //if no prod was ever selected or no prod is checked after prod filtering
+                    if (!$('#ispProductId').val() || !$('.selectedProd').is(':checked')) {
+                        if (alert('Please select an ISP product.')) {
+                            return true;
+                        }
+                        return false;
+                    }
+
+                    //if creating for a new user
+                    if (!$('#userId').val()) {
+                        if (confirm('Because the client does not exist, creating this order will create the clients profile.')) {
+                            return true;
+                        }
+                        return false;
+                    }
+                    return true;
+                }
+                alert("If the client is not the owner of the house you must specify the owner\'s contact details.");
+                return false;
+            });
+
+            // #region IsOwner
+            $('#Order_Client_IsOwner').click(function () {
+                if ($(this).is(':checked')) {
+                    $('#Order_Client_OwnerName').prop('disabled', true);
+                    $('#Order_Client_OwnerEmail').prop('disabled', true);
+                    $('#Order_Client_OwnerPhoneNumber').prop('disabled', true);
+
+                } else {
+                    $('#Order_Client_OwnerName').prop('disabled', false);
+                    $('#Order_Client_OwnerEmail').prop('disabled', false);
+                    $('#Order_Client_OwnerPhoneNumber').prop('disabled', false);
+                }
+            });
+
+            function CheckIsOwnerCanSubmit() {
+                var isOwner = $('#Order_Client_IsOwner').is(':checked');
+                var name = $('#Order_Client_OwnerName').val();
+                var number = $('#Order_Client_OwnerPhoneNumber').val();
+                var email = $('#Order_Client_OwnerEmail').val();
+
+                if (!isOwner) {
+                    if (name && number && email) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            // #endregion
+
+            //when suburb dropdown changes show estate select
+            $('#Order_LocationId').change(function () {
+                var selectedLoc = $('#Order_LocationId').val();
+                $('#suburbName').val($('option:selected', this).text());
+                if (!selectedLoc) {
+                    $('#suburbName').val('');
+                    $("#EstateId").val('');
+                    $("#estatesSelect").empty().parent().hide();
+                    return;
+                }
+
+                GetFilteredProducts(selectedLoc, null, null);
+
+                //filter estates based on selected suburb
+                var estates = $('option.estate.default, option.estate[data-locationid=' + selectedLoc + ']').clone().removeClass('default');
+                $("#estatesSelect").empty().append(estates);
+
+                if (estates.length > 1) {
+                    $('#estatesSelect').parent().show();
+                } else {
+                    $('#estatesSelect').parent().hide();
+                    $("#EstateId").val('');
+                }
+            });
+
+            //show estate select if user in estate
+            if ($('#userEstateId').length > 0 && $('#userEstateId').val() > 0) {
+                $('#estatesSelect').val($('#userEstateId').val());
+                $('#estatesSelect').parent().show();
+            }
+
+            $('#estatesSelect').change(function () {
+                var estateId = $(this).val();
+
+                //"no estate" = -1; if no estate, set id to null
+                var inEstateId = estateId == -1 ? null : estateId;
+
+                $("#EstateId").val(inEstateId);
+
+                GetFilteredProducts($('#Order_LocationId').val(), inEstateId, null);
+            });
+
+            //selected ISP and FF products
+            var selISPProdId;
+            var selFFProdId;
+
+            //create variable to check selected prod against when paging
+            var curISPProdId;
+            var setupCosts = $('.setupCost').clone();
+            //apply discounts to prod table
+            function ApplyDiscount(estateId) {
+                if (discounts.length && estateId != null) {
+                    //check if there is a discount obj with estateId
+                    var item = $.grep(discounts, function (n, i) {
+                        return (n.estateId == estateId);
+                    });
+
+                    if (item.length) {
+                        $('.setupCost').each(function (i) {
+                            var cost = $(setupCosts[i]).text();
+                            $(this).text((cost - ((item[0].discount / 100) * (cost))).toFixed(2));
+                        });
+
+                        var onceoffVal = $('.onceoff').text();
+                        var discountedVal = (onceoffVal - ((item[0].discount / 100) * (onceoffVal)).toFixed(2));
+                        $('.onceoff').text(discountedVal);
+                        $('.onceoffAmount').text(discountedVal);
+                        UpdateValues();
+                    } else {
+                        //set the val back to original
+                        $('.onceoff').text(1500.00);
+                        UpdateValues();
+                    }
+                }
+            }
+
+
+            $('#productTable').on('click', '.selectedProd', function () {
+                var $this = $(this);
+                var optionName = 'contractOption' + $this.data('prodid');
+
+                //force contract to be selected before checking product
+                if (!$('input[name=' + optionName + ']:checked').length) {
+                    alert('Please select a contract option on this product');
+                    return false;
+                }
+
+                //set the contract selection for saving
+                $('#ispProductClientContractTerm').val($this.closest('tr').find('.contractOptionContainer').find('.radio:checked').data('contract'));
+
+                //uncheck all boxes
+                $('.selectedProd').prop('checked', false);
+
+                //check selected
+                $this.prop('checked', true);
+                $('#ispProductId').val($this.data('prodid'));
+
+                //set prod id for pagination compare
+                curISPProdId = $this.data('prodid');
+
+                //set linespeed from checkbox
+                $('.selectLine').val($this.data('linespeed'));
+                selISPProdId = $this.data('prodid');
+                $('#Order_FFProductId').change();
+                selFFProdId = $this.data('linespeed');
+                ApplyDiscount($('#estatesSelect').val());
+            });
+
+            //update selected product on page change
+            function SetSelectedProd() {
+                $('.selectedProd').prop('checked', false);
+                $('[data-prodid="' + curISPProdId + '"]').prop('checked', true);
+            }
+
+            //check if user exists, if they have an order, or if they are allowed to order
+            $('#checkUserOrderStatus').click(function () {
+                var email = $('#clientSearch').val();
+                var lat = $('#Order_Client_Latitude').val();
+                var lng = $('#Order_Client_Longitude').val();
+
+                if (email == '' && (lat == '' || lng == '')) {
+                    alert("Please enter email or lat-long to check user order status");
+                    return;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("GetUserOrderStatus", "Order")',
+                    type: "GET",
+                    dataType: "json",
+                    data: { email: email, lat: lat, lng: lng },
+                    success: function (data) {
+                        if (data.Client != null) {
+                            if (data.UserHasOrder) {
+                                $('#userOrderStatusResult').html('<div class="form-group col-xs-12"><div class="alert alert-warning">Client exists but already has an order</div></div>');
+                            }
+                            if (data.UserAllowedToOrder) {
+                                $('#userOrderStatusResult').html('<div class="form-group"><div class="alert alert-success col-xs-12">Client exists and is able to order</div></div>');
+                            } else {
+                                $('#userOrderStatusResult').html('<div class="form-group col-xs-12"><div class="alert alert-warning">Client exists but cannot order (Frogfoot has blocked ordering)</div></div>');
+                            }
+                            AutoFillClientForm(data.Client);
+                        } else if (data.UserAllowedToOrder) {
+                            $('#userOrderStatusResult').html('<div class="form-group col-xs-12"><div class="alert alert-success">Able to order for the entered co-ordinates</div></div>');
+                        } else {
+                            $('#userOrderStatusResult').html('<div class="form-group col-xs-12"><div class="alert alert-warning">Unable to order for the entered co-ordinates (Frogfoot has blocked ordering)</div></div>');
+                        }
+
+                        if (data.Special != null) {
+                            //if is Early Bird special
+                            if (data.Special.SpecialType == 1) {
+                                $('#zoneSpecialCheckResult').empty().html('<div class="form-group col-xs-12"><div class="alert alert-info">Early Bird special applies to this order.</div></div>').show();
+                            }
+                            //if is Just In Time special
+                            if (data.Special.SpecialType == 2) {
+                                $('#zoneSpecialCheckResult').empty().html('<div class="form-group col-xs-12"><div class="alert alert-info">Just In Time special applies to this order.</div></div>').show();
+                            }
+                        }
+
+                        $('#userOrderStatusResult').show().delay(5000).fadeOut('slow');
+                    }
+                });
+
+            });
+
+            function AutoFillClientForm(data) {
+                $('#Order_Client_Email').val(data.EmailAddress);
+                $('#Order_LocationId').val(data.LocationId);
+                $('#locationId').val(data.LocationId);
+                $('#userId').val(data.Id);
+
+                if (data.EstateId > 0) {
+
+                    var estate = $('option.estate.default, option.estate[data-locationid=' + data.LocationId + ']').clone().removeClass('default');
+                    $("#estatesSelect").empty().append(estate);
+                    $('#estatesSelect').val(data.EstateId);
+                    $('#EstateId').val(data.EstateId);
+                    $('#estateSelectConatiner').show();
+                }
+
+                $('#Order_Client_FirstName').val(data.FirstName);
+                $('#Order_Client_LastName').val(data.LastName);
+                $('#Order_Client_Address').val(data.Address);
+                $('#Order_Client_PhoneNumber').val(data.PhoneNumber);
+                $('#Order_Client_Landline').val(data.Landline);
+                $('#Order_Client_Latitude').val(data.Latitude);
+                $('#Order_Client_Longitude').val(data.Longitude);
+
+                if (data.HasAltContact) {
+                    //populate alt contact
+                    $('#Order_Client_HasAltContact').prop('checked', true);
+                    $('#Order_Client_AltFirstName').val(data.AltFirstName);
+                    $('#Order_Client_AltLastName').val(data.AltLastName);
+                    $('#Order_Client_AltEmail').val(data.AltEmail);
+                    $('#Order_Client_AltCellNo').val(data.AltCellNo);
+                    $('#Order_Client_AltLandline').val(data.AltLandline);
+                    //show alt contact
+                    $('#altContactContainer').show();
+                }
+
+                //hide checkbox if result found to keep existing client preferences
+                $('#hasAltContactContainer').hide();
+
+                GetFilteredProducts(data.LocationId, data.EstateId, null);
+            }
+
+            //use GetFIlteredProducts to retrieve products when a location or estat param changes
+            function GetFilteredProducts(locId, estateId, ispId) {
+                //show spinner
+                $.ajax({
+                    url: '@Url.Action("IncludedProducts", "Order")',
+                    type: "GET",
+                    dataType: "html",
+                    data: { locId: locId, estateId: estateId, ispId: ispId },
+                    success: function (data) {
+                        //show spinner
+                        $('#productTableBody').html(data);
+                        ApplyDiscount(estateId);
+                        //redraw datatable
+                        $('#productTable').DataTable({
+                            "bDestroy": true,
+                            "paging": true,
+                            "ordering": true,
+                            "fnDrawCallback": function () {
+                                SetSelectedProd();
+                            }
+                        });
+                    }
+                });
+            };
+
+            $('#clientSearch').autocomplete({
+                source: '@Url.Action("ClientSearch", "Order")',
+                minLength: 7,
+                select: function (event, ui) {
+                    event.preventDefault();
+                    $("#clientSearch").val(ui.item.label);
+                    $.ajax({
+                        url: '@Url.Action("GetClient", "Order")',
+                        type: "GET",
+                        dataType: "json",
+                        data: { clientId: ui.item.value },
+                        success: function (data) {
+                            AutoFillClientForm(data);
+                        }
+                    });
+                },
+                open: function (ui) {
+                    $(".ui-autocomplete").css("z-index", 1000);
+                },
+                focus: function (event, ui) {
+                    event.preventDefault();
+                    $("#clientSearch").val(ui.item.label);
+                }
+            });
+
+
+            function UpdateValues() {
+                var onceoffSubtotal = 0;
+                var onceoffVat = 0;
+                var onceoffTotal = 0;
+
+                var monthlySubtotal = 0;
+                var monthlyVat = 0;
+                var monthlyTotal = 0;
+
+                $('.onceoffAmount').each(function () {
+                    onceoffSubtotal += parseFloat($(this).text());
+                });
+
+                $('.monthlyAmount').each(function () {
+                    monthlySubtotal += parseFloat($(this).text());
+                });
+
+                onceoffVat = onceoffSubtotal * .14;
+                monthlyVat = monthlySubtotal * .14;
+
+                onceoffTotal = onceoffSubtotal + onceoffVat;
+                monthlyTotal = monthlySubtotal + monthlyVat;
+
+                $('#onceOffSubtotal').text(onceoffSubtotal.toFixed(2));
+                $('#onceOffVat').text(onceoffVat.toFixed(2));
+                $('#onceOffTotal').text(onceoffTotal.toFixed(2));
+
+                $('#monthlySubtotal').text(monthlySubtotal.toFixed(2));
+                $('#monthlyVat').text(monthlyVat.toFixed(2));
+                $('#monthlyTotal').text(monthlyTotal.toFixed(2));
+            }
+
+            function UpdateFFProduct(dropdown, useM2MCost, useFFOnceOff) {
+                var prodId = dropdown.val();
+                var $product = $('#prod' + prodId);
+                var tr = dropdown.closest('tr');
+                var onceOff = 0;
+                var monthly = 0;
+
+                var $onceOffRow = $('#onceOffCostRow');
+                var onceOffLinkCost = $product.data('m2monceoff');
+                var onceOffQty = 0;
+
+
+                if (prodId != "") {
+                    //if M2M cost is selected than use M2M cost
+                    if (useM2MCost == true) {
+                        onceOff = $product.data('onceoff');
+
+                        //if ISP Prod is once off link then apply that pricing
+                        if (useFFOnceOff == true) {
+                            onceOffQty = 1;
+                            $onceOffRow.find('.onceoffAmount').text(onceOffLinkCost);
+                            monthly = $product.data('monthly');
+                        } else {
+                            monthly = $product.data('m2mlink');
+                            $onceOffRow.find('.onceoffAmount').text(0);
+                        }
+                    } else {
+                        onceOff = $product.data('onceoff');
+                        monthly = $product.data('monthly');
+                    }
+                }
+
+                tr.find('.onceoff').text(onceOff);
+                tr.find('.monthly').text(monthly);
+                tr.find('.onceoffAmount').text(onceOff);
+                tr.find('.monthlyAmount').text(monthly);
+
+                $onceOffRow.find('#onceOffLinkQty').text(onceOffQty);
+                $onceOffRow.find('#onceOffLinkCost').text(onceOffLinkCost);
+
+                UpdateValues();
+            }
+
+            //product dropdown
+            $('#Order_FFProductId').on('change', function () {
+                var $this = $(this);
+                var $selectedISPProd = $('[data-prodid="' + curISPProdId + '"]');
+                var useM2MCost = $selectedISPProd.data('ism2mlink') == 'True' ? true : false;
+                var useFFOnceOff = $selectedISPProd.data('isonceoffpayment') == 'True' ? true : false;
+
+                UpdateFFProduct($this, useM2MCost, useFFOnceOff);
+                UpdateValues();
+            });
+
+            //force the firing of the product dropdown on the radio button change event
+            $('#productTable').on('click', '.radio', function () {
+                //set the contract selection for saving
+                $('#ispProductClientContractTerm').val($(this).data('contract'));
+                $('#Order_FFProductId').change();
+            });
+
+            $("input[name='QuantityQty']").change(function () {
+                var qty = $(this).val();
+                var tr = $(this).closest('tr');
+                var onceOff = parseFloat(tr.find('.onceoff').text());
+                var monthly = parseFloat(tr.find('.monthly').text());
+
+                var monthlyAmount = monthly * qty;
+
+                if (qty == 0) {
+                    onceOff = 0;
+                }
+
+                tr.find('.onceoffAmount').text(onceOff);
+                tr.find('.monthlyAmount').text(monthlyAmount);
+
+                UpdateValues();
+            });
+
+            $("input[name='Option']").change(function () {
+                var val = $(this).is(':checked');
+                var tr = $(this).closest('tr');
+                var onceOff = 0;
+                var monthly = 0;
+                if (val == true) {
+                    onceOff = parseFloat(tr.find('.onceoff').text());
+                    monthly = parseFloat(tr.find('.monthly').text());
+                }
+
+                tr.find('.onceoffAmount').text(onceOff);
+                tr.find('.monthlyAmount').text(monthly);
+
+                UpdateValues();
+            });
+        });
+    </script>
+}

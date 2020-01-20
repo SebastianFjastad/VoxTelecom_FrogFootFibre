@@ -1,0 +1,51 @@
+﻿@model FrogFoot.Areas.Home.Models.RegisterViewModel
+
+<select class="form-control" style="display: none;">
+    <option class="estate default" value="-1">Not in estate</option>
+
+    @foreach (var estate in Model.Estates)
+    {
+        <option class="estate" data-locationid="@estate.LocationId" data-code="@estate.EstateCode" value="@estate.EstateId">@estate.Name</option>
+    }
+</select>
+
+<div class="row">
+    <div class="col-md-7">
+        <!-- Map -->
+        <div class="form-group">
+            <div id="map-canvas" style="height: 450px;"></div>
+        </div>
+        <div id="map-results"></div>
+    </div>
+
+    <div class="col-sm-5">
+        <!--Location filters-->
+        <div class="form-group">
+            <select id="LocationId" name="LocationId" class="form-control" data-val="true" data-val-required="Please select a suburb.">
+                <option value="">Select a Suburb</option>
+                @foreach (var item in Model.Locations)
+            {
+                    <option value="@item.LocationId" data-code="@item.PrecinctCode">@item.Name</option>
+                }
+            </select>
+            <span class="field-validation-valid text-danger" data-valmsg-for="LocationId" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="form-group" style="display: none;">
+            <select id="estatesSelect" class="form-control" tabindex="2"></select>
+        </div>
+
+        <div class="form-group" style="display: none;">
+            <select class="form-control" id="pac-select">
+                <option value="">Select Suburb</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <input id="pac-input" class="form-control" name="Address" type="text" placeholder="Street address" autocomplete="off" data-val="true" data-val-required="Please enter an address.">
+            <span class="field-validation-valid text-danger" data-valmsg-for="Address" data-valmsg-replace="true"></span>
+            <span style="color: grey; font-size: 13px;">Move pin to exact location if inaccurate</span>
+        </div>
+        <!--End Location Filters-->
+    </div>
+</div>

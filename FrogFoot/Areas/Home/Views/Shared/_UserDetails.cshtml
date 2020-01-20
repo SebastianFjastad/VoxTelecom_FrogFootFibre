@@ -1,0 +1,45 @@
+﻿@model FrogFoot.Areas.Home.Models.RegisterViewModel
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control", @tabindex = 3, @placeholder = "First name" })
+    @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.LastName, new { @class = "form-control", @tabindex = 4, @placeholder = "Last name" })
+    @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", @tabindex = 5, @placeholder = "Email" })
+    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", @tabindex = 6, @placeholder = "Cell No." })
+    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.TextBoxFor(m => m.Landline, new { @class = "form-control", @tabindex = 7, @placeholder = "Landline" })
+</div>
+
+<div class="form-group">
+    @Html.PasswordFor(m => m.Password, new { @class = "form-control", @tabindex = 8, @placeholder = "Password" })
+    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group">
+    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @tabindex = 9, @placeholder = "Confirm password" })
+    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+</div>
+
+<div class="form-group row">
+    <div class="col-xs-12">
+        <div style="display: inline">
+            <input id="confirmCheckbox" name="confirmCheckbox" type="checkbox" style="display: inline; margin-right: 10px; margin-bottom: 3px;" class="checkbox" data-val="true" data-val-required="Please accept terms and conditions" />
+            By registering I hereby give Frogfoot permission to share my contact information with Internet Service Providers
+            offering packages via Frogfoot fibre for the express purpose of providing me with Internet Access.
+        </div>
+    </div>
+</div>

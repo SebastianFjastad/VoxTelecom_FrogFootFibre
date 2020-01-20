@@ -1,0 +1,657 @@
+﻿@using FrogFoot.Entities
+@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Areas.Client.Models.ProductViewModel
+
+@{
+    ViewBag.Title = "Confirm Order";
+}
+
+@functions
+{
+    private string FormatAmount(decimal? amount)
+    {
+        return string.Format("R{0:#,##0.00}", amount);
+    }
+}
+
+<style type="text/css">
+    .orderButton {
+        height: 50px;
+        margin-top: 15px;
+        color: white;
+        width: 100%;
+        border-radius: 0;
+        background-color: green;
+        font-size: 20px;
+    }
+
+    .panel-title {
+        cursor: pointer;
+    }
+
+    .specialInfo {
+        color: Red;
+        font-weight: bolder;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    #manageISPContactDialog .modal-dialog {
+        width: 700px;
+    }
+
+    #manageISPContactDialog label {
+        cursor: pointer;
+    }
+</style>
+
+@{
+    var estateDiscount = Model.Product.ISP.ISPEstateDiscounts.FirstOrDefault(d => d.EstateId == Model.User.EstateId);
+    var contractTerm = ViewBag.ContractTerm;
+
+    decimal? setupCost = 0;
+    var setupCostInitial = ViewBag.ContractTerm == ContractTerm.Month24 ? Model.Product.SetupCost : Model.Product.M2MSetupCost;
+    var monthlyCost = ViewBag.ContractTerm == ContractTerm.Month24 ? Model.Product.MonthlyCost : Model.Product.M2MMonthlyCost;
+
+    if (estateDiscount != null)
+    {
+        setupCost = (Convert.ToDecimal(setupCostInitial)) - (Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(setupCostInitial);
+    }
+    else
+    {
+        setupCost = setupCostInitial;
+    }
+
+    Special special = new Special();
+    if (Model.User.Zone != null)
+    {
+        //find the applicable special
+        if (Model.User.Zone.Status == TrenchingStatus.Undefined)
+        {
+            special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.EarlyBird);
+        }
+        else if (Model.User.Zone.Status == TrenchingStatus.HasDates)
+        {
+            special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.JustInTime);
+        }
+    }
+
+    //apply special if applicable
+    if (Model.User.Zone != null &&  Model.Product.IsSpecial == true && special != null && Model.User.Zone.AllowSpecial)
+    {
+        var discount = (int)special.Discount;
+        setupCost = setupCost - (discount * setupCost / 100);
+    }
+}
+
+@if (Model.Orders.Any())
+{
+    //user already has existing orders
+    //used for confirmation dialog
+    <div id="userHasOrders"></div>
+}
+
+<h2>Confirm Order</h2>
+
+@if (Model.User.LocationId == 5) //5 = Century City LocationId on server. If in CC, remind client that no FTTH may be ordered to FTTB
+{
+    <label style="color: red;">Please note that Century City Connect does not permit FTTH to be deployed to businesses within Century City.</label>
+}
+
+@if (Model.User.Zone != null && Model.User.Zone.AllowSpecial && Model.Product.IsSpecial == true)
+{
+    if (Model.User.Zone.Status == TrenchingStatus.Undefined)
+    {
+        <div class="specialInfo">You get the Early Bird special: 100% off setup cost.</div>
+    }
+
+    if (Model.User.Zone.Status == TrenchingStatus.HasDates)
+    {
+        <div class="specialInfo">You get the Head-Start special: 50% off setup cost.</div>
+    }
+}
+
+<div class="row">
+    <div class="col-xs-10 form-group">
+        <table class="table table-bordered orderTable">
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Product</th>
+                    <th>Contract Term</th>
+                    <th>Setup cost</th>
+                    <th>Monthly cost</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>
+                        @Model.Product.ISP.Name @Model.Product.LineSpeed.GetDisplayName() @(Model.Product.IsCapped ? "Capped" : "Uncapped") @(Model.Product.IsCapped ? Model.Product.Cap.ToString() : "")
+                    </td>
+                    <td>@(contractTerm == ContractTerm.Month24 ? "24 Months" : "Monthly")</td>
+                    <td>@(FormatAmount(setupCost))</td>
+                    <td>@(FormatAmount(contractTerm == ContractTerm.Month24 ? Model.Product.MonthlyCost : Model.Product.M2MMonthlyCost))</td>
+                </tr>
+                @if (!string.IsNullOrEmpty(Model.Product.Attr1))
+                {
+                    <tr>
+                        <td></td>
+                        <td>
+                            @Model.Product.Attr1
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                @if (!string.IsNullOrEmpty(Model.Product.Attr2))
+                {
+                    <tr>
+                        <td></td>
+                        <td>
+                            @Model.Product.Attr2
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                } @if (!string.IsNullOrEmpty(Model.Product.Attr3))
+                {
+                    <tr>
+                        <td></td>
+                        <td>
+                            @Model.Product.Attr3
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                @if (!string.IsNullOrEmpty(Model.Product.Attr4))
+                {
+                    <tr>
+                        <td></td>
+                        <td>
+                            @Model.Product.Attr4
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <strong>Total:</strong>
+                    </td>
+                    <td><strong>@(FormatAmount(setupCost))  (VAT incl.)</strong></td>
+                    <td><strong>@(FormatAmount(monthlyCost))  (VAT incl.)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-xs-10" style="text-align: center;">
+        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingOne">
+                    <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        <a role="button">
+                            Terms and Conditions
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                    <div class="panel-body">
+                        @Html.Raw(Model.Product.ISP.TermsAndConditions)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-xs-10" style="text-align: center;">
+        <p>NB: Any trenching from curb to house OVER AND ABOVE 30 METRES to be negotiated with contractor directly.</p>
+        <div style="display: inline; font-size: 18px;">I have read and understand the terms and conditions</div>
+        <input id="confirmCheckbox" type="checkbox" style="margin-left: 15px;"/>
+    </div>
+</div>
+
+<div class="row form-group" style="margin-top: 30px;">
+    <div class="col-xs-10">
+        <div class="panel-group" id="homeOwner" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="text-align: center;" role="tab" id="headingTwo">
+                    <h4 class="panel-title" data-toggle="collapse" data-parent="#homeOwner" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        <a role="button">
+                            Home Owner
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTwo" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTwo">
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            @Html.CheckBoxFor(m => m.User.IsOwner, new { @class = "checkbox-inline", @style = "margin-right: 30px;" })
+                                            <label for="User_IsOwner" class="control-label">I am the property owner</label>
+                                            @Html.ValidationMessageFor(m => m.User.IsOwner, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="form-group" style="margin-top: 49px;">
+                                            @Html.LabelFor(m => m.User.OwnerName, new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.User.OwnerName, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.User.OwnerName, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.User.OwnerPhoneNumber, new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.User.OwnerPhoneNumber, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.User.OwnerPhoneNumber, "", new { @class = "text-danger" })
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.LabelFor(m => m.User.OwnerEmail, new { @class = "control-label" })
+                                            @Html.TextBoxFor(m => m.User.OwnerEmail, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.User.OwnerEmail, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-12">
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-6">
+                                            <input id="updateOwnerDetails" class="btn btn-primary" type="button" value="Update Owner Details"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div id="updateOwnerDetailsResult" class="alert alert-success form-group" style="display: none;" role="alert">Owner details successfully saved</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row form-group" style="margin-top: 30px;">
+    <div class="col-xs-10">
+        <div class="panel-group" id="altContact" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" style="text-align: center;" role="tab" id="headingThree">
+                    <h4 class="panel-title" data-toggle="collapse" data-parent="#altContact" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        <a role="button">
+                            On-site contact
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseThree" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingThree">
+                    <div class="panel-body">
+                        <div class="row form-group">
+                            @{
+                                var userVis = Model.User.HasAltContact ? "none" : "";
+                                var altVis = Model.User.HasAltContact ? "" : "none";
+                            }
+                            <div id="primaryContactContainer" style="display: @userVis;">
+                                <h3 style="margin-left: 15px;">These are your contact details for installation teams</h3>
+
+                                <div class="col-xs-6">
+                                    <div class="form-group">
+                                        <label>First name: </label> @Model.User.FirstName
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Last name: </label> @Model.User.LastName
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email address: </label> @Model.User.Email
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="form-group">
+                                        <label>Cell No: </label> @Model.User.PhoneNumber
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Landline: </label> @Model.User.Landline
+                                    </div>
+                                </div>
+
+                                <input id="showAltContact" type="button" class="btn btn-primary" value="Change Contact" />
+                            </div>
+
+                            <div id="altContactContainer" style="display: @altVis;">
+                                <h3 style="margin-left: 15px;">These are your contact details for installation teams</h3>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.User.AltFirstName, new { @class = "control-label" })
+                                                @Html.TextBoxFor(m => m.User.AltFirstName, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.User.AltFirstName, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.User.AltLastName, new { @class = "control-label" })
+                                                @Html.TextBoxFor(m => m.User.AltLastName, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.User.AltLastName, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.User.AltEmail, new { @class = "control-label" })
+                                                @Html.TextBoxFor(m => m.User.AltEmail, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.User.AltEmail, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.User.AltCellNo, new { @class = "control-label" })
+                                                @Html.TextBoxFor(m => m.User.AltCellNo, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.User.AltCellNo, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="form-group">
+                                                @Html.LabelFor(m => m.User.AltLandline, new { @class = "control-label" })
+                                                @Html.TextBoxFor(m => m.User.AltLandline, new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(m => m.User.AltLandline, "", new { @class = "text-danger" })
+                                            </div>
+                                            <div class="form-group">
+                                                <input id="saveChanges" class="btn btn-primary" type="button" value="Update Contact" />
+                                                <input id="cancel" style="margin-left: 15px;" type="button" class="btn btn-default" value="Cancel" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-xs-12">
+                                    <div id="ajaxResult" class="alert alert-success form-group" style="display: none;" role="alert">On-site contact details successfully saved</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+<div class="row form-group">
+    <div class="col-xs-10" style="text-align: center;">
+        @using (Html.BeginForm("PlaceOrder", "Portal", FormMethod.Post, new {id = "orderForm"}))
+        {
+            <input id="prodId" name="prodId" type="text" style="display: none;" value="@Model.Product.ISPProductId"/>
+            <input id="ispId" name="ispId" type="text" style="display: none;" value="@Model.Product.ISPId"/>
+            <input id="contractTerm" name="contractTerm" type="text" style="display: none;" value="@ViewBag.ContractTerm"/>
+            <input id="orderButton" class="btn btn-success orderButton" type="submit" value="Order now"/>
+        }
+    </div>
+</div>
+
+<div class="row form-group">
+    <div class="col-xs-10" style="text-align: center;">
+        <h3>ISP contact details:</h3>
+        <span style="display: inline; margin-right: 30px;">@Model.Product.ISP.Name</span>
+        <span style="display: inline; margin-right: 30px;">@Model.Product.ISP.LandlineNo</span>
+        <span style="display: inline; margin-right: 30px;">@Model.Product.ISP.EmailAddress</span>
+    </div>
+</div>
+
+@Html.Partial("_ManageContactDialog", Model.ISPs)
+
+@section scripts{
+    <script src="~/Scripts/js-cookie/js.cookie-2.1.3.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('.backButton').click(function () {
+                history.go(-1);
+                return false;
+            });
+
+            function CheckIsOwnerCanSubmit() {
+                var isOwner = $('#User_IsOwner').is(':checked');
+                var name = $('#User_OwnerName').val();
+                var number = $('#User_OwnerPhoneNumber').val();
+                var email = $('#User_OwnerEmail').val();
+
+                if (!isOwner) {
+                    if (name && number && email) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function ClearOwnerDetails() {
+                $('#User_OwnerName').val('');
+                $('#User_OwnerEmail').val('');
+                $('#User_OwnerPhoneNumber').val('');
+            }
+
+            $('#User_IsOwner').click(function() {
+                if ($(this).is(':checked')) {
+                    $('#User_OwnerName').prop('disabled', true);
+                    $('#User_OwnerEmail').prop('disabled', true);
+                    $('#User_OwnerPhoneNumber').prop('disabled', true);
+                } else {
+                    $('#User_OwnerName').prop('disabled', false);
+                    $('#User_OwnerEmail').prop('disabled', false);
+                    $('#User_OwnerPhoneNumber').prop('disabled', false);
+                }
+            });
+
+            $('#orderForm').on('submit', function (e) {
+                if ($('#confirmCheckbox').is(':checked')) {
+                    if (CheckIsOwnerCanSubmit()) {
+                        //show alert if user already has orders
+                        if ($('#userHasOrders').length) {
+                            if (confirm("You already have existing order(s). Are you sure you want to order another product? You will be responsible for honouring all the contracts with the ISPs.")) {
+                                return true;
+                            };
+                            return false;
+                        }
+                        return true;
+                    } else {
+                        alert("Because you are not the property owner, you need to fill out the owner's details.");
+                        return false;
+                    }
+                } else {
+                    alert("Please read the terms and conditions and check the checkbox.");
+                }
+                return false;
+            });
+
+            $('#showAltContact').click(function () {
+                $('#primaryContactContainer').hide();
+                $('#altContactContainer').show();
+            });
+
+            $('#cancel').click(function () {
+                $('#primaryContactContainer').show();
+                $('#altContactContainer').hide();
+                $('#altContactContainer').find('input:text').val('');
+            });
+
+            $('#updateOwnerDetails').click(function () {
+                $.ajax({
+                    url: '@Url.Action("UpdateOwnerDetails", "Portal")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        isOwner: $('#User_IsOwner').is(':checked'),
+                        name: $('#User_OwnerName').val(),
+                        email: $('#User_OwnerEmail').val(),
+                        number: $('#User_OwnerPhoneNumber').val()
+                    },
+                    success: function () {
+                        if ($('#User_IsOwner').is(':checked')) { ClearOwnerDetails(); }
+                        $('#updateOwnerDetailsResult').show().delay(2000).fadeOut('slow');
+                    }
+                });
+            });
+
+            $('#saveChanges').click(function () {
+                var altVals = $('#altContactContainer').find('input');
+                for (var i = 0; i < altVals.length; i++) {
+                    if (!$(altVals[i]).val()) {
+                        alert("Please fill all alternate contact fields");
+                        return false;
+                    }
+                }
+
+                $.ajax({
+                    url: '@Url.Action("UpdateAltContact", "Portal")',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        firstName: $('#User_AltFirstName').val(),
+                        lastName: $('#User_AltLastName').val(),
+                        email: $('#User_AltEmail').val(),
+                        cellNo: $('#User_AltCellNo').val(),
+                        landline: $('#User_AltLandline').val()
+                    },
+                    success: function () {
+                        $('#ajaxResult').show().delay(2000).fadeOut('slow');
+                    }
+                });
+            });
+
+            //launch warning when user tries to leave page
+            var mouseLastYPos = null;
+            $(document).mousemove(function (e) {
+                if (mouseLastYPos) {
+                    if (e.pageY < mouseLastYPos && e.pageY <= 20) {
+                        if (typeof Cookies.get('hideManageContactsDialog') == "undefined") {
+                            $('#notifyUserToManageContact').modal('show');
+                        }
+                    }
+                }
+                mouseLastYPos = e.pageY;
+            });
+
+            $('#manageContactsBtn').click(function () {
+                $('#manageISPContactDialog').modal('show');
+            });
+
+            //contact option radio buttons change
+            $('input[name=contactOption]').change(function () {
+                switch ($(this).val()) {
+                    case "1":
+                        option1();
+                        break;
+                    case "2":
+                        option2();
+                        break;
+                    case "3":
+                        option3();
+                        break;
+                }
+            });
+
+            //validate selected options if they try close
+            $('#okModalBtn').click(function () {
+                if (resolveISPContacts()) {
+                    $('#manageISPContactDialog').modal('toggle');
+                }
+            });
+
+            function option1() {
+                $('#option3').hide();
+                $('#option2').hide();
+                $('#option1').show();
+            }
+
+            function option2() {
+                $('#option3').hide();
+                $('#option1').hide();
+                $('#option2').show();
+            }
+
+            function option3() {
+                $('#option1').hide();
+                $('#option2').hide();
+                $('#option3').show();
+            }
+
+            function resolveISPContacts() {
+                var selectedOption = $('input[name=contactOption]:checked').val();
+
+                //if no options are selected
+                if (!selectedOption.length) {
+                    alert('Please select a contact option.');
+                    return false;
+                }
+
+                //if option 1, clear other dropdowns
+                if (selectedOption == "1") {
+                    $('.option2ISP').val('');
+                    if (!$('#option1ISP').val()) {
+                        alert('Please select an ISP');
+                        return false;
+                    }
+                    saveISPContacts([$('#option1ISP').val()]);
+                    return true;
+                }
+
+                //if option 2, clear option 1 dropdown, make sure 3 dropdowns are selected
+                if (selectedOption == "2") {
+                    $('#option1ISP').val('');
+
+                    var invalidItems = $('.option2ISP').filter(function () {
+                        return !this.value;
+                    });
+
+                    if (invalidItems.length) {
+                        alert('Please select three ISPs');
+                        return false;
+                    }
+
+                    var ispIds = $('.option2ISP').map(function () { return this.value }).get();
+                    saveISPContacts(ispIds);
+                    return true;
+                }
+
+                //if option 3, clear other dropdowns
+                if (selectedOption == "3") {
+                    $('#option1ISP').val('');
+                    $('.option2ISP').val('');
+                    $('#notifyUserToManageContact').modal('toggle');
+                    return true;
+                }
+
+                //if we get here then block
+                return false;
+            }
+
+            function saveISPContacts(ids) {
+                $.ajax({
+                    url: '@Url.Action("SaveISPContacts", "Portal")',
+                    dataType: 'json',
+                    type: 'GET',
+                    data: { ids: ids },
+                    traditional: true,
+                    success: function (data) {
+                        if (data) {
+                            $('#notifyUserToManageContact').modal('toggle');
+                            Cookies.set('hideManageContactsDialog', true, { expires: 1 });
+                        }
+                    }
+                });
+            }
+        })
+    </script>
+}
+
+
+
+

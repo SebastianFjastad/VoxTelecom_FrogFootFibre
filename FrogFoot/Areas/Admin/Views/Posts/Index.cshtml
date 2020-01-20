@@ -1,0 +1,79 @@
+﻿@using FrogFoot.Utilities
+@model List<FrogFoot.Entities.Post>
+@{
+    ViewBag.Title = "Posts";
+}
+
+<h2>Posts</h2>
+
+<div class="form-group" style="margin-top: 30px;">
+    @Html.ActionLink("Create Post", "Create", null, new { @class = "btn btn-success" })
+</div>
+
+<table id="postTable" class="table table-striped table-responsive">
+    <thead>
+        <tr>
+            <td style="display: none;"></td>
+            <td>Image</td>
+            <td>Type</td>
+            <td>Gridding</td>
+            <td>Precinct</td>
+            <td>Suburb</td>
+            <td>Zone</td>
+            <td>Title</td>
+            <td>Pub Date</td>
+            <td>Body</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var post in Model)
+            {
+                <tr>
+                    <td style="display: none;">@post.PostId</td>
+                    <td>
+                        @if (post.PostImage != null)
+                        {
+                            <img src="~/Assets/PostImage/@post.PostImage.AssetPath" height="120" alt="product image" style="max-width: 150px;"/>
+                        }
+                    </td>
+                    <td>@post.Type.ToString()</td>
+                    <td>@(string.IsNullOrEmpty(post.PrecinctCode) && post.Zone == null ? "Suburb" : post.GridType.ToString())</td>
+                    <td>@post.PrecinctCode</td>
+                    <td>@(post.Location != null && string.IsNullOrEmpty(post.PrecinctCode) ? post.Location.Name : "")</td>
+                    <td>@(post.Zone != null ? post.Zone.Code : "")</td>
+                    <td>@post.Title</td>
+                    <td>@post.PublishDate.Date()</td>
+                    <td>@(Html.Raw(HtmlStripper.Strip(post.Body).Truncate(100) + "..."))</td>
+
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new {postId = post.PostId}) |
+                        @Html.ActionLink("Delete", "Delete", new {postId = post.PostId}, new {@class = "delete"})
+                    </td>
+                </tr>
+                            }
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#postTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "order": [[0, "desc"]]
+            });
+
+            $('#postTable').on('click', '.delete', function() {
+                if (confirm("Are you sure you want to delete this post?")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        })
+    </script>
+}

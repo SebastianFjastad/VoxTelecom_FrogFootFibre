@@ -1,0 +1,795 @@
+@{
+    ViewBag.Title = "FAQ";
+}
+
+<style>
+    .lightgrey {
+        color: #636363;
+    }
+
+    .panel-heading a:hover, .panel-heading a:active, .panel-heading a:focus {
+        text-decoration: none;
+    }
+</style>
+
+<h2 class="text-center" style="color: green; margin-bottom: 30px;">Frequently Asked Questions</h2>
+
+<p>We have compiled a number of questions that we thought you may have when reading through the content of this website. Simply click on the question and the answer will be revealed. If you do have a query that is not answered in this context, please contact us and we will respond to your email as well as post additional questions and answers on this FAQ page.</p>
+
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    @*Why do we need the fibre (FTTH) initiative?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="button" id="heading1">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse1" aria-expanded="true" aria-controls="collapse1">
+                    Q. Why do we need FTTH?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading1">
+            <div class="panel-body">
+                A. Most South African suburbs have been under serviced when it comes to reliable, fast
+                broadband Internet connectivity. Rolling out a fibre network will put your area at the cutting-edge of
+                telecommunications technology. You will be able to enjoy Internet order of magnitude faster than
+                you most likely have today.
+            </div>
+        </div>
+    </div>
+
+    @*How fast is fibre really?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading2">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse2" aria-expanded="false" aria-controls="collapse2">
+                    Q. How fast is fibre really?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading2">
+            <div class="panel-body">
+                A. The fibre access circuits feeding your house will be configured to deliver information at speeds
+                up to 1 Gigabit per second, which is about 500-1000 times faster than your average ADSL line when
+                it comes to download speed.<br />
+                <br />
+                There will obviously be a level of contention on the backhaul links to your ISP and the GPON fibre
+                technology allows for a value of 50% of download speed to be provisioned for uploading, but at
+                speeds which are orders of magnitude higher than you have now, the only thing that will be holding
+                you back is the Internet Access your ISP can offer you.
+            </div>
+        </div>
+    </div>
+
+    @*How much does it cost?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading3">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse3" aria-expanded="false" aria-controls="collapse3">
+                    Q. How much does it cost?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading3">
+            <div class="panel-body">
+                A. Prices will vary depending on services subscribed (internet, phone, IPTV, UPS, etc) as well as
+                speed and data packages chosen. ISP Packages and Pricing will be provided via this site.
+            </div>
+        </div>
+    </div>
+
+    @*Is there a fixed setup cost?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading4">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                    Q. Is there a fixed setup cost?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading4">
+            <div class="panel-body">
+                A. Yes, for most ISPs there will be. You will be billed by your ISP of choice, who in turn will be billed
+                for the setup and maintenance of the fibre network by Frogfoot Networks.<br />
+                <br />
+                Most fibre providers need to charge a small nominal setup fee which covers the laying of fibre optic
+                cable from the closest fibre in your street to your house, as well as the specific equipment that they
+                will install in your house to connect you to the fibre network.<br />
+                <br />
+                The setup cost should be approximately R1,800.
+            </div>
+        </div>
+    </div>
+
+    @*What will happen to ADSL?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading5">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                    Q. What will happen to ADSL?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse5" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading5">
+            <div class="panel-body">
+                A. ADSL will still be available for the time being, as will the copper cable network.
+            </div>
+        </div>
+    </div>
+
+    @*Will my sidewalk/verge be butchered when new cable tranches are installed?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading7">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse7" aria-expanded="false" aria-controls="collapse7">
+                    Q. Will my sidewalk/verge be butchered when new cable tranches are installed?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse7" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading7">
+            <div class="panel-body">
+                A. Any fibre operator has to comply with the City of Cape Town regulations and standards. Our contractors or business partners will take
+                every precaution to complete installations with the least disruption to residents. They should
+                reinstate the driveways and sidewalks to their original condition. They should contact every resident
+                prior to the installation and explain the exact process to be followed. If they cause any damage they
+                will be obliged to repair it in terms of the signed contract. If the FOCUS<sup>TM</sup> method is being used, very little trenching may be needed.<br />
+                <br />
+                When FOCUS<sup>TM</sup> is used, LinkAfrica make use of a patented, tried and trusted system of running fibre through the storm water and sewer systems. This has no impact on the systems (or fibre service for that matter) and avoids
+                digging up roads and pavements.
+            </div>
+        </div>
+    </div>
+
+    @*What if I move - will I still be able to use my fibre connection?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading8">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse8" aria-expanded="false" aria-controls="collapse8">
+                    Q. What if I move - will I still be able to use my fibre connection?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse8" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading8">
+            <div class="panel-body">
+                If you are moving within your suburb or any other area that will be covered by LinkAfrica and Frogfoot Networks, then that should not be a problem at all.
+                <br />
+                <br />
+                If you move to an area (e.g. a remote farm) which does not have cover, then unfortunately you won't be able to enjoy fast Internet via fibre.
+                <br />
+                <br />
+                The exact terms of your future contract with your ISP will state terms of termination due to a household move. You may have to pay a relocation fee to cover the costs.
+            </div>
+        </div>
+    </div>
+
+    @*Will the TV service envisaged consume my data limit?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading9">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse9" aria-expanded="false" aria-controls="collapse9">
+                    Q. Will any TV service envisaged consume my data limit?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse9" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading9">
+            <div class="panel-body">
+                A. Not likely. If the TV service is deployed, it should not consume your data limit (if applicable) at all. Your data limit is only
+                utilized for video on demand services or streaming services like YouTube, and general Internet
+                data consumption.
+            </div>
+        </div>
+    </div>
+
+    @*What if there is not enough interest shown in the survey, will the fibre network still be built?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading10">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse10" aria-expanded="false" aria-controls="collapse10">
+                    Q. What if there is not enough interest shown from people in my suburb, will a fibre network still be built?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse10" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading10">
+            <div class="panel-body">
+                Where Frogfoot roll out next will be dependent on where the greatest interest is and
+                the highest concentration of ISP signups occur. So if you want fibre soon, persuade your
+                neighbours to show interest and when available, choose an ISP package and order it soon! That
+                way, you influence the decisions of the network planners.
+            </div>
+        </div>
+    </div>
+
+    @*I have an existing Telkom phone line, can this number be ported to the fibre provider?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading11">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse11" aria-expanded="false" aria-controls="collapse11">
+                    Q. I have an existing Telkom phone line, can this number be ported to the fibre provider?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse11" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading11">
+            <div class="panel-body">
+                A. Yes, your number can be ported over to any ISP that offers Voice services, is signed up for
+                porting, and has a contract with Frogfoot Networks. You should enjoy cheaper voice
+                calls over the fibre. Some providers might charge a small administration fee to port your number,
+                but with an open access model you will be able to compare cost from and choose from any provider
+                that will serve this area.
+            </div>
+        </div>
+    </div>
+
+    @*How do I get a project status update?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading14">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse14" aria-expanded="false" aria-controls="collapse14">
+                    Q. How do I get a project status update?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse14" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading14">
+            <div class="panel-body">
+                As the project progresses, we intend publishing our efforts, documents and a project status update on the Status page. Please bookmark that page or come back frequently to get an update. We will also publish information on the Frogfoot Fibre Facebook and Twitter accounts.
+            </div>
+        </div>
+    </div>
+
+    @*What if I want to stay with my ISP - can I still benefit from the fibre?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading19">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse19" aria-expanded="false" aria-controls="collapse19">
+                    Q. What if I want to stay with my ISP - can I still benefit from the fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse19" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading19">
+            <div class="panel-body">
+                You can.  What you will need to do is persuade your ISP to sign up with Frogfoot Networks.  Ask them to contact Hannes Pieterse on ftth@frogfoot.com or  021 448 7225 to kick off that process.  It makes no sense to be using tired old copper when there is lightning fast fibre to your door.
+            </div>
+        </div>
+    </div>
+
+    @*What other services can I get over the fibre?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading20">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse20" aria-expanded="false" aria-controls="collapse20">
+                    Q. What other services can I get over the fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse20" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading20">
+            <div class="panel-body">
+                The fibre will enable you get faster internet access for starters, but it opens up the door for all sorts of hosted services that can be delivered from a Data Centre like Teraco in Newlands.  As soon as the ISP packages are available, you should be able to get the following:
+                <br />
+                <br />
+                <ul>
+                    <li>Telephony services – a phone and calls to anywhere in the world at much lower prices than Telkom.</li>
+                    <li>A WiFi router to broadcast your fibre connection throughout your home.</li>
+                    <li>An Uninterruptible Power Supply (UPS) for your fibre service which can notify you via SMS when the municipal power goes off and when it comes back on again.</li>
+                    <li>Service Alerts – not only can you be notified when the power goes down, but if for some reason your fibre service is interrupted, you can choose to be notified via SMS when the link goes down and when it comes up again.</li>
+                </ul>
+                Other options you could see in future:
+                <br />
+                <br />
+                <ul>
+                    <li>Once the local security companies have had a chance to work with the fibre company, it should be possible to choose a set of local CCTV cameras to be available via your existing PVR, so you can check your area when you need to.</li>
+                    <li>DSTV via fibre – you should be able to keep your existing contract but throw away the satellite dish.  Providers like DSTV, Top TV, et al, will be able to deliver their signals to you over the fibre.</li>
+                    <li>Video on Demand – you will no longer have to “download” a video before watching it; you should be able to stream HD TV programmes and movies to you in real time with no delays.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    @*Is it true that you run your optic fibre cables through the sewers?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading52">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse52" aria-expanded="false" aria-controls="collapse52">
+                    Q. Is it true that you run your optic fibre cables through the sewers?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse52" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading52">
+            <div class="panel-body">
+                In areas where Frogfoot works with Link Africa ,this is true; our business partner LinkAfrica makes use of stormwater pipes and sewers, as well as traditional trenching to deploy our fibre networks.
+            </div>
+        </div>
+    </div>
+
+    @*What if the stormwater pipe is not good enough to use for fibre?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading21">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse21" aria-expanded="false" aria-controls="collapse21">
+                    Q. What if the stormwater pipe is not good enough to use for fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse21" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading21">
+            <div class="panel-body">
+                1st choice is a stormwater pipe, 2nd choice a sewer, 3rd choice is to trench.  LinkAfrica survey the pipes, give the City Council a report and where pipes cannot be repaired, make use of traditional trenching methods.
+            </div>
+        </div>
+    </div>
+
+    @*How is the fibre attached to the pipe?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading22">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse22" aria-expanded="false" aria-controls="collapse22">
+                    Q. How is the fibre attached to the pipe?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse22" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading22">
+            <div class="panel-body">
+                The fibre enters the pipe at a shallow angle through a slot cut using an angle grinder. A patented manifold holds the cable in place after it is attached using a “screw & glue” method. This is enabled using a specialised BASF epoxy which hardens rapidly in water.  The cable lies loosely in the pipe itself.
+            </div>
+        </div>
+    </div>
+
+    @*Doesn't the fibre cause obstructions within the pipe?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading23">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse23" aria-expanded="false" aria-controls="collapse23">
+                    Q. Doesn't the fibre cause obstructions within the pipe?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse23" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading23">
+            <div class="panel-body">
+                Research has shown that the presence of the fibre lying in the bottom of the pipe in fact causes an improved flow through the pipes due to the dual eddies caused on either side of the fibre.
+            </div>
+        </div>
+    </div>
+
+    @*What is the municipality's stance on this method?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading24">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse24" aria-expanded="false" aria-controls="collapse24">
+                    Q. What is the municipality's stance on this method?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse24" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading24">
+            <div class="panel-body">
+                LinkAfrica has been working with City of Cape Town on evaluating this methodology for the past 3 years.  A pilot has been run in Khayalitsha.  The City have embraced the methodology and some AlwaysOn and FreeCityWiFi sites are already using it within the Cape Metropole.  As we roll out to other areas, we will be working with the local municipalities.
+            </div>
+        </div>
+    </div>
+
+    @*What are the boundaries of the area in our suburb to be covered? *@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading25">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse25" aria-expanded="false" aria-controls="collapse25">
+                    Q. What are the boundaries of the area in our suburb to be covered?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse25" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading25">
+            <div class="panel-body">
+                We generally make use of the Google maps definition for the boundaries of each suburb we deploy in and once we have signed a memorandum of understanding with the local representative body, we will post a map on the portal here.
+            </div>
+        </div>
+    </div>
+
+    @*Can our Neighbourhood Watch make use of the fibre for security cameras? *@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading26">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse26" aria-expanded="false" aria-controls="collapse26">
+                    Q. Can our Neighbourhood Watch make use of the fibre for security cameras?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse26" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading26">
+            <div class="panel-body">
+                This is a distinct possibility, but will need to be discussed in detail.  Outdoor units are available for enabling security cameras to be connected to the fibre network.
+            </div>
+        </div>
+    </div>
+
+    @*How can someone tell if they are in or out of the coverage area?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading27">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse27" aria-expanded="false" aria-controls="collapse27">
+                    Q. How can someone tell if they are in or out of the coverage area?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse27" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading27">
+            <div class="panel-body">
+                There will be a coverage map on the Portal in future, which will allow people to check.
+            </div>
+        </div>
+    </div>
+
+    @*What is the process that will be followed from order to completed installation?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading28">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse28" aria-expanded="false" aria-controls="collapse28">
+                    Q. What is the process that will be followed from order to completed installation?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse28" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading28">
+            <div class="panel-body">
+                ISPs will be encouraged to make Internet Access offerings available to residents whose properties will be covered by the fibre network.  Residents should be able to pre-order from the ISPs here on the portal.  The ISP will place the order with Frogfoot for the residence to be connected to the fibre.  When the network is available, a representative of the fibre installer will contact the resident to agree on a time, first to survey the site, and then to return in order to trench and install the fibre from the street to the residence. At that point, Frogfoot will install the fibre modem.
+            </div>
+        </div>
+    </div>
+
+    @*What about Mobile Network Operators and Security Companies will they get access to the fibre? *@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading29">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse29" aria-expanded="false" aria-controls="collapse29">
+                    Q. What about Mobile Network Operators and Security Companies will they get access to the fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse29" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading29">
+            <div class="panel-body">
+                Mobile Network Operators wishing to improve their coverage of the area could make use of the fibre without impacting on the broadband services of residents.  As with security cameras, this will need to be discussed with the companies involved.
+            </div>
+        </div>
+    </div>
+
+    @*Can we use existing WiFi Access Points and routers in the homes?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading30">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse30" aria-expanded="false" aria-controls="collapse30">
+                    Q. Can we use existing WiFi Access Points and routers in the homes?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse30" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading30">
+            <div class="panel-body">
+                Yes. The fibre is effectively replacing the copper access line.  Any ISP router can be plugged into the fibre modem.
+            </div>
+        </div>
+    </div>
+
+    @*Is the UPS for the fibre equipment only?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading31">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse31" aria-expanded="false" aria-controls="collapse31">
+                    Q. Is the UPS for the fibre equipment only?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse31" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading31">
+            <div class="panel-body">
+                Yes.
+            </div>
+        </div>
+    </div>
+
+    @*Has the Uninterruptable Power Supply been tested for a full 8 hours?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading32">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse32" aria-expanded="false" aria-controls="collapse32">
+                    Q. Has the Uninterruptable Power Supply been tested for a full 8 hours?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse32" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading32">
+            <div class="panel-body">
+                Yes.  As long as the UPS only has to power the fibre modem, you should get a full 8 hours.
+            </div>
+        </div>
+    </div>
+
+    @*Is it possible to have two ISPs providing services to the same home over the fibre?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading33">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse33" aria-expanded="false" aria-controls="collapse33">
+                    Q. Is it possible to have two ISPs providing services to the same home over the fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse33" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading33">
+            <div class="panel-body">
+                Yes.  There can be up to 4 Service Providers accommodated on one fibre modem.
+            </div>
+        </div>
+    </div>
+
+    @*Can't you just install one device on the end of the fibre instead of two?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading34">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse34" aria-expanded="false" aria-controls="collapse34">
+                    Q. Can't you just install one device on the end of the fibre instead of two?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse34" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading34">
+            <div class="panel-body">
+                This is in development, but not available immediately. Frogfoot are aiming to offer an upgrade to the standard fibre modem, which will be able to deliver ISP services without the ISP having to visit site.
+            </div>
+        </div>
+    </div>
+
+    @*Do you do anything to the bandwidth in terms of shaping, throttling or overselling?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading35">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse35" aria-expanded="false" aria-controls="collapse35">
+                    Q. Do you do anything to the bandwidth in terms of shaping, throttling or overselling?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse35" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading35">
+            <div class="panel-body">
+                Frogfoot doesn't, no. No shaping or throttling on the fibre network.  The very worst case contention that could exist is 10:1 and would only occur in very extreme cases.  Because the GPON fibre technology uses Time Division Multiplexing there is no chance of one resident hogging most of the bandwidth.
+            </div>
+        </div>
+    </div>
+
+    @*Will ISPs impose additional contention on their side of the interconnect?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading36">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse36" aria-expanded="false" aria-controls="collapse36">
+                    Q. Will ISPs impose additional contention on their side of the interconnect?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse36" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading36">
+            <div class="panel-body">
+                Quite possibly.  That is out of the control of LinkAfrica or Frogfoot and residents should clarify that with their ISP.
+            </div>
+        </div>
+    </div>
+
+    @*Some houses have no street numbers - how will you identify them?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading37">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse37" aria-expanded="false" aria-controls="collapse37">
+                    Q. Some houses have no street numbers - how will you identify them?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse37" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading37">
+            <div class="panel-body">
+                Latitude/longitude coordinates will be used in these cases.
+            </div>
+        </div>
+    </div>
+
+    @*Can the sewerage pipes not be used to access homes, so trenching of people's gardens is not necessary?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading38">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse38" aria-expanded="false" aria-controls="collapse38">
+                    Q. Can the sewerage pipes not be used to access homes, so trenching of people's gardens is not necessary?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse38" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading38">
+            <div class="panel-body">
+                No.
+            </div>
+        </div>
+    </div>
+
+    @*Can water pipes be used to access homes?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading39">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse39" aria-expanded="false" aria-controls="collapse39">
+                    Q. Can water pipes be used to access homes?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse39" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading39">
+            <div class="panel-body">
+                Yes. This is in fact possible and could be discussed with LinkAfrica staff when they do the site survey, if LinkAfrica are deploying the fibre.
+            </div>
+        </div>
+    </div>
+
+    @*Can't you speed things up by adding more teams? *@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading40">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse40" aria-expanded="false" aria-controls="collapse40">
+                    Q. Can't you speed things up by adding more teams?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse40" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading40">
+            <div class="panel-body">
+                The planners have already optimised the number of teams.  Using too many teams tends to create too high a degree of disruption in a suburb and causes aggravation for residents.
+            </div>
+        </div>
+    </div>
+
+    @*How many people are likely to buy 1Gbps services?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading41">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse41" aria-expanded="false" aria-controls="collapse41">
+                    Q. How many people are likely to buy 1Gbps services?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse41" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading41">
+            <div class="panel-body">
+                On average, only about 5% of people buy 1Gbps services - most people want to know that they can if they want to, but find that they do not need anything like that sort of bandwidth.
+            </div>
+        </div>
+    </div>
+
+    @*How does the 64:1 splitting and the 10:1 contention ratio impact on what an ISP can offer their customer - surely this means that like DSL a resident will get a lot less bandwidth than they pay for?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading42">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse42" aria-expanded="false" aria-controls="collapse42">
+                    Q. How does the 64:1 splitting and the 10:1 contention ratio impact on what an ISP can offer their customer - surely this means that like DSL a resident will get a lot less bandwidth than they pay for?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse42" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading42">
+            <div class="panel-body">
+                Not at all.  The full explanation gets a bit technical, but in essence the overall fibre access network contention will never reach more than 10:1, and if contention does become an issue in any one zone, the splitters will be reconfigured to eliminate it.
+            </div>
+        </div>
+    </div>
+
+    @*So what sort of contention ratios should residents expect on this network?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading43">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse43" aria-expanded="false" aria-controls="collapse43">
+                    Q. So what sort of contention ratios should residents expect on this network?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse43" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading43">
+            <div class="panel-body">
+                While there is theoretically the possibility of there being a worst case contention of 10:1, in reality no residents should ever experience less than what they have paid for an extended period of time as a result of the fibre network (as opposed to any contention in the upstream ISP network).
+            </div>
+        </div>
+    </div>
+
+    @*I've heard you split the fibre 64 times, and GPON only provides for 2.5Gbps download. Does that not mean a resident would get far less than 1 Gbps if they bought 1 Gbps access?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading44">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse44" aria-expanded="false" aria-controls="collapse44">
+                    Q. I've heard you split the fibre 64 times, and GPON only provides for 2.5Gbps download. Does that not mean a resident would get far less than 1 Gbps if they bought 1 Gbps access?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse44" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading44">
+            <div class="panel-body">
+                Not at all.  A splitter is essentially a prism, splitting light, and the first time we introduce a splitter is right at the node, where we create a 4:1 split. Closer to the houses, we add another splitter at 16:1, making the overall split on that route 64:1. Should there be a number of close neighbours who all order and make heavy use of 1Gbps services, we will remove the 4:1 splitter for that route, thus dropping the split for the route to 16:1.  Because there is 2.5Gbps available, the possible contention is less than 10:1.  Practically, it is highly unlikely that so many people will buy 1Gbps services, and if they do, just as unlikely that they will all be using the full 1Gbps at the same time.  To use an “old school” analogy, there are not enough telephone trunk lines connecting the suburb's Telkom exchange to the rest of the world to allow every single resident to make an outgoing call at the same time.  The economics of telecoms network engineering relies on contention ratios.
+            </div>
+        </div>
+    </div>
+
+    @*If my neighbour buys a 1Gbps service and I buy a 50Mbps service, does that mean he can get preference and hog all the bandwidth?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading45">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse45" aria-expanded="false" aria-controls="collapse45">
+                    Q. If my neighbour buys a 1Gbps service and I buy a 50Mbps service, does that mean he can get preference and hog all the bandwidth?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse45" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading45">
+            <div class="panel-body">
+                No, the fibre technology used (GPON) uses a mechanism (TDM) to ensure that the bandwidth is allocated fairly.  The package you buy will be what determines your maximum throughput, not your neighbour's penchant for downloading the internet.
+            </div>
+        </div>
+    </div>
+
+    @*So, if none of my neighbours are using their links, would I get access to the full capacity of the fibre?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading46">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse46" aria-expanded="false" aria-controls="collapse46">
+                    Q. So, if none of my neighbours are using their links, would I get access to the full capacity of the fibre?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse46" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading46">
+            <div class="panel-body">
+                No.  In much the same way that you don't get disadvantaged by a neighbour who is a heavy user of the Internet, you don't benefit if your neighbours use little or no bandwidth.
+            </div>
+        </div>
+    </div>
+
+    @*If I wanted to buy an uncontended link, would this be possible?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading47">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse47" aria-expanded="false" aria-controls="collapse47">
+                    Q. If I wanted to buy an uncontended link, would this be possible?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse47" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading47">
+            <div class="panel-body">
+                It would, but this is not something we would promote;  it is highly unlikely, unless you are running an ISP or a movie rendering farm from home, that the 1Gbps fibre broadband product will not fulfil your needs.
+            </div>
+        </div>
+    </div>
+
+    @*What if I needed an Active Ethernet connection and not a GPON connection, say to supply me with 10Gbps, could that be supplied?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading48">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse48" aria-expanded="false" aria-controls="collapse48">
+                    Q. What if I needed an Active Ethernet connection and not a GPON connection, say to supply me with 10Gbps, could that be supplied?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse48" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading48">
+            <div class="panel-body">
+                Yes, it could; again not something we'll be promoting, but if you really do need that, we can negotiate a price and make it happen.
+            </div>
+        </div>
+    </div>
+
+    @*Can you give preference to certain types of traffic, like video or voice?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading49">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse49" aria-expanded="false" aria-controls="collapse49">
+                    Q. Can you give preference to certain types of traffic, like video or voice?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse49" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading49">
+            <div class="panel-body">
+                Yes, we can, if and where this is needed.
+            </div>
+        </div>
+    </div>
+
+    @*Can an ISP peer with Frogfoot via NAP Africa?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading50">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse50" aria-expanded="false" aria-controls="collapse50">
+                    Q. Can an ISP peer with Frogfoot via NAP Africa?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse50" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading50">
+            <div class="panel-body">
+                No. This is a layer 2 peering, not a layer 3 peering.
+            </div>
+        </div>
+    </div>
+
+    @*Can an ISP peer in Joburg or Durban?*@
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="heading51">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse51" aria-expanded="false" aria-controls="collapse51">
+                    Q. Can an ISP peer in Joburg or Durban?
+                </a>
+            </h4>
+        </div>
+        <div id="collapse51" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading51">
+            <div class="panel-body">
+                This is possible, but should be discussed with Frogfoot.  Theoretically, any peering location Frogfoot is present at could be enabled.
+            </div>
+        </div>
+    </div>
+</div>

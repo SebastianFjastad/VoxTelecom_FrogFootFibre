@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/jquery-ui-styles")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css" />
+    <link href="~/Content/bootstrap-datetimepicker.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Admin", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Add User", "AddUser", "ManageUser")</li>
+                            <li>@Html.ActionLink("All Users", "Index", "ManageUser")</li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">ISPs<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("ISPs", "ISPs", "ManageISP")</li>
+                            <li>@Html.ActionLink("ISP Products", "Index", "ISPProduct")</li>
+                            <li>@Html.ActionLink("Leads Audit", "LeadsAudit", "ManageISP")</li>
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Orders", "Index", "Order")</li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gridding<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Suburbs", "Suburbs", "Gridding")</li>
+                            <li>@Html.ActionLink("Estates", "Estates", "Gridding")</li>
+                            <li>@Html.ActionLink("Zones", "Index", "Zone")</li>
+                            <li>@Html.ActionLink("ISP Product Gridding", "Index", "Gridding")</li>
+                            <li>@Html.ActionLink("Map API", "MapAPI", "Gridding")</li>
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Posts", "Index", "Posts")</li>
+                    <li>@Html.ActionLink("Users Map", "UsersMap", "Admin")</li>
+                    <li>@Html.ActionLink("Portals", "Index", "Portals")</li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Reports<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Sales Report", "Index", "Report")</li>
+                            <li>@Html.ActionLink("Interest Report", "InterestReport", "Report")</li>
+                            <li>@Html.ActionLink("Interest Report(excel)", "ExportInterestReportToExcel", "Report")</li>
+                            <li>@Html.ActionLink("Users In Zone(excel)", "UsersInZone", "Report")</li>
+                            <li>@Html.ActionLink("Users Report(excel)", "ExportUsersReportToExcel", "Report")</li>
+                            <li>@Html.ActionLink("ISP Users Report(excel)", "ExportISPUsersReportToExcel", "Report")</li>
+                        </ul>
+                    </li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    <script src="//code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="//cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

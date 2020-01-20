@@ -1,0 +1,194 @@
+﻿@using FrogFoot.Areas.Home.Models
+@using FrogFoot.Context
+@using Microsoft.AspNet.Identity
+@using Microsoft.AspNet.Identity.EntityFramework
+@model FrogFoot.Areas.Admin.Models.UserViewModel
+
+@{
+	ViewBag.Title = "EditUser";
+}
+@{
+	var selectedEstate = Model.User.Estate != null ? Model.User.Estate.EstateId : -1;
+	var selectLocation = Model.User.Location != null ? Model.User.Location.LocationId : -1;
+}
+<h2>EditUser</h2>
+
+<div class="form-group">
+	@Html.ActionLink("Back to List", "Index")
+</div>
+
+@using (Html.BeginForm("EditUser", "ManageUser", FormMethod.Post, new { id = "userForm" }))
+{
+
+	@Html.HiddenFor(n => n.User.Id)
+	@Html.HiddenFor(n => n.User.ISPId)
+	var manager = new UserManager(new UserStore<User>(new ApplicationDbContext()));
+
+	IList<string> roles = manager.GetRoles(Model.User.Id);
+	<div class="form-group">
+		<input class="form-control" value="@roles.FirstOrDefault()" readonly="readonly" />
+	</div>
+
+	if (Model.User == null || roles.Contains("ISPUser"))
+	{
+		<div class="form-group">
+			@Html.TextBoxFor(n => n.User.ISP.Name, new { @class = "form-control", disabled = "disabled"})
+		</div>
+	}
+
+	<div class="form-group">
+		@Html.TextBoxFor(n => n.User.FirstName, new { @class = "form-control", placeholder = "First name" })
+	</div>
+	<div class="form-group">
+		@Html.TextBoxFor(n => n.User.LastName, new { @class = "form-control", placeholder = "Last name" })
+	</div>
+	<div class="form-group">
+		@Html.TextBoxFor(n => n.User.Email, new { @class = "form-control", placeholder = "Email Address" })
+	</div>
+	<div class="form-group">
+		@Html.TextBoxFor(n => n.User.PhoneNumber, new { @class = "form-control", placeholder = "Cell No" })
+	</div>
+	<div class="form-group">
+		@Html.TextBoxFor(n => n.User.Address, new { @class = "form-control", placeholder = "Address" })
+	</div>
+	<div class="form-group">
+		<label>Fill in to reset password on save</label>
+		@Html.TextBoxFor(n => n.UserPassword, new { @class = "form-control", placeholder = "Password reset" })
+	</div>
+
+	if (roles.Contains("Client"))
+	{
+		<input id="EstateId" name="User.EstateId" style="display: none;" value="@Model.User.EstateId" />
+
+		<select class="form-control" style="display: none;">
+			<option class="estate default" value="-1">Not in estate</option>
+
+			@foreach (var estate in Model.Estates)
+					{
+				<option class="estate" data-locationid="@estate.LocationId" data-code="@estate.EstateCode" value="@estate.EstateId" @(estate.EstateId == selectedEstate ? "selected" : "")>@estate.Name</option>
+			}
+		</select>
+
+		<div class="form-group">
+			<select id="LocationId" name="User.LocationId" class="form-control" data-val="true" data-val-required="Please select a suburb.">
+				<option value="">Select a Suburb</option>
+				@foreach (var item in Model.Locations)
+				{
+					<option value="@item.LocationId" data-code="@item.PrecinctCode" @(item.LocationId == selectLocation ? "selected" : "")>@item.Name</option>
+				}
+			</select>
+			<span class="field-validation-valid text-danger" data-valmsg-for="LocationId" data-valmsg-replace="true"></span>
+		</div>
+
+		<div class="form-group">
+			<select id="estatesSelect" name="EstateSelect" class="form-control" tabindex="2"></select>
+		</div>
+
+		<div class="form-group">
+			@Html.TextBoxFor(n => n.User.Latitude, new { @class = "form-control", placeholder = "Latitude" })
+		</div>
+		
+		<div class="form-group">
+			@Html.TextBoxFor(n => n.User.Longitude, new {@class = "form-control", placeholder = "Longitude"})
+		</div>
+		
+		<div class="form-group client">
+			@Html.LabelFor(n => n.User.IsChamp)
+			@Html.CheckBoxFor(n => n.User.IsChamp, new {@class = "checkbox-inline"})
+		</div>
+
+		<div class="form-group">
+			@Html.LabelFor(m => m.User.ISPCommsOptOutStatus)
+			@Html.CheckBoxFor(m => m.User.ISPCommsOptOutStatus, new { @class = "checkbox-inline" })
+		</div>
+
+		<div class="form-group">
+			@Html.LabelFor(m => m.User.FFCommsOptOutStatus)
+			@Html.CheckBoxFor(m => m.User.FFCommsOptOutStatus, new {@class = "checkbox-inline"})
+		</div>
+
+		if (Model.User.Estate != null)
+		{
+			<div class="form-group client">
+				@Html.LabelFor(n => n.User.UsePrecinctCodeForChamp)
+				@Html.CheckBoxFor(n => n.User.UsePrecinctCodeForChamp, new { @class = "checkbox-inline" })
+			</div>
+		}
+	}
+
+	<div class="form-group">
+		@Html.LabelFor(n => n.User.EmailConfirmed)
+		@Html.CheckBoxFor(n => n.User.EmailConfirmed, new { @class = "checkbox-inline" })
+	</div>
+
+	if (roles.Contains("ISPUser"))
+	{
+		<div class="form-group">
+			@Html.LabelFor(n => n.User.IsUserTypeAdmin)
+			@Html.CheckBoxFor(n => n.User.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+		</div>
+	}
+
+	<div class="form-group">
+		<div class="row">
+			<div class="col-sm-2">
+				<input type="submit" class="btn btn-success" value="Save" />
+			</div>
+		</div>
+	</div>
+}
+
+@using (Html.BeginForm("DeleteUser", "ManageUser", FormMethod.Post))
+{
+	<input type="text" name="id" value="@Model.User.Id" style="display: none;" />
+
+	<input type="submit" value="Delete" class="btn btn-warning" />
+}
+
+@section scripts{
+
+	<script type="text/javascript">
+		$(function () {
+
+			$('#LocationId').change(function () {
+				var selectedLoc = $('#LocationId').val();
+				$('#suburbName').val($('option:selected', this).text());
+
+				if (!selectedLoc) {
+					$("#EstateId").val('');
+					$("#estatesSelect").empty().parent().hide();
+					return;
+				}
+
+				var estates = $('option.estate.default, option.estate[data-locationid=' + selectedLoc + ']').clone().removeClass('default');
+				$("#estatesSelect").empty().append(estates);
+
+				if (estates.length > 1) {
+					$('#estatesSelect').parent().show();
+				} else {
+					$('#estatesSelect').parent().hide();
+					$("#EstateId").val('');
+				}
+			});
+
+			$('#LocationId').change();
+
+			$('#estatesSelect').change(function () {
+				$("#EstateId").val($(this).val());
+				if ($('#estatesSelect').val() == -1) {
+					$("#EstateId").val('');
+				}
+			});
+
+			$('#userForm').submit(function () {
+				if ($('#LocationId').val() == "-1") {
+					$('#LocationId').val('');
+				}
+
+				if (!$('estatesSelect').is(':visible')) {
+					$('estatesSelect').val('');
+				}
+			});
+		})
+	</script>
+}

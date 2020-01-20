@@ -1,0 +1,133 @@
+﻿@model FrogFoot.Areas.Admin.Models.ZoneViewModel
+@{
+    ViewBag.Title = "Create Zone";
+}
+
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+
+<h2>Create Zone</h2>
+
+@using (Html.BeginForm("Create", "Zone", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <hr />
+        <div class="row">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.Code, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.Code, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Zone.Code, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.PrecinctCode, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.Zone.PrecinctCode, new SelectList(Model.Precincts, "PrecinctCode", "Name", Model.Zone.PrecinctCode), "Select Precinct", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Zone.PrecinctCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="from" class="control-label col-md-2">First Date Of Fibre</label>
+                <div class="col-md-10">
+                    <input type="text" id="Zone_FirstDateOfFibre" name="Zone.FirstDateOfFibre" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="to" class="control-label col-md-2">Last Date Of Fibre</label>
+                <div class="col-md-10">
+                    <input type="text" id="Zone_LastDateOfFibre" name="Zone.LastDateOfFibre" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.TimeToInstallation, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.TimeToInstallation, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Zone.TimeToInstallation, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.NoHousesInZone, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.NoHousesInZone, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                    @Html.ValidationMessageFor(model => model.Zone.NoHousesInZone, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.NodeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.NodeId, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Zone.NodeId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.NodeName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.NodeName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Zone.NodeName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.NodeLatitude, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.NodeLatitude, new { htmlAttributes = new { @class = "form-control", @placeholder = "-34,04262" } })
+                    @Html.ValidationMessageFor(model => model.Zone.NodeLatitude, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.NodeLongitude, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Zone.NodeLongitude, new { htmlAttributes = new { @class = "form-control", @placeholder = "18,34939" } })
+                    @Html.ValidationMessageFor(model => model.Zone.NodeLongitude, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.AllowOrder, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(model => model.Zone.AllowOrder, new { htmlAttributes = new { @class = "form-control checkbox" } })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Zone.AllowSpecial, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(model => model.Zone.AllowSpecial, new { htmlAttributes = new { @class = "form-control checkbox" } })
+                </div>
+            </div>
+
+            <input type="submit" class="btn btn-success col-sm-offset-2" value="Create" />
+        </div>
+    </div>
+}
+
+@section Scripts{
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(function () {
+            $("#Zone_FirstDateOfFibre").datepicker({
+                changeMonth: true,
+                numberOfMonths: 3,
+                onClose: function (selectedDate) {
+                    $("#Zone_LastDateOfFibre").datepicker("option", "minDate", selectedDate);
+                }
+            });
+            $("#Zone_LastDateOfFibre").datepicker({
+                changeMonth: true,
+                numberOfMonths: 3,
+                onClose: function (selectedDate) {
+                    $("#Zone_FirstDateOfFibre").datepicker("option", "maxDate", selectedDate);
+                }
+            });
+        });
+    </script>
+}

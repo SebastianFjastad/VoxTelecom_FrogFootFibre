@@ -1,0 +1,162 @@
+﻿@using FrogFoot.Resources
+@{
+    ViewBag.Title = "Contact";
+}
+<div class="col-xs-12 text-center">
+    <h2 style="color: green; margin-bottom: 30px;">@ViewBag.Title</h2>
+</div>
+
+<div class="col-sm-5">
+
+    <label>Sales / Enquiries : </label> ftth@frogfoot.com
+    <br />
+    <label>Support : </label> support@frogfoot.com
+    <br />
+    <label>Phone : </label> 021 448 7225
+    <br />
+    <label>Postal address : </label> P.O. Box 23618, Claremont, 7735
+    <br />
+    <label>Physical address : </label>
+    <br />Suite 302,
+    <br />Building 20,
+    <br />The Waverley Business Park,
+    <br />Kotzee Road,
+    <br />Mowbray,
+    <br />Cape Town
+</div>
+
+<div class="col-sm-7">
+    <div id="map" style="width: 600px; height: 400px"></div>
+
+    <div id="0" class="infoBox" style="display: none;">
+        <h3>Frogfoot Johannesburg</h3>
+        <p>
+            Block D,
+            <br/>
+            Rutherford Estate,
+            <br/>
+            1 Scott Street,
+            <br/>
+            Waverley
+        </p>
+        <label>Phone:</label> +27 87 805 0000
+    </div>
+
+    <div id="1" class="infoBox">
+        <h3>Frogfoot Cape Town</h3>
+        <p>
+            Suite 302,
+            <br/>
+            Building 20,
+            <br/>
+            The Waverley Business Park,
+            <br/>
+            Kotzee Road,
+            <br/>
+            Mowbray
+        </p>
+        <label>Phone:</label> +27 21 448 7225
+    </div>
+
+    <div id="2" class="infoBox" style="display: none;">
+        <h3>Frogfoot Pretoria</h3>
+        <p>
+            Block 16
+            <br/>
+            Boardwalk Office Park
+            <br/>
+            Eros Street
+            <br/>
+            Faerie Glen
+        </p>
+        <label>Phone:</label> +27 87 805 0530
+    </div>
+
+    <div id="3" class="infoBox" style="display: none;">
+        <h3>Frogfoot Bloemfontein</h3>
+        <p>
+            No1, 8th Street
+            <br/>
+            Arboretum
+        </p>
+        <label>Phone:</label> +27 51 444 4101
+    </div>
+
+    <div id="4" class="infoBox" style="display: none;">
+        <h3>Frogfoot Port Elizabeth</h3>
+        <p>
+            Suite 2, 5th Avenue,
+            <br/>
+            Newton Park
+        </p>
+        <label>Phone:</label> +27 41 365 2566
+    </div>
+
+    <div id="5" class="infoBox" style="display: none;">
+        <h3>Frogfoot Durban</h3>
+        <p>
+            Suite 4 Strathway,
+            <br/>
+            Strathmore Park,
+            <br/>
+            305 Musgrave Rd,
+            <br/>
+            Durban
+        </p>
+        <label>Phone:</label> +27 31 277 1100
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="//maps.google.com/maps/api/js?key=@(Globals.GoogleApiKey)&libraries=places" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            var map;
+
+            function InitializeMap() {
+
+                var latlng = new google.maps.LatLng(-29.102314, 26.220063);
+                var myOptions =
+                {
+                    zoom: 5,
+                    center: latlng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    disableDefaultUI: false
+                };
+                map = new google.maps.Map(document.getElementById("map"), myOptions);
+            }
+
+            InitializeMap();
+
+            var locations = [
+                [0,"Frogfoot Johannesburg", "-26.1362107", "28.0702908"],
+                [1,"Frogfoot Cape Town", "-33.942507", "18.472060"],
+                [2,"Frogfoot Pretoria", "-25.800492", " 28.325948"],
+                [3,"Frogfoot Bloemfontein", "-29.102314", "26.220063"],
+                [4,"Frogfoot Port Elizabeth", "-33.945701", "25.5627329"],
+                [5,"Frogfoot Durban", "-29.844864", "31.0019655"]
+            ];
+
+            var infowindow = new google.maps.InfoWindow();
+
+            var marker, i;
+
+            for (i = 0; i < locations.length; i++) {
+                marker = new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[i][2], locations[i][3]),
+                    map: map
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                    return function () {
+                        infowindow.setContent(locations[i][1]);
+                        infowindow.open(map, marker);
+                        $('.infoBox').hide();
+                        $('#' + locations[i][0] + '.infoBox').show();
+                    }
+                })(marker, i));
+            }
+        })
+    </script>
+}

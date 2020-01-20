@@ -1,0 +1,43 @@
+﻿@model List<FrogFoot.Entities.ISP>
+
+@{
+    ViewBag.Title = "ISPs";
+}
+
+@if (ViewBag.Response != null)
+{
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewBag.Response
+    </div>
+}
+
+<div class="form-group" style="margin-top: 30px;">
+    @Html.ActionLink("Add ISP", "AddISP", null, new { @class = "btn btn-success" })
+</div>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Email</td>
+            <td>Landline</td>
+            <td>Cell</td>
+            <td>ISP Code</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var isp in Model)
+        {
+            <tr>
+                <td>@isp.Name</td>
+                <td>@isp.EmailAddress</td>
+                <td>@isp.LandlineNo</td>
+                <td>@isp.CellNo</td>
+                <td>@isp.ISPCode</td>
+                <td>@Html.ActionLink("Edit", "ISP", "ManageISP", new { ispId = isp.ISPId } , new { @class = "btn btn-default"} )</td>
+            </tr>
+        }
+    </tbody>
+</table>

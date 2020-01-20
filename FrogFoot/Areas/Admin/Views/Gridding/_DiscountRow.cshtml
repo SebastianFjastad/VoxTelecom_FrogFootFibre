@@ -1,0 +1,14 @@
+﻿@model FrogFoot.Entities.ISPEstateDiscount
+
+<tr class="discountRow">
+    <td>@Html.TextBoxFor(x => Model.ISP.Name, new { @class = "form-control" })</td>
+    <td>
+            @Html.EnumDropDownListFor(d => d.Discount, new { @class = "form-control discount" })
+    </td>
+    <td>
+        <input type="button" class="btn btn-default saveDiscount" value="Save"
+               data-discountid="@Model.ISPEstateDiscountId"
+               data-ispid="@Model.ISP.ISPId" 
+               data-estateid="@Model.EstateId"/>
+    </td>
+</tr>

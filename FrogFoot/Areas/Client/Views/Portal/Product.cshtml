@@ -1,0 +1,506 @@
+﻿@using FrogFoot.Entities
+@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Areas.Client.Models.ProductViewModel
+
+@{
+    ViewBag.Title = "Product";
+}
+
+@functions
+{
+    private string FormatAmount(decimal? amount)
+    {
+        if (amount == 0) return "R0";
+        return string.Format("R{0:#,##0.00}", amount);
+    }
+}
+
+<style type="text/css">
+    .productContainer {
+        font-size: 20px;
+        padding: 30px;
+        color: rgb(120, 120, 120);
+        border: 1px solid lightgray;
+    }
+
+    .hr {
+        border-color: lightgrey;
+    }
+
+    .logo {
+        min-height: 50px;
+        width: 230px;
+    }
+
+    .prodName {
+        font-size: 24px;
+    }
+
+    .cost {
+        font-size: 24px;
+    }
+
+    .specialInfo {
+        color: Red;
+        font-weight: bolder;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+
+    .downSpeedSpecial {
+        color: Red;
+        font-weight: bolder;
+    }
+
+    .description {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .bandwidthContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .upDownSpeed {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .glyphicon {
+        top: 3px;
+        margin-right: 15px;
+    }
+
+    .attrContainer {
+        padding-top: 15px;
+    }
+
+    .subheadingContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .infoBox {
+        margin-top: 15px;
+        font-size: 18px;
+    }
+
+    .orderButton {
+        height: 50px;
+        margin-top: 15px;
+        color: white;
+        width: 100%;
+        border-radius: 0;
+        background-color: green;
+        font-size: 20px;
+    }
+
+    .backButtonContainer {
+        margin-top: 30px;
+        font-size: 20px;
+    }
+
+    .backButton {
+        color: green;
+        cursor: pointer;
+    }
+
+    .title {
+        color: rgb(120, 120, 120);
+    }
+
+    .chevron {
+        color: green;
+    }
+
+    .ui-state-default {
+        color: darkgrey;
+        background: white;
+        border: solid 1px darkgrey;
+    }
+
+    .ui-state-active {
+        color: green;
+        background: rgba(0, 128, 0, .1);
+        border: solid 1px darkgrey;
+    }
+
+    #contractFilter {
+        margin-top: 30px;
+    }
+
+    #contractFilterContainer {
+        margin-top: 25px;
+    }
+</style>
+
+@{
+    var product = Model.Product;
+    var estateDiscount = product.ISP.ISPEstateDiscounts.FirstOrDefault(d => d.EstateId == Model.User.EstateId);
+
+    decimal? setupCost = 0;
+    decimal? setupCostMonthly = 0;
+
+    if (estateDiscount != null)
+    {
+        setupCost = (Convert.ToDecimal(product.SetupCost)) - ((Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(product.SetupCost));
+        setupCostMonthly = (Convert.ToDecimal(product.M2MSetupCost)) - ((Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(product.M2MSetupCost));
+    }
+    else
+    {
+        setupCost = product.SetupCost;
+        setupCostMonthly = product.M2MSetupCost;
+    }
+
+    var m24Visible = ViewBag.ContractTerm != null && ViewBag.ContractTerm == ContractTerm.Month24 ? "" : "none";
+    var m2mVisible = ViewBag.ContractTerm != null && ViewBag.ContractTerm == ContractTerm.MonthToMonth ? "" : "none";
+
+    Special special = new Special();
+    if (Model.User.Zone != null)
+    {
+        //find the applicable special
+        if (Model.User.Zone.Status == TrenchingStatus.Undefined)
+        {
+            special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.EarlyBird);
+        }
+        else if (Model.User.Zone.Status == TrenchingStatus.HasDates)
+        {
+            special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.JustInTime);
+        }
+    }
+}
+
+@Html.HiddenFor(x => x.UserCanOrder)
+
+<div class="row">
+    <div class="col-xs-2">
+        <div class="backButtonContainer">
+            <span class="glyphicon glyphicon-menu-left chevron"></span>
+            <span class="backButton">Back</span>
+        </div>
+    </div>
+
+    @if (ViewBag.IsTwoOptions != null && ViewBag.IsTwoOptions == true && ViewBag.ContractTerm != null)
+    {
+        var m24Checked = ViewBag.ContractTerm == ContractTerm.Month24 ? "checked" : "";
+        var m24Active = m24Checked == "checked" ? "active" : "";
+        var m2mChecked = ViewBag.ContractTerm == ContractTerm.MonthToMonth ? "checked" : "";
+        var m2mActive = m2mChecked == "checked" ? "active" : "";
+
+        <div id="contractFilterContainer" class="col-sm-3">
+            <div id="prodContractFilter" class="btn-group" data-toggle="buttons">
+                <label for="prod24MRadio" class="btn btn-default @m24Active">
+                    <input id="prod24MRadio" data-contract="24m" type="radio" name="prodDetailcontractTerm" @m24Checked autocomplete="off">24 Month
+                </label>
+                <label for="prodM2MRadio" class="btn btn-default @m2mActive">
+                    <input id="prodM2MRadio" data-contract="m2m" type="radio" name="prodDetailcontractTerm" @m2mChecked autocomplete="off">Monthly
+                </label>
+            </div>
+        </div>
+
+    }
+
+    @if (Model.User.Zone != null && Model.User.Zone.AllowSpecial && Model.Product.IsSpecial == true)
+    {
+        if (Model.User.Zone.Status == TrenchingStatus.Undefined)
+        {
+            <div class="specialInfo col-md-5">Order now to get the special: 100% off setup cost</div>
+        }
+
+        if (Model.User.Zone.Status == TrenchingStatus.HasDates)
+        {
+            <div class="specialInfo col-md-5">Order now to get the special: 50% off setup cost</div>
+        }
+    }
+</div>
+
+<div class="row" style="margin-top: 15px;">
+    <div class="productContainer col-sm-10">
+        <div class="row">
+            <div class="col-sm-4">
+                @if (product.ISPLogo != null)
+                {
+                    <div class="logo" style="background: url('/Assets/ISPProductLogo/@product.ISPLogo.AssetPath') center no-repeat;"></div>
+                }
+                else
+                {
+                    <h3 class="logo">@product.ISP.Name</h3>
+                }
+            </div>
+            <div class="col-sm-4">
+                <div class="prodName">@product.ProductName</div>
+            </div>
+            <div class="col-sm-2">
+                <div>
+                    <div class="cost">
+                        <span class="m24Cost" style="display: @m24Visible">@FormatAmount(product.MonthlyCost)</span>
+                        <span class="m2mCost" style="display: @m2mVisible">@FormatAmount(product.M2MMonthlyCost)</span>
+                    </div>
+                    <span style="font-size: 16px;">per month</span>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div class="cost">
+                    @{
+                        var discount = 0;
+                        //m24SetupCost
+                        if (Model.User.Zone != null && Model.User.Zone.AllowSpecial && product.IsSpecial == true && special != null)
+                        {
+                            discount = (int) special.Discount;
+                            if (setupCost != 0)
+                            {
+                                var discountedSetupCost = setupCost - (discount*setupCost/100);
+                                <div class="m24Cost" style="display: @m24Visible;"><span class="downSpeedSpecial"> @FormatAmount(discountedSetupCost)</span></div>
+                                <div class="m24Cost" style="display: @m24Visible;"><span style="text-decoration: line-through; font-size: 17px;">@FormatAmount(setupCost)</span></div>
+                            }
+                            else
+                            {
+                                <span class="m24Cost" style="display: @m24Visible">@(FormatAmount(setupCost))</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="m24Cost" style="display: @m24Visible">@(FormatAmount(setupCost))</span>
+                        }
+
+                        //m2mSetupCost
+                        if (Model.User.Zone != null && Model.User.Zone.AllowSpecial && product.IsSpecial == true && special != null)
+                        {
+                            if (product.M2MSetupCost != null && product.M2MSetupCost != 0)
+                            {
+                                var discountedM2MSetupCost = setupCostMonthly - (discount*setupCostMonthly/100);
+                                <div class="m2mCost" style="display: @m2mVisible"><span class="downSpeedSpecial">@FormatAmount(discountedM2MSetupCost)</span></div>
+                                <div class="m2mCost" style="display: @m2mVisible"><span style="text-decoration: line-through;">@FormatAmount(setupCostMonthly)</span></div>
+                            }
+                            else
+                            {
+                                <span class="m2mCost" style="display: @m2mVisible">@FormatAmount(setupCostMonthly)</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="m2mCost" style="display: @m2mVisible">@FormatAmount(setupCostMonthly)</span>
+                        }
+                        <p style="font-size: 16px;">setup</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <hr class="hr" />
+
+        <div class="description">
+            @product.Description
+        </div>
+
+        <div class="bandwidthContainer">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-download"></span><span class="downSpeed">@product.LineSpeed.GetDisplayName()</span>
+                        @*@if (Model.User.Zone != null && Model.User.Zone.AllowSpecial && product.IsSpecial == true && special != null)
+                            {
+                                //if special is early bird then dont show 1Gbps line change
+                                //and if special is Just In Time then dont show 100Mbps and 1Gbps line change
+                                if ((special.SpecialType == SpecialType.EarlyBird && product.LineSpeed != LineSpeed.HundredMbps)
+                                    || special.SpecialType == SpecialType.JustInTime && product.LineSpeed != LineSpeed.HundredMbps || product.LineSpeed != LineSpeed.HundredMbps)
+                                {
+                                    <span class="downSpeed downSpeedSpecial">(@special.SpecialLineSpeed.GetDisplayName())</span>
+                                }
+                            }*@
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-cloud-download"></span><span class="upSpeed">@(product.IsCapped ? "Capped" : "Uncapped")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bandwidthContainer" style="margin-top: 5px;">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-upload"></span><span class="upSpeed">@product.UpSpeed Mbps</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-step-forward"></span><span class="downSpeed">@(product.IsCapped ? product.Cap + " GB" : "n/a")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="attrContainer"></div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@product.Attr1</li>
+                    <li>@product.Attr2</li>
+                </ul>
+            </div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@product.Attr3</li>
+                    <li>@product.Attr4</li>
+                </ul>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(product.Info1Heading) || !string.IsNullOrEmpty(product.Info2Heading))
+        {
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(product.Info1Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@product.Info1Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(product.Info2Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@product.Info2Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @product.Info1
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @product.Info2
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(product.Info3Heading) || !string.IsNullOrEmpty(product.Info4Heading))
+        {
+            <div class="col-xs-12" style="margin-top: 15px; margin-bottom: 15px;">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(product.Info3Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@product.Info3Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(product.Info4Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@product.Info4Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @product.Info3
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @product.Info4
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-sm-offset-4 col-xs-4">
+                <a href="@Url.Action("ConfirmOrder", "Portal", new { prodId = product.ISPProductId, ispId = product.ISPId })" class="btn btn-success orderButton">Order Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="stopUserOrder" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Unable to order yet</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Thank you for your interest.
+                </p>
+                <p>
+                    We'd love to process your order, but right now, we don't have scheduled dates for when the fibre is due to pass your house.
+                    We'd rather be sure of that before taking your order.
+                    <br /><br />Keep an eye on the Portal and <a href="https://www.facebook.com/frogfootfibre/?fref=ts" target="_blank">Facebook</a> page for updates.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('.backButton').click(function () {
+                history.go(-1);
+                return false;
+            });
+
+            $('#contractFilterContainer input[type=radio]').change(function () {
+                var isM2M = $('#contractFilterContainer label.active > input').data('contract') == 'm2m' ? true : false;
+                if (isM2M) {
+                    $('.m24Cost').hide();
+                    $('.m2mCost').show();
+                } else {
+                    $('.m2mCost').hide();
+                    $('.m24Cost').show();
+                }
+            });
+
+            $('.orderButton').click(function (e) {
+                if ($('#UserCanOrder').val() == "False") {
+                    $('#stopUserOrder').modal('show');
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+                return true;
+            });
+
+            $('.orderButton').click(function (e) {
+                BuildUrl($(this), e);
+            });
+
+            function BuildUrl($button, e) {
+                e.preventDefault();
+                var $this = $button;
+                var href = $this.attr("href");
+                var selectedOption = $('#contractFilterContainer label.active > input').data('contract') == 'm2m' ? 1 : 2;;
+                window.location = href + '&contractTerm=' + selectedOption;
+            }
+        })
+    </script>
+}

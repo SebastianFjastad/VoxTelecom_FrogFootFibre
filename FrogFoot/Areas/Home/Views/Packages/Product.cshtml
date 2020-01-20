@@ -1,0 +1,234 @@
+﻿@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Entities.ISPProduct
+
+@{
+    ViewBag.Title = "Product";
+}
+
+@{
+    var m24PriceVisible = ViewBag.ContractTerm != null && ViewBag.ContractTerm == ContractTerm.Month24 ? "" : "none";
+    var m2mPriceVisible = ViewBag.ContractTerm != null && ViewBag.ContractTerm == ContractTerm.MonthToMonth ? "" : "none";
+}
+
+<link href="~/Content/Custom/Product.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-xs-2">
+        <div class="backButtonContainer">
+            <span class="glyphicon glyphicon-menu-left chevron"></span>
+            <span class="backButton">Back</span>
+        </div>
+    </div>
+
+    @if (ViewBag.IsTwoOptions != null && ViewBag.IsTwoOptions == true && ViewBag.ContractTerm != null)
+    {
+        var m24Checked = ViewBag.ContractTerm == ContractTerm.Month24 ? "checked" : "";
+        var m24Active = m24Checked == "checked" ? "active" : "";
+        var m2mChecked = ViewBag.ContractTerm == ContractTerm.MonthToMonth ? "checked" : "";
+        var m2mActive = m2mChecked == "checked" ? "active" : "";
+
+        <div id="contractFilterContainer" class="col-xs-4">
+            <div id="prodContractFilter" class="btn-group" data-toggle="buttons">
+                <label for="prod24MRadio" class="btn btn-default @m24Active">
+                    <input id="prod24MRadio" data-contract="24m" type="radio" name="prodDetailcontractTerm" @m24Checked autocomplete="off">24 Month
+                </label>
+                <label for="prodM2MRadio" class="btn btn-default @m2mActive">
+                    <input id="prodM2MRadio" data-contract="m2m" type="radio" name="prodDetailcontractTerm" @m2mChecked autocomplete="off">Monthly
+                </label>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row">
+    <div class="productContainer col-sm-10">
+        <div class="row">
+            <div class="col-sm-4">
+                @if (Model.ISPLogo != null)
+                {
+                    <div class="logo" style="background: url('/Assets/ISPProductLogo/@Model.ISPLogo.AssetPath') center no-repeat;"></div>
+                }
+                else
+                {
+                    <h3 class="logo">@Model.ISP.Name</h3>
+                }
+            </div>
+            <div class="col-sm-4">
+                <div class="prodDetailsName">@Model.ProductName</div>
+            </div>
+            <div class="col-sm-2">
+                <div>
+                    <div class="cost">
+                        <span class="m24Cost" style="display: @m24PriceVisible">R@(Model.MonthlyCost)</span>
+                        <span class="m2mCost" style="display: @m2mPriceVisible">R@(Model.M2MMonthlyCost)</span>
+                    </div>
+                    <span style="font-size: 16px;">per month</span>
+                </div>
+            </div>
+            <div class="col-sm-2">
+                <div>
+                    <div class="cost m24Cost" style="display: @m24PriceVisible;">R@(Model.SetupCost ?? 0)</div>
+                    <div class="cost m2mCost" style="display: @m2mPriceVisible;">R@(Model.M2MSetupCost ?? 0)</div>
+                    <span style="font-size: 16px;">setup</span>
+                </div>
+            </div>
+        </div>
+
+        <hr class="hr" />
+
+        <div class="description">
+            @Model.Description
+        </div>
+
+        <div class="bandwidthContainer">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-download"></span><span class="downSpeed">@Model.LineSpeed.GetDisplayName()</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-cloud-download"></span><span class="upSpeed">@(Model.IsCapped ? "Capped" : "Uncapped")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bandwidthContainer" style="margin-top: 5px;">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-upload"></span><span class="upSpeed">@Model.UpSpeed Mbps</span>
+                    </div>
+                    <div class="col-xs-6">
+                        <span class="glyphicon glyphicon-step-forward"></span><span class="downSpeed">@(Model.IsCapped ? Model.Cap + " GB" : "n/a")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="attrContainer"></div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@Model.Attr1</li>
+                    <li>@Model.Attr2</li>
+                </ul>
+            </div>
+            <div class="col-xs-6">
+                <ul>
+                    <li>@Model.Attr3</li>
+                    <li>@Model.Attr4</li>
+                </ul>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Info1Heading) || !string.IsNullOrEmpty(Model.Info2Heading))
+        {
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(Model.Info1Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info1Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.Info2Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info2Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info1
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info2
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(Model.Info3Heading) || !string.IsNullOrEmpty(Model.Info4Heading))
+        {
+            <div class="col-xs-12" style="margin-top: 15px; margin-bottom: 15px;">
+                <div class="row">
+                    <div class="subheadingContainer">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                @if (!string.IsNullOrEmpty(Model.Info3Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info3Heading</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrEmpty(Model.Info4Heading))
+                                {
+                                    <div class="col-xs-6">
+                                        <div class="">@Model.Info4Heading</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info3
+                        </div>
+                    </div>
+
+                    <div class="col-xs-6">
+                        <div class="infoBox">
+                            @Model.Info4
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-sm-offset-4 col-xs-4">
+                <a id="orderLink" href="@Url.Action("Interest", "Home")">
+                    <input class="btn btn-success prodOrderButton" type="button" value="Order now" />
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('.backButton').click(function () {
+                history.go(-1);
+                return false;
+            });
+
+            $('input[name=prodDetailcontractTerm]').change(function () {
+                var isM2M = $('input[name=prodDetailcontractTerm]:checked').data('contract') == 'm2m' ? true : false;
+                if (isM2M) {
+                    $('.m24Cost').hide();
+                    $('.m2mCost').show();
+                } else {
+                    $('.m2mCost').hide();
+                    $('.m24Cost').show();
+                }
+            });
+        })
+    </script>
+}

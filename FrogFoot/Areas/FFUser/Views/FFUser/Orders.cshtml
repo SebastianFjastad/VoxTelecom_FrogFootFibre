@@ -1,0 +1,100 @@
+﻿@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Areas.FFUser.Models.OrderViewModel
+
+@{
+    ViewBag.Title = "Orders";
+}
+
+<h2>Orders</h2>
+
+<table id="orderTable" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.OrderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.Status)
+            </th>
+            <th>
+                ISP
+            </th>
+            <th>
+                Client Name
+            </th>
+            <th>Created By</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.Location.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.Client.Estate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.Client.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Order.CreatedDate)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Orders)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <th>
+                    @Html.DisplayFor(modelItem => item.ISP.Name)
+                </th>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.FirstName)
+                    @Html.DisplayFor(modelItem => item.Client.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedByRole)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.Location.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.Estate.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.Address)
+                </td>
+                <td>
+                    @item.CreatedDate.Date()
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.OrderId }) |
+                    @Html.ActionLink("Cancel", "Cancel", new { id = item.OrderId }, new { @class = "cancelLink" })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#orderTable').DataTable({
+                "paging": true,
+                "ordering": true
+            });
+
+            $('.cancelLink').click(function() {
+                if (confirm("Are you sure you want to cance this order? You will not be able to undo this action.")) {
+                    return true;
+                }
+                return false;
+            });
+        })
+    </script>
+}

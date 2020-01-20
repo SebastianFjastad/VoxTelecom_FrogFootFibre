@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+
+    <style type="text/css">
+        body {
+            font-size: 17px;
+        }
+
+        .footerLink {
+            color: #00923e;
+            font-size: 17px;
+        }
+
+            .footerLink:hover {
+                color: #00923e;
+                text-decoration: none;
+            }
+
+            .footerLink:focus {
+                color: #00923e;
+                text-decoration: none;
+            }
+
+        .footerList {
+            padding-left: 0;
+        }
+
+            .footerList li {
+                list-style: none;
+            }
+
+        .footerH3 {
+            color: #3e4b53;
+            font-family: Arial;
+            font-size: 16px;
+        }
+
+        .registerButtonNav {
+            float: right;
+            margin-left: 40px;
+            margin-top: 12px;
+            height: 28px;
+            padding: 2px;
+            width: 109px;
+        }
+
+        .copyright {
+            font-size: smaller;
+            color: grey;
+            text-align: center;
+        }
+
+            .copyright a {
+                color: grey;
+            }
+
+                .copyright a:hover {
+                    text-decoration: none;
+                }
+
+        @@media screen and (max-width: 767px) {
+            .registerButtonNav {
+                display: none;
+            }
+        }
+
+        .control-label {
+            color: green;
+        }
+    </style>
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+    <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-66327785-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    @*<script type="text/javascript">
+      var onloadCallback = function() {
+          grecaptcha.render('recaptcha_div', {
+            'sitekey': '6LcwliQTAAAAAA5OiWq8rvf1XbHM87_hfICk-sI4'
+        });
+      };
+    </script>*@
+
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="@Url.Action("Index", "Home")"><img src="~/Content/whitefrogfeet.png" alt="ff-logo" style="margin-top: 5px;" /></a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("What is FTTH", "WhatIsFTTH", "Home")</li>
+                    <li>@Html.ActionLink("Coverage", "Coverage", "Home")</li>
+                    <li>@Html.ActionLink("Packages", "Index", "Packages")</li>
+                    <li>@Html.ActionLink("News", "Index", "News")</li>
+                    <li>@Html.ActionLink("FAQ", "FAQ", "Home")</li>
+                </ul>
+                @Html.ActionLink("Register Now", "Register", "Account", null, new { @class = "btn btn-success registerButtonNav" })
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <div class="row">
+                <div class="col-sm-2">
+                    <h3 class="footerH3">Learn More</h3>
+                    <ul class="footerList">
+                        <li>@Html.ActionLink("What is FTTH", "WhatIsFTTH", "Home", null, new { @class = "footerLink" })</li>
+                        <li>@Html.ActionLink("FAQs", "FAQ", "Home", null, new { @class = "footerLink" })</li>
+                        <li>@Html.ActionLink("Contact Us", "Contact", "Home", null, new { @class = "footerLink" })</li>
+                        <li>@Html.ActionLink("Coverage", "Coverage", "Home", null, new { @class = "footerLink" })</li>
+                    </ul>
+                </div>
+
+                <div class="col-sm-2">
+                    <h3 class="footerH3">About Us</h3>
+                    <ul class="footerList">
+                        <li>@Html.ActionLink("FrogFoot Networks", "About", "Home", null, new { @class = "footerLink" })</li>
+                        <li>@Html.ActionLink("Terms & Conditions", "TermsOfUse", "Home", null, new { @class = "footerLink" })</li>
+                        <li>@Html.ActionLink("Privacy Policy", "Privacy", "Frogfoot", null, new { @class = "footerLink" })</li>
+                    </ul>
+                </div>
+                <div class="col-sm-4"></div>
+                <div class="col-sm-4">
+                    <img src="@Url.Content("~/Content/logo.png")" />
+                </div>
+            </div>
+        </footer>
+        <div>
+            <p class="col-sm-12 copyright form-group">
+                Powered by <a href="http://www.lavalamp.biz/">Lava Lamp Lab</a> - Copyright © 2016 <a href="http://www.Frogfoot.com">Frogfoot Networks (PTY) Ltd.</a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5562c7326ccf181a" async="async"></script>
+    @*<script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>*@
+    @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.5";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

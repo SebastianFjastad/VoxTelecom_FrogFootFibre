@@ -1,0 +1,122 @@
+﻿@using FrogFoot.Entities
+@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model  FrogFoot.Areas.Client.Models.ProductPartialViewModel
+
+@functions
+{
+    private string FormatAmount(decimal? amount)
+    {
+        if (amount == 0) return "R0";
+        return string.Format("R{0:#,##0.00}", amount);
+    }
+}
+
+<h3 class="col-sm-12 noProdMessage" style="display: @(Model.Products.Any() ? "none": "")">No packages for your search criteria</h3>
+@if (Model.Products.Any())
+{
+    foreach (var prod in Model.Products)
+    {
+        var estateDiscount = prod.ISP.ISPEstateDiscounts.FirstOrDefault(d => d.EstateId == Model.User.EstateId);
+
+        decimal? setupCost = 0;
+        decimal? setupCostMonthly = 0;
+
+        if (estateDiscount != null)
+        {
+            setupCost = (Convert.ToDecimal(prod.SetupCost)) - ((Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(prod.SetupCost));
+            setupCostMonthly = (Convert.ToDecimal(prod.M2MSetupCost)) - ((Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(prod.M2MSetupCost));
+        }
+        else
+        {
+            setupCost = prod.SetupCost;
+            setupCostMonthly = prod.M2MSetupCost;
+        }
+
+        var m24PriceVisible = (prod.Is24MClient && !prod.IsM2MClient) ? "" : "none";
+        var m2mPriceVisible = prod.IsM2MClient ? "" : "none";
+        var initialProdVisibility = !prod.IsCapped && prod.IsM2MClient ? "" : "none";
+
+        Special special = new Special();
+        if (Model.UserZone != null && Model.UserZone.AllowSpecial)
+        {
+            //find the applicable special
+            if (Model.UserZone.Status == TrenchingStatus.Undefined)
+            {
+                special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.EarlyBird);
+            }
+            else if (Model.UserZone.Status == TrenchingStatus.HasDates)
+            {
+                special = Model.Specials.FirstOrDefault(s => s.SpecialType == SpecialType.JustInTime);
+            }
+        }
+
+        <div class="col-md-3 col-sm-4 col-xs-6" data-prodid="@prod.ISPProductId" data-ispid="@prod.ISPId" data-is24m="@prod.Is24MClient" data-ism2m="@prod.IsM2MClient" style="display: @initialProdVisibility">
+            <div class="prodContainer">
+                @if (prod.ISPLogo != null)
+                {
+                    <div class="logo padding" style="background: url('/Assets/ISPProductLogo/@prod.ISPLogo.AssetPath') center no-repeat;"></div>
+                }
+                else
+                {
+                    <h4 class="logo logoPlaceholder padding">@prod.ISP.Name</h4>
+                }
+                <div class="prodName">@prod.ProductName</div>
+                <div class="info padding">@prod.Description</div>
+                <div class="upDownSpeed padding">
+                    <span class="glyphicon glyphicon-download downSpeedIcon"></span><span class="downSpeed">@prod.LineSpeed.GetDisplayName()</span>
+                </div>
+                <div class="cap padding">@(prod.IsCapped ? "Cap: " + prod.Cap + " GB" : "Uncapped")</div>
+                <div class="attr padding">@prod.Attr1</div>
+                <div class="attr attrAlt padding">@prod.Attr2</div>
+                <div class="attr padding">
+                    @if (Model.UserZone != null && Model.UserZone.AllowSpecial && prod.IsSpecial == true && special != null)
+                    {
+                        //m24setupCost
+                        var discount = (int)special.Discount;
+                        if (setupCost != null && setupCost != 0)
+                        {
+                            var discountedSetupCost = setupCost - (discount * setupCost / 100);
+                            <div class="m24SetupCost" style="display: @m24PriceVisible">setup: <span style="text-decoration: line-through;">@(FormatAmount(setupCost))</span><span class="downSpeedSpecial"> @(FormatAmount(discountedSetupCost))</span></div>
+                        }
+                        else
+                        {
+                            <span class="m24SetupCost" style="display: @m24PriceVisible">setup: @(FormatAmount(setupCost))</span>
+                        }
+
+                        //m2mSetupCost
+                        if (setupCostMonthly != null && setupCostMonthly != 0)
+                        {
+                            var discountedM2MSetupCost = setupCostMonthly - (discount * setupCostMonthly / 100);
+                            <div class="m2mSetupCost" style="display: @m2mPriceVisible">setup: <span style="text-decoration: line-through;">@(FormatAmount(setupCostMonthly))</span><span class="downSpeedSpecial"> @(FormatAmount(discountedM2MSetupCost))</span></div>
+                        }
+                        else
+                        {
+                            <span class="m2mSetupCost" style="display: @m2mPriceVisible">setup: @(FormatAmount(setupCostMonthly))</span>
+                        }
+                    }
+                    else
+                    {
+                        @prod.Attr3
+                    }
+                </div>
+                <div class="attr attrAlt cost">
+                    <span class="m24Cost" style="display: @m24PriceVisible">@("R" + Convert.ToInt32(prod.MonthlyCost) + "pm")</span>
+                    <span class="m2mCost" style="display: @m2mPriceVisible">@("R" + Convert.ToInt32(prod.M2MMonthlyCost) + "pm")</span>
+                </div>
+                <div class="buttonContainer">
+                    <div class="row">
+                        <div class="col-xs-6" style="padding-right: 0;">
+                            <a href="@Url.Action("Product", new { prodId = prod.ISPProductId} )" data-istwocontractoptions="@(prod.Is24MClient && prod.IsM2MClient)" class="btn btn-default infoButton">More Info</a>
+                        </div>
+                        <div class="col-xs-6" style="padding-left: 0;">
+                            <div href="@Url.Action("ConfirmOrder", "Portal", new { prodId = prod.ISPProductId, ispId = prod.ISPId })" class="btn btn-success orderButton">Order Now</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+

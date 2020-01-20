@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "What Is FTTH";
+}
+
+<style type="text/css">
+    .wrapper {
+        width: 100%;
+        height: 100%;
+        margin: 0 auto;
+        background: #CCC;
+    }
+
+    .h_iframe {
+        height: auto;
+        padding-top: 56%;
+    }
+
+        .h_iframe iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+    .videoContainer {
+        margin-bottom: 60px;
+    }
+
+    .boxImg {
+        width: 90px;
+    }
+
+    .textJustify {
+        text-align: justify;
+    }
+
+    p {
+        color: grey;
+    }
+
+    .registerLink {
+        color: darkgreen;
+    }
+   
+     .registerLink:hover {
+        color: white;
+    }
+
+    .stepContainer {
+        background-color: #00923F;
+        padding: 15px 30px;
+    }
+
+    .stepHeader {
+        color: white;
+        background-color: #D79861;
+        padding: 2px 5px;
+    }
+
+    .step {
+        color: white;
+    }
+    
+    .facebookLink {
+        color: darkgreen;
+    }
+
+    .facebookLink:hover {
+        color: white;
+    }
+</style>
+
+<div class="row">
+    <div class="col-xs-12 text-center" style="margin-top: 45px;">
+        <img src="~/Content/icons/icon-fibre.png" />
+        <h2 style="color: green;">What Is FTTH</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12 form-group text-center">
+        <p>
+            Fibre To The Home refers to the use of optic fibre cables to provide unprecedented
+            high-speed Internet access and other services, directly to individual residences, apartment buildings and businesses.
+            FTTH dramatically increases the connection speeds available to computer users compared with copper based technologies
+            like DSL, currently in common use.
+        </p>
+    </div>
+
+    <div class="col-sm-8 col-sm-offset-2 form-group videoContainer">
+        <div class="wrapper">
+            <div class="h_iframe">
+                <iframe height="2" width="2" src="https://www.youtube.com/embed/DkQjF54gy9w" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    @*First Row*@
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-speed-new.png")" class="form-group boxImg" />
+        <b><p>Better speed!</p></b>
+        <p class="textJustify">Fibre is up to 250 times faster than today's basic DSL broadband. Upload speed is more or less the same as download speed, which is great for video conferencing via Skype and for remote working. Fibre future-proofs your home.</p>
+    </div>
+
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-security-new.png")" class="form-group boxImg" />
+        <b><p>Improved Security</p></b>
+        <p class="textJustify">Rolling out a fibre network makes it possible for CCTV cameras to be placed throughout the community, which can play a significant role in improving the overall security in the areas they cover.</p>
+    </div>
+
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-entertainment-new.png")" class="form-group boxImg" />
+        <b><p>HD Entertainment possible</p></b>
+        <p class="textJustify">Rapidly download or even live stream your favourite HD TV shows, movies, games and music via the Internet.</p>
+    </div>
+</div>
+
+<div class="row">
+    @*Second Row*@
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-telephony-new.png")" class="form-group boxImg" />
+        <b>
+            <p>Internet telephony</p>
+        </b>
+        <p class="textJustify">VoIP (Voice over IP) can cut your phone costs by making calls (locally and internationally) from your home at a fraction of current costs, but with crystal clear quality.</p>
+    </div>
+
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-mobile-new.png")" class="form-group boxImg" />
+        <b>
+            <p>Improved Mobile phone coverage</p>
+        </b>
+        <p class="textJustify">Mobile phone coverage (which can be very poor in some areas) can be improved with the installation of decentralised mini-antennas mounted on, for example, camera poles and traffic lights – they can be powered through the fibre network. This is a very viable means of addressing environmental and health concerns associated with large masts in residential areas.</p>
+    </div>
+
+    <div class="col-sm-4 form-group" style="text-align: center;">
+        <img src="@Url.Content("~/Content/icons/icon-services-new.png")" class="form-group boxImg" />
+        <b>
+            <p>Additional services</p>
+        </b>
+        <p class="textJustify">Smart metering and home automation allows homeowners to upgrade to smart homes, with remote control of alarms, devices, lights, appliances, and remote measuring of water and electricity consumption.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 stepContainer">
+        <h2 class="text-center" style="color: white; margin-bottom: 30px;">How do I get FTTH?</h2>
+        <div class="form-group">
+            <label class="stepHeader">Step 1</label>
+            <p class="step">Click on the <i>@Html.ActionLink("Register", "Register", "Account", null, new {@class = "registerLink"})</i> button.</p>
+        </div>
+        <div class="form-group">
+            <label class="stepHeader">Step 2</label>
+            <p class="step">Enter your details, and check that the pin on the map indicates where you want fibre, submit the info and follow instructions in the 'welcome' email.</p>
+        </div>
+        <div class="form-group">
+            <label class="stepHeader">Step 3</label>
+            <p class="step">Place an advanced order for a Fibre Broadband package from the ISP of your choice.</p>
+        </div>
+        <div class="form-group">
+            <label class="stepHeader">Step 4</label>
+            <p class="step">Rally your neighbourhood - the more people in your area that register, the more reason we have to roll out fibre in your suburb.</p>
+        </div>
+        <div class="form-group" style="margin-bottom: 45px;">
+            <label class="stepHeader">Step 5</label>
+            <p class="step">Keep an eye on the Frogfoot Fibre Facebook page (<a class="facebookLink" href="http://www.facebook.com/frogfootfibre">www.facebook.com/frogfootfibre</a>) and this portal for updates
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+﻿@model List<FrogFoot.Entities.ISPProduct>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var prod in Model.OrderBy(p => p.ISPId))
+    {
+        <tr>
+            <td>@prod.ProductName</td>
+            <td>@prod.LineSpeed</td>
+            <td>@prod.UpSpeed</td>
+            <td>@prod.ISP.Name</td>
+            <td>@prod.MonthlyCost</td>
+            <td><input type="radio" @(prod.IsCapped ? "checked='checked'" : "") class="radio" /></td>
+            <td><input type="radio" @(prod.OnceOfFFPaymentForM2M ? "checked='checked'" : "") class="radio" /></td>
+            <td><input type="radio" @(prod.IsM2MFrogfootLink ? "checked='checked'" : "") class="radio" /></td>
+            <td class="contractOptionContainer">
+                @if (prod.IsM2MClient)
+                {
+                    //default to checked if only option
+                    var isChecked = prod.IsM2MClient && !prod.Is24MClient;
+                    <input class="radio radio-inline" data-contract="1" type="radio" @(isChecked ? "checked='checked'" : "") name="@("contractOption" + prod.ISPProductId)"><label>Monthly</label>
+                }
+
+                @if (prod.Is24MClient)
+                {
+                    //default to checked if only option
+                    var isChecked = prod.Is24MClient && !prod.IsM2MClient;
+                    <input class="radio radio-inline" data-contract="2" type="radio" @(isChecked ? "checked='checked'" : "") name="@("contractOption" + prod.ISPProductId)"><label>24 Month</label>
+                }
+            </td>
+            <td>
+                <input type="checkbox" class="checkbox selectedProd"
+                       data-prodid="@prod.ISPProductId"
+                       data-linespeed="@((int) prod.LineSpeed)"
+                       data-ism2mlink="@prod.IsM2MFrogfootLink"
+                       data-isonceoffpayment="@prod.OnceOfFFPaymentForM2M" />
+            </td>
+        </tr>
+    }
+}

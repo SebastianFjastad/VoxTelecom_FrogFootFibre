@@ -1,0 +1,322 @@
+﻿@using FrogFoot.Models
+@using FrogFoot.Utilities
+@model FrogFoot.Areas.Client.Models.OrdersViewModel
+@{
+    ViewBag.Title = "Orders";
+}
+
+<style type="text/css">
+    .productContainer {
+        margin-top: 20px;
+        font-size: 20px;
+        padding: 30px;
+        color: rgb(120, 120, 120);
+        border: 1px solid lightgray;
+    }
+
+    .hr {
+        border-color: lightgrey;
+    }
+
+    .logo {
+        min-height: 50px;
+        width: 230px;
+    }
+
+    .prodName {
+        font-size: 24px;
+    }
+
+    .cost {
+        font-size: 24px;
+    }
+
+    .description {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    .bandwidthContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .upDownSpeed {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .glyphicon {
+        top: 3px;
+        margin-right: 15px;
+    }
+
+    .attrContainer {
+        padding-top: 15px;
+    }
+
+    .subheadingContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: rgb(227, 227, 227);
+    }
+
+    .infoBox {
+        margin-top: 15px;
+        font-size: 18px;
+    }
+
+    .orderButton {
+        height: 50px;
+        margin-top: 15px;
+        color: white;
+        width: 100%;
+        border-radius: 0;
+        background-color: green;
+        font-size: 20px;
+    }
+
+    .backButtonContainer {
+        margin-top: 30px;
+        font-size: 20px;
+    }
+
+    .backButton {
+        color: green;
+        cursor: pointer;
+    }
+
+    .title {
+        color: rgb(120, 120, 120);
+    }
+
+    .chevron {
+        color: green;
+    }
+
+    .panel-title {
+        cursor: pointer;
+    }
+</style>
+
+@{
+    var moreThanOneOrder = Model.Orders.Any();
+    var isExpanded = moreThanOneOrder ? "true" : "false";
+}
+
+<h2 class="text-center">Orders</h2>
+
+<div class="row">
+    @for (int i = 0; i < Model.Orders.Count; i++)
+    {
+        var item = Model.Orders[i];
+        var estateDiscount = item.ISP.ISPEstateDiscounts.FirstOrDefault(d => d.EstateId == Model.User.EstateId);
+
+        decimal? setupCost = 0;
+        var setupCostInitial = item.ISPProduct.Is24MClient ? item.ISPProduct.SetupCost : item.ISPProduct.M2MSetupCost;
+        if (estateDiscount != null)
+        {
+            setupCost = Convert.ToDecimal(setupCostInitial) - (Convert.ToDecimal(estateDiscount.Discount) / (decimal)100.0) * Convert.ToDecimal(setupCostInitial);
+        }
+        else
+        {
+            setupCost = setupCostInitial;
+        }
+
+        var special = item.Special;
+        if (special != null)
+        {
+            var discount = (int)special.Discount;
+            setupCost = setupCost - (discount*setupCost/100);
+        }
+
+        var monthlyCost = item.ClientContractTerm == ContractTerm.Month24 ? item.ISPProduct.MonthlyCost : item.ISPProduct.M2MMonthlyCost;
+
+        <div class="col-xs-12" style="text-align: center; margin-bottom: 30px;">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="heading@(i)">
+                        <h4 class="panel-title" data-toggle="collapse" data-parent="#accordion" href="#collapse@(i)" aria-expanded="@isExpanded" aria-controls="collapse@(i)">
+                            <a role="button">
+                                @item.ISPProduct.ProductName
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapse@(i)" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading@(i)">
+                        <div class="panel-body">
+
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="col-xs-4">
+                                    <label class="control-label">Order status: </label>
+                                    <span>@item.Status</span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <label class="control-label">Ordered on: </label>
+                                    <span>@item.CreatedDate.Date()</span>
+                                </div>
+                            </div>
+
+                            <div class="row" style="margin-bottom: 30px;">
+                                <div class="productContainer col-sm-10 col-lg-offset-1">
+                                    <div class="row">
+                                        <div class="col-sm-4">
+                                            @if (item.ISPProduct.ISPLogo != null)
+                                            {
+                                                <div class="logo" style="background: url('/Assets/ISPProductLogo/@item.ISPProduct.ISPLogo.AssetPath') center no-repeat;"></div>
+                                            }
+                                            else
+                                            {
+                                                <h3 class="logo">@item.ISPProduct.ISP.Name</h3>
+                                            }
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <div class="prodName">@item.ISPProduct.ProductName</div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div>
+                                                <div class="cost">@("R" + monthlyCost)</div>
+                                                <span style="font-size: 16px;">per month</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <div>
+                                                <div class="cost">R@(setupCost)</div>
+                                                <span style="font-size: 16px;">setup</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="hr" />
+
+                                    <div class="description">
+                                        @item.ISPProduct.Description
+                                    </div>
+
+                                    <div class="bandwidthContainer">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <span class="glyphicon glyphicon-download"></span><span class="downSpeed">@item.ISPProduct.LineSpeed.GetDisplayName()</span>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <span class="glyphicon glyphicon-cloud-download"></span><span class="upSpeed">@(item.ISPProduct.IsCapped ? "Capped" : "Uncapped")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="bandwidthContainer" style="margin-top: 5px;">
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <div class="col-xs-6">
+                                                    <span class="glyphicon glyphicon-upload"></span><span class="upSpeed">@item.ISPProduct.UpSpeed Mbps</span>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                    <span class="glyphicon glyphicon-step-forward"></span><span class="downSpeed">@(item.ISPProduct.IsCapped ? item.ISPProduct.Cap + " GB" : "n/a")</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="attrContainer"></div>
+                                        <div class="col-xs-6">
+                                            <ul>
+                                                <li>@item.ISPProduct.Attr1</li>
+                                                <li>@item.ISPProduct.Attr2</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <ul>
+                                                <li>@item.ISPProduct.Attr3</li>
+                                                <li>@item.ISPProduct.Attr4</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(item.ISPProduct.Info1Heading) || !string.IsNullOrEmpty(item.ISPProduct.Info2Heading))
+                                    {
+                                        <div class="col-xs-12">
+                                            <div class="row">
+                                                <div class="subheadingContainer">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            @if (!string.IsNullOrEmpty(item.ISPProduct.Info1Heading))
+                                                            {
+                                                                <div class="col-xs-6">
+                                                                    <div class="">@item.ISPProduct.Info1Heading</div>
+                                                                </div>
+                                                            }
+
+                                                            @if (!string.IsNullOrEmpty(item.ISPProduct.Info2Heading))
+                                                            {
+                                                                <div class="col-xs-6">
+                                                                    <div class="">@item.ISPProduct.Info2Heading</div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-6">
+                                                    <div class="infoBox">
+                                                        @item.ISPProduct.Info1
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-6">
+                                                    <div class="infoBox">
+                                                        @item.ISPProduct.Info2
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    @if (!string.IsNullOrEmpty(item.ISPProduct.Info3Heading) || !string.IsNullOrEmpty(item.ISPProduct.Info4Heading))
+                                    {
+                                        <div class="col-xs-12" style="margin-top: 15px; margin-bottom: 15px;">
+                                            <div class="row">
+                                                <div class="subheadingContainer">
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            @if (!string.IsNullOrEmpty(item.ISPProduct.Info3Heading))
+                                                            {
+                                                                <div class="col-xs-6">
+                                                                    <div class="">@item.ISPProduct.Info3Heading</div>
+                                                                </div>
+                                                            }
+
+                                                            @if (!string.IsNullOrEmpty(item.ISPProduct.Info4Heading))
+                                                            {
+                                                                <div class="col-xs-6">
+                                                                    <div class="">@item.ISPProduct.Info4Heading</div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-6">
+                                                    <div class="infoBox">
+                                                        @item.ISPProduct.Info3
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-xs-6">
+                                                    <div class="infoBox">
+                                                        @item.ISPProduct.Info4
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

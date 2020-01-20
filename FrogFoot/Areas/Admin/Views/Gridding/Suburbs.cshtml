@@ -1,0 +1,148 @@
+﻿@model FrogFoot.Areas.Admin.Models.SettingsViewModel
+
+@{
+    ViewBag.Title = "Suburbs";
+}
+
+<h2>Suburbs</h2>
+
+<ul id="locationTabs" class="nav nav-tabs">
+    @*<li class="active"><a data-toggle="tab" href="#locations">Locations</a></li>*@
+    @*<li><a data-toggle="tab" href="#api">Map API</a></li>*@
+</ul>
+
+<div class="tab-content">
+    <div id="locations" class="tab-pane fade in active">
+        <div class="form-group">
+            <table id="locationsTable" class="table table-striped table-responsive">
+                <thead>
+                    <tr>
+                        <td><label>Name</label></td>
+                        <td><label>Name for Map API</label></td>
+                        <td><label>Precinct Code</label></td>
+                        <td><label>Residents</label></td>
+                        <td><label>Active</label></td>
+                        <td><label>Allow Order</label></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                    @foreach (var loc in Model.Locations)
+            {
+                        <tr data-id="@loc.LocationId">
+                            <td>@Html.TextBoxFor(x => loc.Name, new { @class = "form-control name" })</td>
+                            <td>@Html.TextBoxFor(x => loc.APIName, new { @class = "form-control apiName" })</td>
+                            <td>@Html.TextBoxFor(x => loc.PrecinctCode, new { @class = "form-control code" })</td>
+                            <td>@Html.TextBoxFor(x => loc.Residents, new { @class = "form-control residents", @type = "number", @style = "width: 90px;" })</td>
+                            <td>@Html.CheckBoxFor(x => loc.IsActive, new { @class = "active" })</td>
+                            <td>@Html.CheckBoxFor(x => loc.AllowOrder, new { @class = "allowOrder" })</td>
+                            <td>
+                                <input type="button" class="btnUpdate btn btn-default" value="Edit" />
+                            </td>
+                            <td>
+                                @Html.ActionLink("Delete", "DeleteLocation", new { id = @loc.LocationId }, new { @class = "btn btn-default" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <hr />
+
+        <div class="form-group" style="margin-top: 30px;">
+            <h3>New location</h3>
+            <div class="row">
+                <div class="col-sm-2">
+                    @Html.TextBoxFor(n => n.Location.Name, new { @class = "form-control", @placeholder = "Location Name" })
+                </div>
+                <div class="col-sm-2">
+                    @Html.TextBoxFor(n => n.Location.APIName, new { @class = "form-control", @placeholder = "API Name" })
+                </div>
+                <div class="col-sm-2">
+                    @Html.TextBoxFor(n => n.Location.PrecinctCode, new { @class = "form-control", @placeholder = "Precinct Code" })
+                </div>
+                <div class="col-sm-2">
+                    @Html.TextBoxFor(n => n.Location.Residents, new { @class = "form-control", @style = "display: inline; margin-right: 10px;width: 90px;", @type = "number" })
+                </div>
+                <div class="col-sm-1">
+                    @Html.CheckBoxFor(n => n.Location.IsActive, new { @class = "checkbox active", @style = "display: inline; margin-right: 10px;" })
+                    @Html.LabelFor(x => x.Location.IsActive, new { @style = "display: inline" })
+                </div>
+                <div class="col-sm-1">
+                    @Html.CheckBoxFor(n => n.Location.AllowOrder, new { @class = "checkbox allowOrder", @style = "display: inline; margin-right: 10px;" })
+                    @Html.LabelFor(x => x.Location.AllowOrder, new { @style = "display: inline" })
+                </div>
+                <div class="col-sm-1">
+                    <div id="addLocation" class="btn btn-success">Add Location</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="api" class="tab-pane fade">
+        <div id="apiResults">
+            <!-- placeholder for API results-->
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#addLocation').on('click', function () {
+                if ($('#Location_Name').val().length) {
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: '@Url.Action("SaveLocation", "Gridding")',
+                        contentType: 'application/json',
+                        data: {
+                            name: $('#Location_Name').val(),
+                            apiName: $('#Location_APIName').val(),
+                            code: $('#Location_PrecinctCode').val(),
+                            active: $('#Location_IsActive').is(':checked'),
+                            allowOrder: $('#Location_AllowOrder').is(':checked'),
+                            residents: $('#Location_Residents').val()
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#locationsTable').on('click', '.btnUpdate', function () {
+                var tr = $(this).closest('tr');
+                var id = tr.data('id');
+                var name = tr.find('.name').val();
+                var apiName = tr.find('.apiName').val();
+                var code = tr.find('.code').val();
+                var active = tr.find("input:checkbox.active").is(':checked');
+                var allowOrder = tr.find("input:checkbox.allowOrder").is(':checked');
+                var residents = tr.find(".residents").val();
+
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("UpdateLocation", "Gridding")',
+                    contentType: 'application/json',
+                    data: { id: id, name: name, apiName: apiName, code: code, active: active, allowOrder: allowOrder, residents: residents },
+                    success: function (result) {
+                        if (result.success) {
+                            location.reload();
+                        }
+                    }
+                });
+            });
+        })
+    </script>
+}
+
+
+
+

@@ -1,0 +1,96 @@
+﻿@model FrogFoot.Areas.Admin.Models.ISPContactAuditViewModel
+@using FrogFoot.Models
+@using FrogFoot.Utilities
+
+@{
+    var ordered = Model.Client != null && Model.Client.Orders != null && Model.Client.Orders.Count > 0;
+    var hasOrdered = ordered ? "Yes" : "No";
+}
+
+@if (Model.Client != null)
+{
+    <div class="row">
+        <div class="col-sm-3">
+            <!-- Client -->
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <label style="font-size: 18px;">Client</label>
+                    <hr style="margin-top: 0; margin-bottom: 10px;"/>
+
+                    @if (Model.Client != null)
+                    {
+                        <div class="form-group">
+                            <label class="control-label">Name: </label>
+                            @Html.DisplayFor(x => x.Client.FirstName)
+                            @Html.DisplayFor(x => x.Client.LastName)
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Email: </label>
+                            @Html.DisplayFor(x => x.Client.Email)
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Cell No: </label>
+                            @Html.DisplayFor(x => x.Client.PhoneNumber)
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Landline: </label>
+                            @Html.DisplayFor(x => x.Client.Landline)
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label">Ordered: </label>
+                            @hasOrdered
+                        </div>
+
+                        if (ordered)
+                        {
+                            <div class="form-group">
+                                <label class="control-label">Ordered Date: </label>
+                                @Html.DisplayFor(x => x.Client.Orders.FirstOrDefault(o => o.Status != OrderStatus.Canceled).CreatedDate)
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-9">
+            <!-- ISP Users who have seen the Client's details -->
+            <table class="table table-condensed table-striped">
+                <thead>
+                    <tr>
+                        <th>ISP</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Cell No.</th>
+                        <th>Landline</th>
+                        <th>Contact Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model.ISPUsers)
+                {
+                    var contact = Model.ISPClientContacts.First(c => c.ISPUserId == user.Id);
+                    if (contact != null)
+                    {
+                    <tr>
+                        <td>@user.ISP.Name</td>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>@user.PhoneNumber</td>
+                        <td>@user.Landline</td>
+                        <td>@contact.ContactMadeDate.Date()</td>
+                    </tr>
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <h3>No results</h3>
+}

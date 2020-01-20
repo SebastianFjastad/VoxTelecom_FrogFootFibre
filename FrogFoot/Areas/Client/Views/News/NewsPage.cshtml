@@ -1,0 +1,52 @@
+﻿@using FrogFoot.Utilities
+@model List<FrogFoot.Entities.Post>
+
+@*add element for jqury to find to hide more button*@
+@if (Model.Count < 5)
+{
+    <div id="hideShowMore" style="display: none;"></div>
+}
+
+@foreach (var post in Model)
+{
+    var imgUrl = "";
+    var bgColour = "";
+    if (post.PostImage != null)
+    {
+        imgUrl = "\'../../Assets/PostImage/" + post.PostImage.AssetPath + "\'";
+
+    }
+    else
+    {
+        bgColour = "green";
+        imgUrl = "\'../../Content/whitefrogfeet.png\'";
+    }
+
+    <div class="row form-group">
+        <div class="col-xs-2">
+            <div class="line lineTop"></div>
+            <div class="dateContainer">
+                <div class="articleDay">@post.PublishDate.ToString("dd")</div>
+                <div class="articleDate">@post.PublishDate.ToString("MMM")</div>
+            </div>
+            <div class="line lineBottom"></div>
+        </div>
+
+        <div class="col-xs-10">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="articleImage" style="background: url(@imgUrl) no-repeat center center; background-color: @bgColour; background-size: cover; height: 120px; width: 100%"></div>
+                </div>
+                <div class="col-sm-8">
+                    <h4 class="articleTitle">@post.Title</h4>
+                    <div class="articleBody">
+                        @{
+                            var postBody = HtmlStripper.Strip(post.Body);
+                        }
+                        @(Html.Raw(postBody.Truncate(200) + "...")) <a href="@Url.Action("Post", "News", new {postId = post.PostId})">Read more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

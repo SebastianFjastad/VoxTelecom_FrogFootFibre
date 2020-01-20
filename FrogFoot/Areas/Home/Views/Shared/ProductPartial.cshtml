@@ -1,0 +1,53 @@
+﻿@using FrogFoot.Utilities
+@model IEnumerable<FrogFoot.Entities.ISPProduct>
+
+<h3 class="col-sm-12 noProdMessage" style="display: @(Model.Any() ? "none": "")">No packages for your search criteria</h3>
+@foreach (var prod in Model)
+{
+    var m24PriceVisible = (prod.Is24MClient && !prod.IsM2MClient) ? "" : "none";
+    var m2mPriceVisible = prod.IsM2MClient ? "" : "none";
+    var showProdInitially = !prod.IsCapped && prod.IsM2MClient ? "" : "none";
+
+    <div class="col-md-3 col-sm-4 col-xs-6" data-prodid="@prod.ISPProductId" data-is24m="@prod.Is24MClient" data-ism2m="@prod.IsM2MClient" data-ispid="@prod.ISPId" style="display: @showProdInitially">
+        <div class="prodContainer">
+            @if (prod.ISPLogo != null)
+                {
+                <div class="logo padding" style="background: url('/Assets/ISPProductLogo/@prod.ISPLogo.AssetPath') center no-repeat;"></div>
+            }
+            else
+            {
+                <h3 class="logo logoPlaceholder padding">@prod.ISP.Name</h3>
+            }
+
+            <div class="prodName">@prod.ProductName</div>
+            <div class="info padding">@prod.Description</div>
+            <div class="upDownSpeed padding">
+                <span class="glyphicon glyphicon-download"></span><span class="downSpeed" style="margin-right: 10px;">@prod.LineSpeed.GetDisplayName()</span>
+                <span class="glyphicon glyphicon-upload"></span><span class="upSpeed">@prod.UpSpeed Mbps</span>
+            </div>
+            <div class="cap padding">@(prod.IsCapped ? "Cap: " + prod.Cap + " GB" : "Uncapped")</div>
+            <div class="attr padding">@prod.Attr1</div>
+            <div class="attr attrAlt padding">@prod.Attr2</div>
+            <div class="attr padding">@prod.Attr3</div>
+            <div class="attr attrAlt cost">
+                <span class="m24Cost" style="display: @m24PriceVisible">@("R" + Convert.ToInt32(prod.MonthlyCost) + "pm")</span>
+                <span class="m2mCost" style="display: @m2mPriceVisible">@("R" + Convert.ToInt32(prod.M2MMonthlyCost) + "pm")</span>
+            </div>
+            <div class="buttonContainer">
+                <div class="row">
+                    <div class="col-xs-6" style="padding-right: 0;">
+                        <a href="@Url.Action("Product", "Packages", new {prodId = prod.ISPProductId})" data-istwocontractoptions="@(prod.Is24MClient && prod.IsM2MClient)" class="btn btn-default infoButton">More Info</a>
+                    </div>
+                    <div class="col-xs-6" style="padding-left: 0;">
+                        @using (Html.BeginForm("Interest", "Home", FormMethod.Post, new { isProdOrder = true }))
+                        {
+                            <input type="hidden" name="isProdOrder" value="true" />
+                                <input type="submit" class="btn btn-success orderButton orderButtonQuickOrder" value="Order now" />
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

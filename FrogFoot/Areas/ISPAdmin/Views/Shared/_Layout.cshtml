@@ -1,0 +1,81 @@
+﻿@using FrogFoot.Context
+@using Microsoft.AspNet.Identity
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/jquery-ui-styles")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+    <link href="~/Content/bootstrap-datetimepicker.css" rel="stylesheet" />
+</head>
+<body>
+    @{
+        var context = new ApplicationDbContext();
+        var user = context.Users.Find(User.Identity.GetUserId());
+        var ispName = "ISP";
+        if (user != null)
+        {
+            ispName = context.ISPs.Find(user.ISPId).Name;
+        }
+
+        var isFluidContainer = Request.RequestContext.RouteData.Values["controller"].ToString() == "Leads";
+        var container = isFluidContainer ? "container-fluid" : "container";
+    }
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="@container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink(ispName, "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Orders", "Index", "Order")</li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Coverage <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>@Html.ActionLink("Precincts", "Locations", "ISP")</li>
+                            <li>@Html.ActionLink("Coverage Map", "Index", "Coverage")</li>
+                        </ul>
+                    </li>
+                    <li>@Html.ActionLink("Leads", "Index", "Leads")</li>
+                    @{
+                        if (user != null && user.IsUserTypeAdmin)
+                        {
+                            <li>@Html.ActionLink("Product Gridding", "Index", "Gridding")</li>
+                            <li>@Html.ActionLink("Products", "Index", "Products")</li>
+                            <li>@Html.ActionLink("Users", "Index", "User")</li>
+                            <li>@Html.ActionLink("Reports", "Index", "Report")</li>
+                        }
+                    }
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+
+    <div class="@container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - FrogFoot</p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    <script src="//code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E=" crossorigin="anonymous"></script>
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="//cdn.datatables.net/1.10.8/js/jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

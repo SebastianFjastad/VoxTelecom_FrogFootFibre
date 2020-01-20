@@ -1,0 +1,176 @@
+﻿@using FrogFoot.Utilities
+@model FrogFoot.Areas.Admin.Models.ISPProductViewModel
+
+@{
+    ViewBag.Title = "Products";
+}
+
+<style type="text/css">
+    .activeBox {
+        padding: 3px;
+        padding-left: 35%;
+        text-align: center;
+    }
+
+    .dirty {
+        border: solid 1px black;
+    }
+</style>
+
+<h2>Products</h2>
+
+<div class="row">
+    <div class="col-sm-9 form-group">
+        @Html.ActionLink("Create Product", "CreateProduct", new { ispId = Model.ISPId, ispName = Model.ISPName }, new { @class = "btn btn-success" })
+    </div>
+    <div class="col-sm-3 form-group">
+        <div id="saveResult" class="pull-left" style="display: none;"><span style="color: green" class="glyphicon glyphicon-ok"></span> Saved
+        </div>
+        <button id="saveActiveChanges" class="btn btn-success pull-right">Save Active Changes</button>
+    </div>
+    <div class="col-sm-3 col-sm-offset-9">
+        <p id="changeCountContainer" style="display: none; text-align: right;">Unsaved active changes: <strong id="changeCount"></strong></p>
+    </div>
+</div>
+
+<h3>@Model.ISP.Name</h3>
+
+<table id="productsTable" class="table table-striped table-responsive">
+    <thead>
+    <tr>
+        <td></td>
+        <td>Product name</td>
+        <td>Down speed</td>
+        <td>Up speed</td>
+        <td>Cost/pm</td>
+        <td>Capped</td>
+        <td>M2M Client</td>
+        <td>24M Client</td>
+        <td>M2M Frogfoot</td>
+        <td>Description</td>
+        <td>Active <span class="glyphicon glyphicon-info-sign" style="color: green" data-toggle="tooltip" title="Show or hide your product from the public for viewing and ordering"></span></td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+    @{
+        if (Model.ISPProducts != null && Model.ISPProducts.Any())
+        {
+            foreach (var prod in Model.ISPProducts)
+            {
+                <tr>
+                    <td>
+                        @if (prod.ISPLogo != null)
+                        {
+                            <img src="~/Assets/ISPProductLogo/@prod.ISPLogo.AssetPath" width="200" height="60" alt="product image"/>
+                        }
+                    </td>
+                    <td>@prod.ProductName</td>
+                    <td>@prod.LineSpeed</td>
+                    <td>@prod.UpSpeed</td>
+                    <td>@prod.MonthlyCost</td>
+                    <td><input type="radio" @(prod.IsCapped ? "checked='checked'" : "") class="radio" /></td>
+                    <td><input type="radio" @(prod.IsM2MClient ? "checked='checked'" : "") class="radio" /></td>
+                    <td><input type="radio" @(prod.Is24MClient ? "checked='checked'" : "") class="radio" /></td>
+                    <td><input type="radio" @(prod.IsM2MFrogfootLink ? "checked='checked'" : "") class="radio" /></td>
+                    <td>@prod.Description.Truncate(30)</td>
+                    <td>
+                        <div class="activeBox">
+                            <input class="checkbox" data-prodid="@prod.ISPProductId" type="checkbox" @(prod.IsActive ? "checked='checked'" : "")/>
+                        </div>
+                    </td>
+                    <td>
+                        @Html.ActionLink("Edit", "EditProduct", new { ispId = Model.ISPId, prodId = prod.ISPProductId}, new {@class = "btn btn-default"})
+                    </td>
+                </tr>
+            }
+        }
+    }
+    </tbody>
+</table>
+
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('#productsTable').DataTable({
+                "ordering": true,
+                "fnDrawCallback": function () {
+                    BuildCheckedList();
+                }
+            });
+            
+            //store initial active items to dirty check against
+            var initActiveList = [];
+
+            //store the count of changes made
+            //this is so that when you're on a different page and it doesnt save the changes you know to page to them and save
+            var changeCount = 0;
+
+            //get all checkbox items
+            function BuildCheckedList() {
+                initActiveList = [];
+                $('.activeBox > .checkbox').each(function () {
+                    initActiveList.push(this.checked);
+                });
+            }
+
+            function UpdateChangeCount(changes) {
+                if (changes > 0) {
+                    $('#changeCount').text(changes);
+                    $('#changeCountContainer').show();
+                } else {
+                    $('#changeCountContainer').hide();
+                }
+            }
+
+            BuildCheckedList();
+
+            //check if the clicked checkbox has changed compared to initActiveList
+            $('#productsTable').on('click', '.checkbox', function () {
+                var $this = $(this);
+
+                var index = $this.index('.checkbox');
+                var corresponding = initActiveList[index];
+
+                if (corresponding == $this.is(':checked')) {
+                    $this.parent().removeClass('dirty');
+                    changeCount --;
+                } else {
+                    $this.parent().addClass('dirty');
+                    changeCount ++;
+                }
+                UpdateChangeCount(changeCount);
+            });
+
+            //save only the pproducts that have had IsActive changes
+            $('#saveActiveChanges').click(function () {
+
+                var products = [];
+                $('.dirty > .checkbox').each(function () {
+                    products.push({ prodId: $(this).data('prodid'), isActive: $(this).is(':checked') });
+                });
+
+                changeCount = changeCount - products.length; 
+
+                if (products.length) {
+                    $.ajax({
+                        url: '@Url.Action("SaveProductsStatus", "ISPProduct")',
+                        type: "POST",
+                        dataType: "json",
+                        contentType: 'application/json',
+                        traditional: true,
+                        data: JSON.stringify({ products: products }),
+                        success: function (data) {
+                            $('.dirty').delay(3000).removeClass('dirty');
+                            $('#saveResult').show().delay(3000).fadeOut('slow');
+                            UpdateChangeCount(changeCount);
+                            BuildCheckedList();
+                        }
+                    });
+                }
+            });
+
+            $('[data-toggle="tooltip"]').tooltip();
+        })
+    </script>
+}

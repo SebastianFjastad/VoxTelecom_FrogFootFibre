@@ -1,0 +1,159 @@
+﻿@using FrogFoot.Utilities
+@model  FrogFoot.Areas.Client.Models.PostViewModel
+@{
+    ViewBag.Title = "Post";
+}
+
+<style type="text/css">
+    .hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-color: lightgrey;
+    }
+
+    .headingPrimary {
+        text-align: center;
+        color: rgb(117, 115, 115);
+        font-weight: bolder;
+    }
+
+    .postTitle {
+        margin-top: 10px;
+        font-weight: bold;
+        color: rgb(117, 115, 115);
+    }
+
+    .postDate, .postDay {
+        position: relative;
+        color: #fff;
+        font-weight: 700;
+        background-color: green;
+        opacity: 0.7;
+        z-index: 999;
+        text-align: center;
+    }
+
+    .postDay {
+        text-decoration: underline;
+        font-size: 20px;
+        padding: 0 5px 0 5px;
+    }
+
+    .postDate {
+        font-size: 10px;
+        padding: 0 5px 10px 5px;
+    }
+
+    .dateContainer {
+        width: 50px;
+        height: 80px;
+        float: left;
+        position: absolute;
+        top: 67px;
+        right: -15px;
+    }
+
+    .postImage {
+        float: left;
+        margin-right: 15px;
+        width: 250px;
+        height: 190px;
+    }
+
+    .postBody {
+        text-align: justify;
+    }
+
+    @@media screen and (max-width: 767px) {
+
+        .dateContainer {
+            position: absolute;
+            top: 67px;
+            right: inherit;
+        }
+    }
+
+    .fibreDateTitle {
+        color: rgb(117, 115, 115);
+        margin-top: 5px;
+    }
+
+    .recentPostsTitle {
+        color: rgb(117, 115, 115);
+    }
+
+    .recentPostTitle {
+        color: green;
+        text-decoration: none;
+        margin-bottom: 0;
+    }
+</style>
+
+@{
+    var imgUrl = "";
+    var bgColour = "";
+    if (Model.Post.PostImage != null)
+    {
+        imgUrl = "\'../../Assets/PostImage/" + Model.Post.PostImage.AssetPath + "\'";
+
+    }
+    else
+    {
+        bgColour = "green";
+        imgUrl = "\'../../Content/whitefrogfeet.png\'";
+    }
+}
+
+<div class="row">
+    <div class="col-sm-1">
+        <div class="dateContainer">
+            <div class="postDay">@Model.Post.PublishDate.ToString("dd")</div>
+            <div class="postDate">@Model.Post.PublishDate.ToString("MMM")</div>
+        </div>
+    </div>
+
+    <div class="col-sm-7">
+        <h3 class="headingPrimary">News</h3>
+        <hr class="hr" />
+        <div class="postImage" style="background: url(@imgUrl) no-repeat center center; background-size: cover; background-color: @bgColour;"></div>
+        <h4 class="postTitle">@Model.Post.Title</h4>
+        <div class="postBody">
+            @(Html.Raw(Model.Post.Body))
+        </div>
+    </div>
+
+    <div class="col-sm-4">
+        <div style="margin-top: 60px;">
+            @Html.Action("FibreStatus", "News", new { model = Model.User.Zone })
+
+            <div class="fb-page" style="margin-top:15px;"
+                 data-href="https://www.facebook.com/frogfootfibre/?fref=ts"
+                 data-height="600"
+                 data-tabs="timeline"
+                 data-small-header="true"
+                 data-adapt-container-width="true"
+                 data-hide-cover="true"
+                 data-show-facepile="true">
+                <div class="fb-xfbml-parse-ignore">
+                    <blockquote cite="https://www.facebook.com/frogfootfibre/?fref=ts"><a href="https://www.facebook.com/frogfootfibre/?fref=ts">Frogfoot Fibre</a></blockquote>
+                </div>
+            </div>
+
+            @if (Model.Posts.Any())
+            {
+                <hr class="hr" style="margin: 15px 0" />
+
+                <h3 class="recentPostsTitle">Recent Posts</h3>
+
+                foreach (var post in Model.Posts)
+                {
+                    var postBody = HtmlStripper.Strip(post.Body);
+                    <a href="@Url.Action("Post", "News", new {postId = post.PostId})"><h4 class="recentPostTitle">@post.Title</h4></a>
+                    <p>@(Html.Raw(postBody.Truncate(80) + "..."))</p>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<div id="fb-root"></div>

@@ -1,0 +1,31 @@
+﻿@model List<FrogFoot.Entities.Location>
+
+@{
+    ViewBag.Title = "Locations";
+}
+
+<h2>Locations</h2>
+
+<div class="form-group">
+    <table id="usersTable" class="table table-striped table-responsive">
+        <thead>
+            <tr>
+                <td><label>Name</label></td>
+                <td>Open for registration</td>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+
+            @foreach (var loc in Model)
+            {
+                <tr data-id="@loc.LocationId">
+                    <td>
+                        <h4>@loc.Name</h4>
+                    </td>
+                    <td>@Html.CheckBoxFor(x => loc.IsActive, new { @disabled = "disabled" })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

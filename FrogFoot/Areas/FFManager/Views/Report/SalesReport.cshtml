@@ -1,0 +1,392 @@
+﻿@model FrogFoot.Areas.Admin.Models.ReportViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+@functions
+{
+    private string FormatAmount(decimal? amount)
+    {
+        return string.Format("{0:###,###,#0.00}", amount);
+    }
+
+}
+
+<style type="text/css">
+    td {
+        text-align: right;
+    }
+
+    .cellLeft {
+        text-align: left;
+    }
+
+    tfoot {
+        font-weight: bolder;
+    }
+</style>
+
+@{
+    var residentsTotal = Model.Locations.Where(l => l.AllowOrder).Sum(l => l.Residents);
+}
+
+<div class="row form-group">
+    <div class="col-sm-6">
+        <h2>Reports</h2>
+    </div>
+    <div class="col-sm-6" style="margin-top: 18px;">
+        @Html.ActionLink("Generate Excel", "ExportSalesReportToExcel", null, new { @class = "btn btn-primary" })
+    </div>
+</div>
+
+<!--Orders by Location-->
+<label>Sales performace per precinct</label>
+<div class="row form-group">
+    <div class="col-sm-12">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>Precinct</th>
+                    <th>Vox Orders</th>
+                    <th>All Orders</th>
+                    <th>Frogfoot</th>
+                    <th>Vox</th>
+                    <th>Other</th>
+                    <th>Group</th>
+                    <th>V% Orders</th>
+                    <th>V% Revenue</th>
+                    <th>Penetration</th>
+                    <th>Residents</th>
+                    <th>FF ARPU</th>
+                    <th>Group ARPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var loc in Model.OrdersByLocation)
+            {
+                    <tr>
+                        <td class="cellLeft">@loc.Name</td>
+                        <td>@loc.CountVox</td>
+                        <td>@loc.CountAll</td>
+                        <td>@FormatAmount(loc.FFValue)</td>
+                        <td>@FormatAmount(loc.VoxValue)</td>
+                        <td>@FormatAmount(loc.OtherValue)</td>
+                        <td>@FormatAmount(loc.GroupValue)</td>
+                        <td>@FormatAmount(loc.VoxPercOfOrders)</td>
+                        <td>@FormatAmount(loc.VoxPercOfRevenue)</td>
+                        <td>@FormatAmount(loc.Penetration)</td>
+                        <td>@FormatAmount(loc.Residents)</td>
+                        <td>@FormatAmount(loc.FFARPU)</td>
+                        <td>@FormatAmount(loc.GroupARPU)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="cellLeft">Total</td>
+                    <td>@Model.SumVoxOrderCount</td>
+                    <td>@Model.SumAllOrderCount</td>
+                    <td>R@(FormatAmount(Model.SumFrogfootValue))</td>
+                    <td>R@(FormatAmount(Model.SumVoxValue))</td>
+                    <td>R@(FormatAmount(Model.SumOtherValue))</td>
+                    <td>R@(FormatAmount(Model.SumGroupValue))</td>
+                    <td>@FormatAmount(Model.AvgVoxPercOrders)%</td>
+                    <td>@FormatAmount(Model.AvgVoxPercRevenue)%</td>
+                    <td>@FormatAmount(Model.AvgPercPenetration)%</td>
+                    <td>@FormatAmount(Model.SumResidents)</td>
+                    <td>R@(FormatAmount(Model.AvgFFARPU))</td>
+                    <td>R@(FormatAmount(Model.AvgGroupARPU))</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!--Orders by Product-->
+<label>Product sales performance per link speed</label>
+<div class="row form-group">
+    <div class="col-sm-12">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>Products</th>
+                    <th>Vox Orders</th>
+                    <th>All Orders</th>
+                    <th>Frogfoot</th>
+                    <th>Vox</th>
+                    <th>Other</th>
+                    <th>Group</th>
+                    <th>V% Orders</th>
+                    <th>V% Revenue</th>
+                    <th>% Total</th>
+                    <th>V% Total</th>
+                    <th>Av. Capped Price</th>
+                    <th>Av. Uncapped Price</th>
+                    <th>Av. Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prod in Model.OrdersByFFProduct)
+            {
+                    <tr>
+                        <td class="cellLeft">@prod.LineSpeed.ToString()</td>
+                        <td>@prod.CountVox</td>
+                        <td>@prod.CountAll</td>
+                        <td>@FormatAmount(prod.FFValue)</td>
+                        <td>@FormatAmount(prod.VoxValue)</td>
+                        <td>@FormatAmount(prod.OtherValue)</td>
+                        <td>@FormatAmount(prod.GroupValue)</td>
+                        <td>@FormatAmount(prod.VoxPercOfOrders)</td>
+                        <td>@FormatAmount(prod.VoxPercOfRevenue)</td>
+                        <td>@FormatAmount(prod.FFProdOrderPerc)</td>
+                        <td>@FormatAmount(prod.VoxProdOrderPerc)</td>
+                        <td>@FormatAmount(prod.AverageCappedPrice ?? 0)</td>
+                        <td>@FormatAmount(prod.AverageUncappedPrice ?? 0)</td>
+                        <td>@FormatAmount(prod.AveragePrice ?? 0)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="cellLeft">Total</td>
+                    <td>@Model.SumVoxOrderCount</td>
+                    <td>@Model.SumAllOrderCount</td>
+                    <td>R@(FormatAmount(Model.SumFrogfootValue))</td>
+                    <td>R@(FormatAmount(Model.SumVoxValue))</td>
+                    <td>R@(FormatAmount(Model.SumOtherValue))</td>
+                    <td>R@(FormatAmount(Model.SumGroupValue))</td>
+                    <td>@FormatAmount(Model.AvgVoxPercOrders)%</td>
+                    <td>@FormatAmount(Model.AvgVoxPercRevenue)%</td>
+                    <td>@FormatAmount(Model.AvgPercTotalOrders)%</td>
+                    <td>@FormatAmount(Model.AvgVoxPercTotalOrders)%</td>
+                    <td>R@(FormatAmount(Model.AvgCappedPrice))</td>
+                    <td>R@(FormatAmount(Model.AvgUncappedPrice))</td>
+                    <td>R@(FormatAmount(Model.AvgPrice))</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!-- Orders by ISP -->
+<label>ISP sales performance</label>
+<div class="row form-group">
+    <div class="col-sm-12">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>ISP</th>
+                    <th>Orders</th>
+                    <th>BB Value</th>
+                    <th>Links Value</th>
+                    <th>ISP % Orders</th>
+                    <th>ISP % Rev.</th>
+                    <th>New</th>
+                    <th>Pending</th>
+                    <th>Ordered</th>
+                    <th>Accepted</th>
+                    <th>Penetration</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var isp in Model.OrdersByISP)
+            {
+                    <tr>
+                        <td class="cellLeft">@isp.ISPName</td>
+                        <td>@isp.Orders</td>
+                        <td>R@(FormatAmount(isp.BBValue))</td>
+                        <td>R@(FormatAmount(isp.LinksValue))</td>
+                        <td>@FormatAmount(isp.ISPPercOfOrders)%</td>
+                        <td>@FormatAmount(isp.ISPPercOfRevenue)%</td>
+                        <td>@FormatAmount(isp.StatusNew)</td>
+                        <td>@FormatAmount(isp.StatusPending)</td>
+                        <td>@FormatAmount(isp.StatusOrdered)</td>
+                        <td>@FormatAmount(isp.StatusAccepted)</td>
+                        <td>@FormatAmount(residentsTotal != 0 ? isp.Orders / (decimal)residentsTotal * 100 : 0)%</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="cellLeft">Total</td>
+                    <td>@FormatAmount(Model.OrdersByISP.Sum(o => o.Orders))</td>
+                    <td>R@(FormatAmount(Model.OrdersByISP.Sum(o => o.BBValue)))</td>
+                    <td>R@(FormatAmount(Model.OrdersByISP.Sum(o => o.LinksValue)))</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<!--Orders by Month-->
+<label>Overall to-date sales performance</label>
+<div class="row form-group">
+    <div class="col-sm-12">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Vox Orders</th>
+                    <th>All Orders</th>
+                    <th>Frogfoot</th>
+                    <th>Vox</th>
+                    <th>Other</th>
+                    <th>Group</th>
+                    <th>V% Orders</th>
+                    <th>V% Revenue</th>
+                    <th>FF ARPU</th>
+                    <th>Group ARPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prod in Model.OrdersByMonth)
+            {
+                    <tr>
+                        <td class="cellLeft">@prod.Name</td>
+                        <td>@prod.CountVox</td>
+                        <td>@prod.CountAll</td>
+                        <td>@FormatAmount(prod.FFValue)</td>
+                        <td>@FormatAmount(prod.VoxValue)</td>
+                        <td>@FormatAmount(prod.OtherValue)</td>
+                        <td>@FormatAmount(prod.GroupValue)</td>
+                        <td>@FormatAmount(prod.VoxPercOfOrders)</td>
+                        <td>@FormatAmount(prod.VoxPercOfRevenue)</td>
+                        <td>@FormatAmount(prod.FFARPU)</td>
+                        <td>@FormatAmount(prod.GroupARPU)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="cellLeft">Total</td>
+                    <td>@Model.SumVoxOrderCount</td>
+                    <td>@Model.SumAllOrderCount</td>
+                    <td>R@(FormatAmount(Model.SumFrogfootValue))</td>
+                    <td>R@(FormatAmount(Model.SumVoxValue))</td>
+                    <td>R@(FormatAmount(Model.SumOtherValue))</td>
+                    <td>R@(FormatAmount(Model.SumGroupValue))</td>
+                    <td>@FormatAmount(Model.AvgVoxPercOrders)%</td>
+                    <td>@FormatAmount(Model.AvgVoxPercRevenue)%</td>
+                    <td>R@(FormatAmount(Model.AvgFFARPU))</td>
+                    <td>R@(FormatAmount(Model.AvgGroupARPU))</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <!--Progress report by Month-->
+    <label>Overall sales performance - from month 1 of each precinct</label>
+    <div class="col-sm-8 form-group">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>Period</th>
+                    <th>Penetration</th>
+                    <th>Orders</th>
+                    <th>FF Rev.</th>
+                    <th>Vox Rev.</th>
+                    <th>Group Rev.</th>
+                    <th>FF ARPU</th>
+                    <th>Group ARPU</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var month in Model.MonthlyOverview)
+            {
+                    <tr>
+                        <td class="cellLeft">@month.Month</td>
+                        <td>@FormatAmount(month.Penetration)</td>
+                        <td>@month.Orders</td>
+                        <td>@FormatAmount(month.FFRevenue)</td>
+                        <td>@FormatAmount(month.VoxRevenue)</td>
+                        <td>@FormatAmount(month.GroupRevenue)</td>
+                        <td>@FormatAmount(month.FFARPU)</td>
+                        <td>@FormatAmount(month.GroupARPU)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!--ARPU-->
+    <label>Average revenue per user per link speed</label>
+    @{ int arpuCount = Model.ARPU.Count;}
+    <div class="col-sm-4 form-group">
+        <table class="table table-bordered table-responsive">
+            <thead>
+                <tr>
+                    <th>ARPU</th>
+                    <th>Frogfoot</th>
+                    <th>Vox</th>
+                    <th>Group</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prod in Model.ARPU)
+            {
+                    <tr>
+                        <td class="cellLeft">@prod.FFProduct</td>
+                        <td>@FormatAmount(prod.Frogfoot)</td>
+                        <td>@FormatAmount(prod.Vox)</td>
+                        <td>@FormatAmount(prod.Group)</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>R@(arpuCount != 0 ? FormatAmount(Model.ARPU.Sum(x => x.Frogfoot) / arpuCount) : "0")</td>
+                    <td>R@(arpuCount != 0 ? FormatAmount(Model.ARPU.Sum(x => x.Vox) / arpuCount) : "0")</td>
+                    <td>R@(arpuCount != 0 ? FormatAmount(Model.ARPU.Sum(x => x.Group) / arpuCount) : "0")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<label style="margin-top: 15px;">SIP and Voice Channel ancillary products not included in report</label>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script type="text/javascript">
+        $(function () {
+            $('#timePickerFrom').datetimepicker({
+                format: "MM-DD-YYYY",
+                //viewMode: "months"
+            });
+
+            $('#timePickerTo').datetimepicker({
+                format: "MM-DD-YYYY",
+                //viewMode: "months"
+            });
+
+            $("#timePickerFrom").on("dp.change", function (e) {
+                $('#timePickerTo').data("DateTimePicker").minDate(e.date);
+            });
+            $("#timePickerTo").on("dp.change", function (e) {
+                $('#timePickerFrom').data("DateTimePicker").maxDate(e.date);
+            });
+
+            $("#timePickerFrom").on("dp.change", function (e) {
+                $('#timePickerTo').data("DateTimePicker").minDate(e.date);
+            });
+            $("#timePickerTo").on("dp.change", function (e) {
+                $('#timePickerFrom').data("DateTimePicker").maxDate(e.date);
+            });
+
+            $('#generateReport').click(function () {
+                $('#reportForm').submit();
+            });
+        });
+    </script>
+}

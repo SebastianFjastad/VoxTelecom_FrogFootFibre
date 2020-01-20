@@ -1,0 +1,116 @@
+﻿@using FrogFoot.Resources
+@model  FrogFoot.Areas.Admin.Models.UserInterestViewModel
+
+@{
+    ViewBag.Title = "Users Map";
+}
+
+<h2 class="text-center">Users Map</h2>
+
+<div class="row form-group">
+    <div class="col-xs-12">
+        <div id="map-canvas" style="width: 100%; height: 900px; margin-bottom: 10px;"></div>
+        <label style="margin-top: 5px;">Click pin for user info</label>
+        <img class="mapKeyIcon" style="margin-left: 20px;" src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" /><label class="mapKeyLabel">No Order</label>
+        <img class="mapKeyIcon" src="http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png" /><label class="mapKeyLabel">New</label>
+        <img class="mapKeyIcon" src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" /><label class="mapKeyLabel">Pending</label>
+        <img class="mapKeyIcon" src="http://maps.google.com/mapfiles/ms/icons/purple-dot.png" /><label class="mapKeyLabel">Ordered</label>
+        <img class="mapKeyIcon" src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" /><label class="mapKeyLabel">Accepted</label>
+        <img class="mapKeyIcon" src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" /><label class="mapKeyLabel">Cancelled</label>
+    </div>
+</div>
+<hr />
+<div class="row form-group">
+    <div class="col-sm-12" style="max-width: 400px; max-height: 400px; overflow-y: scroll;">
+        <table class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>Zone</th>
+                    <th>No. Users</th>
+                </tr>
+            </thead>
+            <tbody>
+            @{
+                var userGroup = Model.Users.GroupBy(z => z.ZoneId);
+                }
+                @foreach (var userZone in userGroup)
+            {
+                var user = userZone.FirstOrDefault(u => u.Zone != null);
+                    <tr>
+                        <td>@(user != null ? user.Zone.Code : "No Zone")</td>
+                        <td>@userZone.Count()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr />
+<div class="row form-group">
+    <div class="col-sm-12">
+        <table id="usersTable" class="table table-striped table-responsive">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Cell No</th>
+                    <th>Landline</th>
+                    <th>Address</th>
+                    <th>Zone</th>
+                    <th>Ordered</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- Ajax response -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=@(Globals.GoogleApiKey)&libraries=places"></script>
+    <script src="~/Scripts/map/user-orders-map-pins.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var markers = [];
+            //create the markers then pass them to the map creation function
+            @foreach (var u in Model.Users)
+            {
+                if (u.Latitude != null && u.Longitude != null)
+                {
+                    var order = u.Orders.FirstOrDefault();
+                    int status = order == null ? 0 : (int)order.Status;
+
+                    @:markers.push({ lat: @u.Latitude, lng: @u.Longitude, firstName: '@u.FirstName', lastName: '@u.LastName', email: '@u.Email', address: '@u.Address', status: @status });
+                }
+            }
+
+            CreatePinMap(markers);
+
+            var userTable = $('#usersTable').DataTable({
+                "paging": true,
+                "serverSide": true,
+                "ajax": {
+                    "type": "POST",
+                    "url": '@Url.Action("UserDataHandler")',
+                    "contentType": 'application/json; charset=utf-8',
+                    'data': function(data) { return data = JSON.stringify(data); }
+                },
+                "processing": true,
+                "deferRender": true,
+                "columns": [
+                    { "data": "FirstName" },
+                    { "data": "LastName" },
+                    { "data": "Email" },
+                    { "data": "PhoneNumber" },
+                    { "data": "Landline" },
+                    { "data": "Address" },
+                    { "data": "Zone" },
+                    { "data": "Ordered" }
+                ]
+            });
+        });
+    </script>
+}

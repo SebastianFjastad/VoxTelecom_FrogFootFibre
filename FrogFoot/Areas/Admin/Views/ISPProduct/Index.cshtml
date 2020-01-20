@@ -1,0 +1,44 @@
+﻿@model List<FrogFoot.Repositories.ISPDto>
+@{
+    ViewBag.Title = "ISP Products";
+}
+
+<h2>ISP Products</h2>
+
+<table id="ispTable" class="table table-striped table-responsive">
+    <thead>
+    <tr>
+        <td>Name</td>
+        <td>Email</td>
+        <td>Product Qty</td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+    @{
+        foreach (var isp in Model)
+        {
+            <tr>
+                <td>@isp.Name</td>
+                <td>@isp.EmailAddress</td>
+                <td>@isp.ProdCount</td>
+                <td>
+                    @Html.ActionLink("Manage Products", "Products", new {ispId = isp.ISPId, ispName = isp.Name}, new {@class = "btn btn-default"})
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+    
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#ispTable').DataTable({
+                "paging": true,
+                "ordering": true
+            });
+        })
+    </script>
+}

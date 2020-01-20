@@ -1,0 +1,108 @@
+﻿@model List<FrogFoot.Entities.ISP>
+
+<!-- IMPORTANT: this partial view should only be used once per page-->
+
+<!-- Dialog for when user wants to exit quick order process -->
+<div id="notifyUserToManageContact" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Important!</h4>
+            </div>
+            <div class="modal-body">
+                <label>You are exiting the quick order process before ordering.</label>
+                <p>If you wish to exit now, all ISPs will be able to contact you.</p>
+                <p>Please click the Manage Contacts button to limit who can contact you.</p>
+            </div>
+            <div class="modal-footer">
+                <button id="manageContactsBtn" type="button" class="btn btn-primary">Manage Contacts</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dialog to let user manage their ISP contacts -->
+<div id="manageISPContactDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Manage ISP Contact</h4>
+            </div>
+            <div class="modal-body" style="padding-top: 30px;">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="oneISP">
+                                <input type="radio" name="contactOption" id="oneISP" value="1"/>
+                                I know which ISP I'm interested in.
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="threeISPs">
+                                <input type="radio" name="contactOption" id="threeISPs" value="2"/>
+                                I want to hear from 3 ISPs.
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="allISPs">
+                                <input type="radio" name="contactOption" id="allISPs" value="3"/>
+                                Any ISP can contact me.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div id="option1" style="display: none;">
+                            <div class="form-group">
+                                <select id="option1ISP" name="SelectedISPIds" class="form-control">
+                                    <option value="">Select ISP</option>
+                                    @foreach (var isp in Model)
+                                    {
+                                        <option value="@isp.ISPId" data-ispid="@isp.ISPId">@isp.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div id="option2" style="display: none;">
+                            <div class="form-group">
+                                <select id="option2ISP1" name="SelectedISPIds" class="form-control option2ISP">
+                                    <option value="">Select ISP</option>
+                                    @foreach (var isp in Model)
+                                    {
+                                        <option value="@isp.ISPId" data-ispid="@isp.ISPId">@isp.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select id="option2ISP2" name="SelectedISPIds" class="form-control option2ISP">
+                                    <option value="">Select ISP</option>
+                                    @foreach (var isp in Model)
+                                    {
+                                        <option value="@isp.ISPId" data-ispid="@isp.ISPId">@isp.Name</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select id="option2ISP3" name="SelectedISPIds" class="form-control option2ISP">
+                                    <option value="">Select ISP</option>
+                                    @foreach (var isp in Model)
+                                    {
+                                        <option value="@isp.ISPId" data-ispid="@isp.ISPId">@isp.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div id="option3" style="display: none;">
+                            <label>The best option if you are not sure what you want.</label>
+                            <p>Once you have registered you can manage which ISPs can contact you.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="okModalBtn" type="button" class="btn btn-success">Done</button>
+            </div>
+        </div>
+    </div>
+</div>

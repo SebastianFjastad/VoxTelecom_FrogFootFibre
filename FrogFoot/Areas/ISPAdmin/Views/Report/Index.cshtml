@@ -1,0 +1,74 @@
+﻿@model FrogFoot.Areas.ISPAdmin.Models.ReportViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+<h2>Generate Report</h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        @using (Html.BeginForm("Report", "Report", FormMethod.Post, new { @id = "reportForm", @role = "form" }))
+        {
+            <div class="row form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-1" for="LocationId">Precinct</label>
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.LocationId, new SelectList(Model.Locations, "LocationId", "Name", 1), "All Precincts", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.From, new { @class = "control-label col-sm-1" })
+                    <div class="input-group date col-sm-3">
+                        @Html.TextBoxFor(f => f.From, new { @id = "timePickerFrom", @class = "form-control" })
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.To, new { @class = "control-label col-sm-1" })
+                    <div class="input-group date col-sm-3">
+                        @Html.TextBoxFor(f => f.To, new { @id = "timePickerTo", @class = "form-control" })
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="form-group" style="margin-top: 30px;">
+                <div class="col-sm-offset-1 col-sm-2">
+                    <button id="generateReport" type="button" class="btn btn-success">Generate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('#timePickerFrom').datetimepicker({
+                format: "MM-DD-YYYY"
+            });
+
+            $('#timePickerTo').datetimepicker({
+                format: "MM-DD-YYYY"
+            });
+
+            $("#timePickerFrom").on("dp.change", function (e) {
+                $('#timePickerTo').data("DateTimePicker").minDate(e.date);
+            });
+            $("#timePickerTo").on("dp.change", function (e) {
+                $('#timePickerFrom').data("DateTimePicker").maxDate(e.date);
+            });
+
+            $('#generateReport').click(function () {
+                $('#reportForm').submit();
+            });
+        });
+    </script>
+}

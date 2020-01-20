@@ -1,0 +1,585 @@
+﻿@model FrogFoot.Areas.Admin.Models.ISPProductViewModel
+@{
+    ViewBag.Title = "Create Product";
+}
+
+<style type="text/css">
+    .prodContainer {
+        float: left;
+        margin-top: 30px;
+        min-height: 400px;
+        width: 100%;
+        font-size: 17px;
+        text-align: center;
+        color: rgb(120, 120, 120);
+        border: 1px solid lightgray;
+    }
+
+    .logo {
+        margin-top: 15px;
+        margin-left: 15px;
+        margin-right: 15px;
+    }
+
+    .prodName {
+        margin-top: 10px;
+        font-weight: bolder;
+    }
+
+    .info {
+        min-height: 80px;
+        font-size: 16px;
+    }
+
+    .upDownSpeed {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .capped {
+        float: right;
+        background-color: lightblue;
+        padding: 3px 10px;
+        font-weight: bolder;
+    }
+
+    .attr {
+        background-color: rgb(227, 227, 227);
+    }
+
+    .attrAlt {
+        background-color: white;
+    }
+
+    .padding {
+        padding: 10px 15px;
+    }
+
+    .cost {
+        font-size: 22px;
+        font-weight: bolder;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    #lineSpeedTabs > li {
+        width: 120px;
+    }
+
+        #lineSpeedTabs > li > a {
+            font-size: 18px;
+        }
+
+    .nav-tabs > li.active > a {
+        background-color: green;
+        color: white;
+    }
+</style>
+
+<h2>Create Product</h2>
+
+@using (Html.BeginForm("SaveProduct", "ISPProduct", FormMethod.Post, new { @enctype = "multipart/form-data", id = "ispProductForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.CheckBoxFor(model => model.ISPProduct.IsM2MFrogfootLink, new { style = "display: none;" })
+    <input name="ISPProduct.ISPId" type="text" value="@Model.ISPId" style="display: none;" />
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="row">
+            <div class="col-sm-7">
+                @if (Model.ISPProduct != null && Model.ISPProduct.ISPLogo != null)
+                {
+                    <div class="form-group" id="currentImage">
+                        <label class="col-sm-3">Logo</label>
+                        <div class="col-md-3">
+                            <img src="~/Assets/ISPProductLogo/@Model.ISPProduct.ISPLogo.AssetPath" alt="image" style="max-height: 200px;" />
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <div id="uploadContainer" class="col-sm-offset-3 col-xs-9">
+                        <input id="ImgInput" type="file" name="upload" />
+                    </div>
+                </div>
+
+                <div class="form-group" id="imgPreviewContainer" style="display: none;">
+                    <label class="col-sm-3">Logo</label>
+                    <div class="col-sm-4">
+                        <img id="imgPreview" width="300" height="200" />
+                    </div>
+                    <div class="col-sm-5 text-right">
+                        <input id="keepCurImg" style="margin-bottom: 30px;" type="button" class="btn btn-default" value="Revert image" />
+                        <div id="imgDetails"></div>
+                    </div>
+                </div>
+
+                <hr />
+                <h3>Frogfoot Link</h3>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.LineSpeed, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EnumDropDownListFor(u => u.ISPProduct.LineSpeed, "Select Line Speed", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.LineSpeed, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.IsM2MFrogfootLink, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        <div class="radio">
+                            <label><input type="radio" name="contractTerm" checked>24 Month Frogfoot Line</label>
+                        </div>
+                        <div class="radio">
+                            <label><input type="radio" class="m2m" value="true" name="contractTerm">Month to month Frogfoot Line</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="m2mOnceOffPayment" class="form-group" style="display: none;">
+                    @Html.LabelFor(model => model.ISPProduct.OnceOfFFPaymentForM2M, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.ISPProduct.OnceOfFFPaymentForM2M, new { @class = "checkbox" })
+                    </div>
+                </div>
+
+                <hr />
+                <h3>Broadband Product</h3>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.ProductName, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.ProductName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.ProductName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Description, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.ISPProduct.Description, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <!--24 Month Fields-->
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISPProduct.Is24MClient, htmlAttributes: new {@class = "control-label col-md-3"})
+                <div class="col-md-9">
+                    @Html.CheckBoxFor(model => model.ISPProduct.Is24MClient, new {@class = "checkbox"})
+                </div>
+            </div>
+
+                <div id="24mMonthlyCostContainer" style="display: none;">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ISPProduct.MonthlyCost, htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.ISPProduct.MonthlyCost, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                            @Html.ValidationMessageFor(model => model.ISPProduct.MonthlyCost, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ISPProduct.SetupCost, htmlAttributes: new { @class = "control-label col-md-3" })
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.ISPProduct.SetupCost, new { htmlAttributes = new { @class = "form-control", @type = "number" } })
+                            @Html.ValidationMessageFor(model => model.ISPProduct.SetupCost, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <!--End 24 Month Fields-->
+
+                <!--Monthly fields-->
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.IsM2MClient, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.ISPProduct.IsM2MClient, new { @class = "checkbox" })
+                    </div>
+                </div>
+
+                <div id="m2mMonthlyCostContainer" style="display: none;">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ISPProduct.M2MMonthlyCost, htmlAttributes: new {@class = "control-label col-md-3"})
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.ISPProduct.M2MMonthlyCost, new {htmlAttributes = new {@class = "form-control", @type = "number"}})
+                            @Html.ValidationMessageFor(model => model.ISPProduct.M2MMonthlyCost, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.ISPProduct.M2MSetupCost, htmlAttributes: new {@class = "control-label col-md-3"})
+                        <div class="col-md-9">
+                            @Html.EditorFor(model => model.ISPProduct.M2MSetupCost, new {htmlAttributes = new {@class = "form-control", @type = "number"}})
+                            @Html.ValidationMessageFor(model => model.ISPProduct.M2MSetupCost, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                </div>
+                <!--End Monthly Fields-->
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.UpSpeed, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(model => model.ISPProduct.UpSpeed, new { @class = "form-control", @style = "width: 200px!important; display: inline", @type = "number" })
+                        <label style="display: inline;">Mbps</label>
+                        @Html.ValidationMessageFor(model => model.ISPProduct.UpSpeed, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.IsCapped, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBoxFor(model => model.ISPProduct.IsCapped, new { @class = "checkbox" })
+                    </div>
+                </div>
+
+                <div id="capAmount" class="form-group" style="display: none;">
+                    @Html.LabelFor(model => model.ISPProduct.Cap, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextBoxFor(model => model.ISPProduct.Cap, new { @class = "form-control", @style = "width: 200px!important; display: inline", @type = "number" })
+                        <label style="display: inline;">Gb</label>
+                    </div>
+                </div>
+
+                <!--Specials-->
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.IsSpecial, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.IsSpecial", Model.ISPProduct.IsSpecial ?? false)
+                    </div>
+                </div>
+                <!--End Specials-->
+                @*Attributes*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Attr1, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Attr1, new { htmlAttributes = new { @class = "form-control", placeholder = "Free Wifi Router incl." } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Attr1, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Attr2, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Attr2, new { htmlAttributes = new { @class = "form-control", placeholder = "Free Phone & Line incl." } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Attr2, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Attr3, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Attr3, new { htmlAttributes = new { @class = "form-control", placeholder = "R3.50/GB Top Up" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Attr3, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Attr4, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Attr4, new { htmlAttributes = new { @class = "form-control", placeholder = "Other feature..." } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Attr4, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @*Info Sections*@
+                <h3>Info for "More Details" page</h3>
+                <label style="margin: 10px 0;">Keep info text mostly uniform in length and height. MUST include header if there is body.</label>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info1Heading, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Info1Heading, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info1Heading, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info1, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.ISPProduct.Info1, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info1, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info2Heading, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Info2Heading, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info2Heading, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info2, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.ISPProduct.Info2, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info2, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info3Heading, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Info3Heading, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info3Heading, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info3, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.ISPProduct.Info3, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info3, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info4Heading, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.EditorFor(model => model.ISPProduct.Info4Heading, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info4Heading, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Info4, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.TextAreaFor(model => model.ISPProduct.Info4, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.ISPProduct.Info4, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @*Product checkbox attributes*@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Shaped, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.Shaped", Model.ISPProduct.Shaped ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Router, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.Router", Model.ISPProduct.Router ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Phone, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.Phone", Model.ISPProduct.Phone ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Install, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.Install", Model.ISPProduct.Install ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.Video, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.Video", Model.ISPProduct.Video ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.MobileData, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.MobileData", Model.ISPProduct.MobileData ?? false)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ISPProduct.CCTV, htmlAttributes: new { @class = "control-label col-md-3" })
+                    <div class="col-md-9">
+                        @Html.CheckBox("ISPProduct.CCTV", Model.ISPProduct.CCTV ?? false)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-9">
+                        <input type="submit" value="Create" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-sm-5">
+                <div class="col-md-8 col-xs-6">
+                    <h3>Preview</h3>
+                    <div class="prodContainer">
+                        <div class="logo padding" style="min-height: 50px; min-width: 60px;"></div>
+                        <div class="prodName"></div>
+                        <div class="info padding"></div>
+                        <div class="upDownSpeed padding">
+                            <span class="glyphicon glyphicon-download" style="margin-right: 10px;"></span><span class="downSpeed" style="margin-right: 10px;"></span>
+                            <span class="glyphicon glyphicon-upload" style="margin-right: 10px;"></span><span class="upSpeed"></span>
+                        </div>
+                        <div class="cap padding"></div>
+                        <div class="attr attr1 padding"></div>
+                        <div class="attr attr2 attrAlt padding"></div>
+                        <div class="attr attr3 padding"></div>
+                        <div class="attr attrAlt cost"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(function () {
+
+            $('#ISPProduct_IsCapped').click(function () {
+                if ($(this).is(':checked')) {
+                    $('#capAmount').show();
+                } else {
+                    $('#capAmount').hide();
+                }
+            });
+
+            $('#ISPProduct_LineSpeed, #ISPProduct_UpSpeed, #ISPProduct_IsCapped, #ISPProduct_Cap, #ISPProduct_MonthlyCost')
+                .on('change', function () {
+                    var chkVal = '';
+                    if ($('#ISPProduct_IsCapped').is(':checked')) {
+                        chkVal = 'Capped';
+
+                    } else {
+                        chkVal = 'Uncapped';
+                        $('#ISPProduct_Cap').val('');
+                        $('.cap').text('Uncapped');
+                    }
+
+                    //$('.info').text($('#ISPProduct_Description').val());
+                    $('.downSpeed').text($('#ISPProduct_LineSpeed option:selected').text());
+                    $('.upSpeed').text($('#ISPProduct_UpSpeed').val() + ' Mbps');
+                    $('.capped').text(chkVal);
+                    $('.cap').text($('#ISPProduct_Cap').val() + 'Gb');
+
+                    $('.cost').text('R' + $('#ISPProduct_MonthlyCost').val() + 'pm');
+
+                });
+
+            $('#ISPProduct_Description, #IPSProduct_ProductName, #ISPProduct_Attr1, #ISPProduct_Attr2, #ISPProduct_Attr3').on('keydown', function () {
+                $('.info').text($('#ISPProduct_Description').val());
+                $('.prodName').text($('#ISPProduct_ProductName').val());
+                $('.attr1').text($('#ISPProduct_Attr1').val());
+                $('.attr2').text($('#ISPProduct_Attr2').val());
+                $('.attr3').text($('#ISPProduct_Attr3').val());
+            });
+
+            //stops scroll from incrementing number inputs
+            $(':input[type=number]').on('mousewheel', function (e) { $(this).blur(); });
+
+            //preview uploaded image
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    var file = input.files[0];
+                    reader.readAsDataURL(file);
+
+                    var image = new Image();
+
+                    reader.onload = function (e) {
+                        image.src = e.target.result;
+
+                        image.onload = function () {
+                            var w = this.width,
+                                h = this.height,
+                                s = ~~(file.size / 1024) + 'KB';
+                            $('#imgDetails').html("<p>width: " + w + "</p><p>height: " + h + "</p><p>size: " + s + "</p>");
+
+                            if (s > 2000) {
+                                alert.show("file size of " + s + " is too large. <br/> Recommended size is under 300 KB");
+                            }
+
+                            $('#imgPreview').attr('src', e.target.result);
+
+                            //set the package preview image to the uploaded image
+                            $('.logo').css('background', 'transparent url(' + e.target.result + ') center no-repeat');
+                            $('#imgPreviewContainer').show();
+                            $('#currentImage').hide();
+                        }
+                    }
+                }
+            }
+
+            $("#uploadContainer").on('change', '#ImgInput', function () {
+                readURL(this);
+            });
+
+            //keep new image; discard old
+            $('#keepCurImg').on('click', function () {
+                $('#uploadContainer').empty();
+                $('#uploadContainer').html('<input id="ImgInput" type="file" name="upload" />');
+                $('#imgPreviewContainer').hide();
+                $('#currentImage').show();
+            });
+
+            //show or hide the m2m price
+            $('#ISPProduct_IsM2MClient').click(function () {
+                if ($(this).is(':checked')) {
+                    $('#m2mMonthlyCostContainer').show();
+                } else {
+                    $('#m2mMonthlyCostContainer').hide();
+                    $('#ISPProduct_M2MMonthlyCost').val('');
+                }
+            });
+
+            //show or hide the 24m price
+            $('#ISPProduct_Is24MClient').click(function () {
+                if ($(this).is(':checked')) {
+                    $('#24mMonthlyCostContainer').show();
+                } else {
+                    $('#24mMonthlyCostContainer').hide();
+                    $('#ISPProduct_Is24MClient').val('');
+                }
+            });
+
+            //hide the OnceOffCost if the 24M FF option is selected
+            $('input[name=contractTerm]').change(function() {
+                if ($(this).hasClass('m2m') && $(this).is(':checked')) {
+                    $('#m2mOnceOffPayment').show();
+                } else {
+                    $('#m2mOnceOffPayment').hide();
+                }
+            });
+
+            $('#ispProductForm').submit(function () {
+
+                $('#ISPProduct_IsM2MFrogfootLink')[0].checked = $("input[type='radio'].m2m:checked").val() == 'true' ? true : false;
+
+                if (!$('#ISPProduct_IsM2MClient').is(':checked')) {
+                    $('#ISPProduct_M2MMonthlyCost').val('');
+                    $('#ISPProduct_M2MSetupCost').val('');
+                } else {
+                    if ($('#ISPProduct_M2MMonthlyCost').val() == '') {
+                        alert('Month to Month Monthly Cost must be specified if selected.');
+                        return false;
+                    }
+                    if ($('#ISPProduct_M2MSetupCost').val() == '') {
+                        alert('Month to Month Setup Cost must have a price if selected.');
+                        return false;
+                    }
+                }
+
+                if (!$('#ISPProduct_Is24MClient').is(':checked')) {
+                    $('#ISPProduct_MonthlyCost').val('');
+                    $('#ISPProduct_SetupCost').val('');
+                } else {
+                    if ($('#ISPProduct_MonthlyCost').val() == '') {
+                        alert('24 Month Monthly Cost must be specified if selected.');
+                        return false;
+                    }
+
+                    if ($('#ISPProduct_SetupCost').val() == '') {
+                        alert("24 Month Setup Cost must be specified if selected.");
+                        return false;
+                    }
+                }
+
+                if ($('#ISPProduct_MonthlyCost').val() == '' && $('#ISPProduct_M2MMonthlyCost').val() == '') {
+                    alert('The ISP product must be either 24 month or Month to Month options.');
+                    return false;
+                }
+            });
+        });
+    </script>
+}

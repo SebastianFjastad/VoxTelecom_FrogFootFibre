@@ -1,0 +1,269 @@
+﻿@using FrogFoot.Models
+@model FrogFoot.Areas.Home.Models.PackageViewModel
+@{
+    ViewBag.Title = "Packages";
+}
+
+<link href="~/Content/Custom/Packages.css" rel="stylesheet" />
+
+@{
+    var rnd = new Random();
+
+    var tenMeg = Model.Products.Where(p => p.LineSpeed == LineSpeed.TenMbps).OrderBy(i => rnd.Next());
+    var twentyMeg = Model.Products.Where(p => p.LineSpeed == LineSpeed.TwentyMbps).OrderBy(i => rnd.Next());
+    var fiftyMeg = Model.Products.Where(p => p.LineSpeed == LineSpeed.FiftyMbps).OrderBy(i => rnd.Next());
+    var hundredMeg = Model.Products.Where(p => p.LineSpeed == LineSpeed.HundredMbps).OrderBy(i => rnd.Next());
+    var oneGig = Model.Products.Where(p => p.LineSpeed == LineSpeed.OneGps).OrderBy(i => rnd.Next());
+}
+
+<div class="text-center">
+    <h2>Packages</h2>
+    <h4 style="color: grey; margin-bottom: 30px;">Choose your Fibre package to your home</h4>
+</div>
+
+<div id="filterContainer" class="row">
+    <div class="col-md-4 col-sm-6 col-xs-12 form-group">
+        <div id="cappedFilter" class="btn-group" data-toggle="buttons">
+            <label for="all" class="btn btn-default">
+                <input type="radio" id="all" name="radio" autocomplete="off" data-capped="">All
+            </label>
+            <label for="uncapped" class="btn btn-default active">
+                <input checked="checked" type="radio" id="uncapped" name="radio" autocomplete="off" data-capped="False">Uncapped
+            </label>
+            <label for="capped" class="btn btn-default">
+                <input type="radio" id="capped" name="radio" autocomplete="off" data-capped="True">Capped
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-3 form-group">
+        <div id="contractFilter" class="btn-group" data-toggle="buttons">
+            <label for="M2MRadio" class="btn btn-default active">
+                <input id="M2MRadio" data-contract="m2m" type="radio" name="radio2" checked="checked" autocomplete="off">Monthly
+            </label>
+            <label for="24MRadio" class="btn btn-default">
+                <input id="24MRadio" data-contract="24m" type="radio" name="radio2" autocomplete="off">24 Month
+            </label>
+        </div>
+    </div>
+
+    <div class="col-md-2 col-sm-3 form-group">
+        <select id="ispFilter" class="form-control filter">
+            <option value="">All ISPs</option>
+            @foreach (var isp in Model.ISPs)
+            {
+            <option value="@isp.ISPId">@isp.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2 col-sm-3 form-group">
+        <select id="suburbFilter" class="form-control filter">
+            <option value="">All Suburbs</option>
+            @foreach (var loc in Model.Suburbs.Where(s => s.LocationId != -1))
+            {
+            <option value="@loc.LocationId">@loc.Name</option>
+            }
+        </select>
+    </div>
+</div>
+
+<ul id="lineSpeedTabs" class="nav nav-tabs col-xs-12">
+    <li><a class="roundedLeftCorners" data-toggle="tab" href="#10meg">10 Mbps</a></li>
+    <li><a data-toggle="tab" href="#20meg">20 Mbps</a></li>
+    <li><a data-toggle="tab" href="#50meg">50 Mbps</a></li>
+    <li class="active"><a data-toggle="tab" href="#100meg">100 Mbps</a></li>
+    <li><a class="roundedRightCorners" data-toggle="tab" href="#1gig">1 Gbps</a></li>
+</ul>
+
+<div class="row form-group">
+    <div id="productTabs" class="tab-content">
+        <div id="10meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", tenMeg)
+        </div>
+        <div id="20meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", twentyMeg)
+        </div>
+        <div id="50meg" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", fiftyMeg)
+        </div>
+        <div id="100meg" class="tab-pane fade in active">
+            @Html.Partial("ProductPartial", hundredMeg)
+        </div>
+        <div id="1gig" class="tab-pane fade in">
+            @Html.Partial("ProductPartial", oneGig)
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12" style="text-align: center; margin-top: 20px;">
+        <span style="color: grey;">Pricing defined by each ISP. Terms and Conditions apply. Errors & Omissions Excepted.</span>
+    </div>
+</div>
+
+<div id="chooseLocationDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Where are you?</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="control-label">Select location</label>
+                    <select id="dialogLocation" class="form-control">
+                        @foreach (var loc in Model.Suburbs)
+                        {
+                        <option value="@loc.LocationId">@loc.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function() {
+            //fit the products so their outer row height is the same
+            //var maxHeight = 0;
+            //$('.prodContainer').each(function () {
+            //    if ($(this).height() > maxHeight) {
+            //        maxHeight = $(this).height();
+            //    }
+            //});
+            //$('.prodContainer').height(maxHeight);
+
+            //if the location is cached then dont show dialog
+            if (getLocationCache() == null) {
+                $('#chooseLocationDialog').modal('show');
+            } else {
+                //if there is a location cached then set the location filter dropdown
+                setLocationDropdown();
+            }
+
+            $('#dialogLocation').change(function() {
+                $('#suburbFilter').val($(this).val());
+                $('#suburbFilter').change();
+                setLocationCache($(this).val());
+            });
+
+            function filterProducts() {
+                var locId = $('#suburbFilter').val();
+                var ispId = $('#ispFilter').val();
+                var capped = $('#cappedFilter label.active > input').data('capped');
+                var isM2M = $('#contractFilter label.active > input').data('contract') == 'm2m' ? true : false;
+                setLocationCache(locId);
+
+                $.ajax({
+                    url: '@Url.Action("GetFilteredProducts", "Home")',
+                    type: "GET",
+                    dataType: "json",
+                    data: { locId: locId, ispId: ispId, capped: capped, isM2MClientContract: isM2M },
+                    success: function(data) {
+                        $('[data-prodid]').hide();
+
+                        //for each line speed tab find all the products
+                        $('.tab-pane').each(function() {
+                            var isps = [];
+                            var $productsInTab = $(this).find('[data-prodid]');
+
+                            //check each product to see if it should be visible or not
+                            $productsInTab.each(function() {
+                                var $this = $(this);
+
+                                //check if the product is included by the filters
+                                var id = $this.data('prodid');
+                                var visible = $.grep(data.ids, function(n) {
+                                    return n == id;
+                                });
+
+                                visible = visible.length ? true : false;
+
+                                if (visible) {
+                                    var prodISPId = $this.data('ispid');
+                                    var isp = $.grep(isps, function(x) {
+                                        return x.ispId === prodISPId;
+                                    });
+
+                                    isp = isp[0];
+
+                                    //if the isp exists in array then check if prod count >= 2
+                                    if (typeof isp !== 'undefined' && isp !== null) {
+                                        if (isp.prods === 1) {
+                                            //set visible length to 0 for evaluation further down
+                                            visible = false;
+                                        } else {
+                                            isp.prods++;
+                                        }
+                                    } else {
+                                        isps.push({ 'ispId': prodISPId, prods: 0 });
+                                    }
+                                }
+
+                                //show the relevant contractTerm pricing
+                                if (isM2M) {
+                                    $this.find('.m24Cost').hide();
+                                    $this.find('.m2mCost').show();
+                                } else {
+                                    $this.find('.m2mCost').hide();
+                                    $this.find('.m24Cost').show();
+                                }
+
+                                // hide/show the product
+                                if (visible) {
+                                    $this.addClass('visible').show();
+                                } else {
+                                    $this.removeClass('visible').hide();
+                                }
+                            });
+                        });
+
+                        //hide or show the no product message for each tab
+                        $('.tab-pane').each(function() {
+                            var visibleProds = $(this).find('[data-prodid].visible');
+                            if (!visibleProds.length) {
+                                $(this).find('.noProdMessage').addClass('visible').show();
+                            } else {
+                                $(this).find('.noProdMessage').removeClass('visible').hide();
+                            }
+                        });
+                    }
+                });
+            }
+
+            filterProducts();
+
+            function setLocationCache(locId) {
+                localStorage['locId'] = locId;
+            }
+
+            function getLocationCache() {
+                return localStorage['locId'];
+            }
+
+            function setLocationDropdown() {
+                var locId = getLocationCache();
+                if (locId != null) {
+                    $('#suburbFilter').val(locId);
+                }
+            }
+
+            $('#filterContainer').on('change', 'input[type=radio], select', function() { setTimeout(filterProducts, 100); });
+
+            $('#productTabs').on('click', '.infoButton', function(e) {
+                e.preventDefault();
+                var $this = $(this);
+                var href = $this.attr("href");
+                var selectedOption = $('#contractFilter label.active > input').data('contract') == 'm2m' ? 1 : 2;
+                var isTwoOptions = $this.data('istwocontractoptions');
+                window.location = href + '&contractTerm=' + selectedOption + '&isTwoOptions=' + isTwoOptions;
+            });
+        })
+    </script>
+}

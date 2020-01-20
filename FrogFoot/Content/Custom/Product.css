@@ -1,0 +1,105 @@
+﻿/*Product Details*/
+
+.productContainer {
+    margin-top: 20px;
+    font-size: 20px;
+    padding: 30px;
+    color: rgb(120, 120, 120);
+    border: 1px solid lightgray;
+}
+
+.hr {
+    border-color: lightgrey;
+}
+
+.logo {
+    min-height: 50px;
+    width: 230px;
+}
+
+.prodDetailsName {
+    font-size: 24px;
+}
+
+.cost {
+    font-size: 24px;
+}
+
+.description {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.bandwidthContainer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(227, 227, 227);
+}
+
+.upDownSpeed {
+    background-color: rgb(227, 227, 227);
+}
+
+.glyphicon {
+    top: 3px;
+    margin-right: 15px;
+}
+
+.attrContainer {
+    padding-top: 15px;
+}
+
+.subheadingContainer {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(227, 227, 227);
+}
+
+.infoBox {
+    margin-top: 15px;
+    font-size: 18px;
+}
+
+.prodOrderButton {
+    height: 50px;
+    margin-top: 15px;
+    color: white;
+    width: 100%;
+    border-radius: 0;
+    background-color: green;
+    font-size: 20px;
+}
+
+.backButtonContainer {
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+.backButton {
+    color: green;
+    cursor: pointer;
+}
+
+.title {
+    color: rgb(120, 120, 120);
+}
+
+.chevron {
+    color: green;
+}
+
+.ui-state-default {
+    color: darkgrey;
+    background: white;
+    border: solid 1px darkgrey;
+}
+
+.ui-state-active {
+    color: green;
+    background: rgba(0, 128, 0, .1);
+    border: solid 1px darkgrey;
+}
+
+#contractFilterContainer {
+    margin-top: 30px;
+}

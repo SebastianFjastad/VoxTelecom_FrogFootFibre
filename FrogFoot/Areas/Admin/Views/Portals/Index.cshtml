@@ -1,0 +1,71 @@
+﻿@model List<FrogFoot.Entities.Portal>
+@{
+    ViewBag.Title = "Portals";
+}
+
+<h2>Portals</h2>
+
+<div class="form-group" style="margin-top: 30px;">
+    @Html.ActionLink("Create Portal", "Create", null, new { @class = "btn btn-success" })
+</div>
+
+<table id="portalTable" class="table table-striped table-responsive">
+    <thead>
+        <tr>
+            <th style="display: none;"></th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Precinct Code</th>
+            <th>Facebook</th>
+            <th>Twitter</th>
+            <th>URL Count</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var portal in Model)
+            {
+                <tr>
+                    <td style="display: none;">@portal.PortalId</td>
+                    <td>
+                        @if (portal.CoverImage != null)
+                        {
+                            <img src="~/Assets/PortalImage/@portal.CoverImage.AssetPath" height="120" alt="product image" style="max-width: 150px;"/>
+                        }
+                    </td>
+                    <td>@portal.Name</td>
+                    <td>@portal.PrecinctCode</td>
+                    <td>@portal.FacebookUrl</td>
+                    <td>@portal.TwitterUrl</td>
+                    <td>@portal.Urls.Count</td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = portal.PortalId }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = portal.PortalId }, new { @class = "delete" })
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#portalTable').DataTable({
+                "paging": true,
+                "ordering": true,
+                "order": [[0, "desc"]]
+            });
+
+            $('#portalTable').on('click', '.delete', function() {
+                if (confirm("Are you sure you want to delete this Portal?")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        })
+    </script>
+}

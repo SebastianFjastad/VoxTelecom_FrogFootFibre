@@ -1,0 +1,293 @@
+﻿@model FrogFoot.Areas.Admin.Models.PostViewModel
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "Posts", FormMethod.Post, new { role = "form", @enctype = "multipart/form-data" }))
+{
+    <input id="precinctCode" name="Post.PrecinctCode" type="text" value="" style="display: none;"/>
+
+    <div class="row">
+        <div class="col-xs-4">
+            <h3>Post Gridding</h3>
+
+            <div class="form-group">
+                @Html.EnumDropDownListFor(n => n.Post.GridType, "Select Gridding Type", new { @class = "form-control", data_val = "true", data_val_required = "Please select Gridding Type" })
+                <span class="field-validation-valid text-danger" data-valmsg-for="Post.GridType" data-valmsg-replace="true"></span>
+            </div>
+
+            <div id="locationContainer" class="form-group" style="display: none;">
+                <select id="Post_LocationId" name="Post.LocationId" class="form-control">
+                    <option value="">Select Suburb</option>
+                    @foreach (var pre in Model.Precincts)
+                    {
+                        <option value="@pre.LocationId" data-preccode="@pre.PrecinctCode">@pre.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div id="usePrecinctContainer" class="form-group" style="display: none;">
+                <input id="useWholePrecinct" class="checkbox checkbox-inline" type="checkbox" value="" />
+                <label class="contol-label" for="useWholePrecinct">Post to whole <span id="usePrecinctCodeLabel"></span> precinct</label>
+            </div>
+
+            <div id="postZoneContainer" class="form-group" style="display: none;">
+                <select id="Post_ZoneId" name="Post.ZoneId" class="form-control">
+                    <option value="">Select Zone</option>
+                    @foreach (var zone in Model.Zones)
+                    {
+                        <option value="@zone.ZoneId" data-precinctcode="@zone.PrecinctCode">@zone.Code</option>
+                    }
+                </select>
+            </div>
+
+            <h3>Post</h3>
+
+            <div class="form-group">
+                @Html.EnumDropDownListFor(n => n.Post.Type, "Select Post Type", new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                @Html.TextBoxFor(n => n.Post.Title, new { @class = "form-control", placeholder = "Title" })
+                @Html.ValidationMessageFor(model => model.Post.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <div class="input-group date" style="max-width: 280px">
+                    <input type="text" id="publishDate" name="Post.PublishDate" class="form-control"/>
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.CheckBoxFor(n => n.Post.IsEmail, new { @class = "checkbox", @style = "display: inline;" })
+                <label for="Post.IsEmail">Post and Email</label>
+            </div>
+        </div>
+
+        <div id="imgUploadContainer" class="col-xs-8" style="padding-top: 30px; display: none;">
+            <div id="uploadContainer">
+                <label>Article Image</label>
+                <input id="ImgInput" type="file" name="upload" />
+                <div>Recommended size < 100kb</div>
+            </div>
+
+            <div class="row">
+                <div id="imgPreviewContainer" class="form-group" style="display: none;">
+                    <div class="col-sm-6">
+                        <img id="imgPreview" width="350" style="margin-top: 10px; margin-bottom: 30px;" />
+                    </div>
+                    <div class="col-sm-4 text-right">
+                        <input id="keepCurImg" style="margin-bottom: 30px;" type="button" class="btn btn-default" value="Remove Image" />
+                        <div id="imgDetails"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group" style="width: 800px;">
+                @Html.TextAreaFor(n => n.Post.Body, new { @class = "form-control", placeholder = "Post body" })
+                @Html.ValidationMessageFor(model => model.Post.Body, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <input id="save" type="submit" class="btn btn-success" value="Save" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            tinyMCE.init({
+                mode: "textareas",
+                theme: "modern",
+                plugins: "link",
+                theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+                theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+                theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+                theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+                theme_advanced_toolbar_location: "top",
+                theme_advanced_toolbar_align: "left",
+                theme_advanced_statusbar_location: "bottom",
+                theme_advanced_resizing: true
+            });
+
+            $('#publishDate').datetimepicker({
+                defaultDate: moment()
+            });
+
+            function Zone() {
+                $('#locationContainer').show();
+                $('#postZoneContainer').show();
+            }
+
+            function Precinct() {
+                $('#postZoneContainer').hide();
+                $('#locationContainer').show();
+            }
+
+            function Clients() {
+                $('#locationContainer').hide();
+                $('#postZoneContainer').hide();
+            }
+
+            function Public() {
+                $('#postZoneContainer').hide();
+                $('#locationContainer').hide();
+            }
+
+            //show different inputs depending on the type selected
+            $("#Post_GridType").change(function () {
+                switch (this.value) {
+                    case "1":
+                        Zone();
+                        break;
+                    case "2":
+                        Precinct();
+                        break;
+                    case "3":
+                        Clients();
+                        break;
+                    case "4":
+                        Public();
+                        break;
+                    default:
+                        Public();
+                }
+            });
+
+            $('#Post_Type').change(function () {
+                //2 == Article
+                this.value == 2 ? $('#imgUploadContainer').show() : $('#imgUploadContainer').hide();
+            });
+
+            $('#Post_LocationId').change(function() {
+                var precinctCode = $(':selected', this).data('preccode');
+                $('option[data-precinctcode]').hide();
+
+                //if gridding is 2 (precinct)
+                if ($("#Post_GridType").val() == "2") {
+                    $('#usePrecinctCodeLabel').text(precinctCode);
+
+                    if (precinctCode != null && !precinctCode.length) {
+                        $('#usePrecinctContainer').hide();
+                        $('#usePrecinctContainer').prop('checked', false);
+                        $('#precinctCode').val('');
+                    } else {
+                        $('#usePrecinctContainer').show();
+                        $('#precinctCode').val(precinctCode);
+                    }
+                }
+
+                $('option[data-precinctcode=' + precinctCode + ']').show();
+            });
+
+           //preview uploaded image
+            function readURL(input) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    var file = input.files[0];
+                    reader.readAsDataURL(file);
+
+                    var image = new Image();
+
+                    reader.onload = function (e) {
+                        image.src = e.target.result;
+
+                        image.onload = function () {
+                            var w = this.width,
+                                h = this.height,
+                                s = ~~(file.size / 1024) + 'kb';
+                            $('#imgDetails').html("<p>width: " + w + "</p><p>height: " + h + "</p><p>size: " + s + "</p>");
+
+                            if ((file.size / 1024) > 500) {
+                                alert("file size of " + s + " is too large. Recommended size is under 100kb");
+                                return;
+                            }
+
+                            $('#imgPreview').attr('src', e.target.result);
+                            $('#imgPreviewContainer').show();
+                            $('#currentImage').hide();
+                        }
+                    }
+                }
+            }
+
+            $("#uploadContainer").on('change', '#ImgInput', function () {
+                readURL(this);
+            });
+
+            $('#keepCurImg').on('click', function () {
+                $('#uploadContainer').empty();
+                $('#uploadContainer').html('<input id="ImgInput" type="file" name="upload" />');
+                $('#imgPreviewContainer').hide();
+                $('#currentImage').show();
+            });
+
+            //clear out the image if it was selected then post type was changed so it's not visible but still has img value
+            $('#save').click(function () {
+                if ($('#Post_Type').val() != "2" && $('#ImgInput').val() != '') {
+                    $('#ImgInput').val('');
+                } else if ($('#Post_Type').val() == "2" && $('#ImgInput').val() == '') {
+                    alert('Please choose an image for the article');
+                    return false;
+                }
+
+                if (!$('#useWholePrecinct').is(':checked')) {
+                    $('#precinctCode').val('');
+                }
+
+                //Gridding type validation
+                if ($('#Post_GridType').val() == "0") {
+                    alert("Please select Gridding Type");
+                    return false;
+                }
+
+                //Precinct validation
+                var $locdd = $('#Post_LocationId');
+                if ($locdd.is(':visible') && !$locdd.val()) {
+                    alert("Please select a Precinct");
+                    return false;
+                }
+
+                //Zone validation
+                var $zonedd = $('#Post_ZoneId');
+                if ($zonedd.is(':visible') && $zonedd.val() == "") {
+                    alert("Please select a Zone");
+                    return false;
+                }
+
+                //Post type validation
+                if ($('#Post_Type').val() == "0") {
+                    alert("Please select Post Type");
+                    return false;
+                }
+
+                //Post Body validation
+                if (tinyMCE.get('Post_Body').getContent() == "") {
+                    alert("Please enter a Post Body");
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+}

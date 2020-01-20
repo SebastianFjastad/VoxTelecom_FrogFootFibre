@@ -1,0 +1,66 @@
+﻿@model FrogFoot.Areas.Home.Models.User
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+<div id="notification" class="alert alert-success" style="display: none;">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+    <div id="notificationContent"></div>
+</div>
+
+@using (Html.BeginForm("Edit", "User", FormMethod.Post, new { role = "form" }))
+{
+    @Html.HiddenFor(n => n.Id)
+    @Html.HiddenFor(n => n.ISPId)
+
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.Email, new { @class = "form-control", placeholder = "Email address", disabled = "disabled" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.FirstName, new { @class = "form-control", placeholder = "First name" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.LastName, new { @class = "form-control", placeholder = "Last name" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.PhoneNumber, new { @class = "form-control", placeholder = "Phone No" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(n => n.IsUserTypeAdmin)
+        @Html.CheckBoxFor(n => n.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <input type="submit" class="btn btn-success" value="Save" />
+            </div>
+            <div class="col-sm-2">
+                <input id="resendPassword" type="button" class="btn btn-default" value="Reset login details"/>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#resendPassword').click(function () {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: '@Url.Action("ResetPassword", "User")',
+                    contentType: 'application/json',
+                    data: { userId: $('#Id').val() },
+                    success: function (response) {
+                        $('#notificationContent').html(response.message);
+                        $('#notification').show();
+                        $('#notification').delay(3000).fadeOut();
+                    }
+                });
+            });
+        })
+    </script>
+}

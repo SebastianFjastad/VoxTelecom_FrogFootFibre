@@ -1,0 +1,181 @@
+﻿@model FrogFoot.Areas.Admin.Models.UserViewModel
+
+@{
+    ViewBag.Title = "AddUser";
+}
+
+<style>
+    .ispUser, .client {
+        display: none;
+    }
+</style>
+
+<h2>Add User</h2>
+
+@using (Html.BeginForm("AddUser", "ManageUser", FormMethod.Post, new { role = "form", id = "addUserForm" }))
+{
+    <select class="form-control" style="display: none;">
+        <option class="estate default" value="-1">Not in estate</option>
+
+        @foreach (var estate in Model.Estates)
+                {
+            <option class="estate" data-locationid="@estate.LocationId" data-code="@estate.EstateCode" value="@estate.EstateId">@estate.Name</option>
+        }
+    </select>
+
+    <div class="form-group">
+        @Html.EnumDropDownListFor(u => u.Type, "Select User Type", new { @class = "form-control" })
+    </div>
+
+    <div class="form-group ispUser">
+        @Html.DropDownListFor(n => n.User.ISPId, new SelectList(Model.ISPList, "ISPId", "Name", 1), "Select ISP", new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.User.Email, new { @class = "form-control", placeholder = "Email address", @data_val = "true", @data_val_required = "The Email field is required." })
+        <span class="field-validation-valid text-danger" data-valmsg-for="User.Email" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.User.FirstName, new { @class = "form-control", placeholder = "First name" })
+        @Html.ValidationMessageFor(model => model.User.FirstName, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.User.LastName, new { @class = "form-control", placeholder = "Last name" })
+        @Html.ValidationMessageFor(model => model.User.LastName, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <select id="LocationId" name="User.LocationId" class="form-control client" data-val="true" data-val-required="Please select a suburb.">
+            <option value="">Select a Suburb</option>
+            <option value="-1">Other</option>
+            @foreach (var item in Model.Locations)
+            {
+                <option value="@item.LocationId" data-code="@item.PrecinctCode">@item.Name</option>
+            }
+        </select>
+        <span class="field-validation-valid text-danger" data-valmsg-for="LocationId" data-valmsg-replace="true"></span>
+    </div>
+
+    <div class="form-group clientEstate" style="display: none;">
+        <select id="estatesSelect" name="User.EstateId" class="form-control" tabindex="2"></select>
+    </div>
+
+    <div class="form-group" style="display: none;">
+        <select class="form-control" id="pac-select">
+            <option value="">Select Suburb</option>
+        </select>
+    </div>
+
+    <div class="form-group client">
+        @Html.TextBoxFor(n => n.User.Address, new { @class = "form-control", placeholder = "Street address", @data_val = "true", @data_val_required = "The Address field is required." })
+        <span class="field-validation-valid text-danger" data-valmsg-for="User.Address" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.User.PhoneNumber, new { @class = "form-control", placeholder = "Phone No", @data_val = "true", @data_val_required = "The Phone Number field is required." })
+        <span class="field-validation-valid text-danger" data-valmsg-for="User.PhoneNumber" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group client">
+        @Html.TextBoxFor(n => n.User.Latitude, new { @class = "form-control", placeholder = "Latitude", @data_val = "true", @data_val_required = "The Latitude field is required." })
+        <span class="field-validation-valid text-danger" data-valmsg-for="User.Latitude" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group client">
+        @Html.TextBoxFor(n => n.User.Longitude, new { @class = "form-control", placeholder = "Longitude", @data_val = "true", @data_val_required = "The Longitude field is required." })
+        <span class="field-validation-valid text-danger" data-valmsg-for="User.Longitude" data-valmsg-replace="true"></span>
+    </div>
+    <div class="form-group ispUser">
+        @Html.LabelFor(n => n.User.IsUserTypeAdmin)
+        @Html.CheckBoxFor(n => n.User.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+    </div>
+    <div class="form-group client">
+        @Html.LabelFor(n => n.User.EmailConfirmed)
+        @Html.CheckBoxFor(n => n.User.EmailConfirmed, new { @class = "checkbox-inline" })
+    </div>
+    <div class="form-group client">
+        @Html.LabelFor(n => n.User.IsChamp)
+        @Html.CheckBoxFor(n => n.User.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+    </div>
+    <div class="form-group client">
+        @Html.LabelFor(n => n.User.UsePrecinctCodeForChamp)
+        @Html.CheckBoxFor(n => n.User.IsUserTypeAdmin, new { @class = "checkbox-inline" })
+    </div>
+
+    if (TempData["UserExists"] as bool? == true)
+    {
+        <div class="col-sm-6">
+            <div class="alert alert-warning">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                A user with the same email already exists.
+            </div>
+        </div>
+    }
+
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <input type="submit" class="btn btn-success" value="Save" />
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(function () {
+            $('select').change(function () {
+                //2 = ISP User
+                //3 = Client
+                var val = $('#Type').val();
+                if (val === '2') {
+                    $('.ispUser').show();
+                } else {
+                    $('.ispUser').hide();
+                }
+                if (val === '3') {
+                    $('.client').show();
+                } else {
+                    $('.client').hide();
+                }
+            });
+
+
+            $('#LocationId').change(function () {
+                var selectedLoc = $('#LocationId').val();
+                $('#suburbName').val($('option:selected', this).text());
+
+                var code = $('option:selected', this).data('code');
+                var optionIndex = $('#pac-select option').filter(function () {
+                    return $(this).data('id') == code;
+                }).val();
+
+                $('#pac-select').val(optionIndex).change();
+
+                if (!selectedLoc) {
+                    $("#estatesSelect").empty().parent().hide();
+                    return;
+                }
+
+                var estates = $('option.estate.default, option.estate[data-locationid=' + selectedLoc + ']').clone().removeClass('default');
+                $("#estatesSelect").empty().append(estates);
+
+                if (estates.length > 1) {
+                    $('#estatesSelect').parent().show();
+                } else {
+                    $('#estatesSelect').parent().hide();
+                    $("#EstateId").val('');
+                }
+            });
+
+            //if the Location and Estate are not visible then set values to null
+            $('#addUserForm').submit(function() {
+                if ($('#LocationId').val() == "-1" || !$('#LocationId').is(':visible')) {
+                    $('#LocationId').val('');
+                }
+
+                if (!$('estatesSelect').is(':visible')) {
+                    $('estatesSelect').val('');
+                }
+            });
+        });
+    </script>
+}
+

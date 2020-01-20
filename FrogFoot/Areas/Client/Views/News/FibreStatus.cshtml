@@ -1,0 +1,56 @@
+﻿@using FrogFoot.Utilities
+@model FrogFoot.Entities.Zone
+
+<h3 class="fibreDateTitle">Fibre Dates</h3>
+
+@if (Model != null && !string.IsNullOrEmpty(Model.Code))
+{
+    <div class="row">
+        <div class="form-group">
+            <label class="control-label col-md-6">Zone Name</label>
+            <div class="col-md-6">
+                @Html.DisplayFor(model => model.Code)
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label class="control-label col-md-6">Zone Status: </label>
+            <div class="col-md-6">
+                <span>@Model.Status.GetDisplayName()</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            @Html.LabelFor(model => model.FirstDateOfFibre, new { @class = "control-label col-md-6" })
+            <div class="col-md-6">
+                @(Model.FirstDateOfFibre != null ? Model.FirstDateOfFibre.Value.ToString("dd/MM/yyyy") : "No dates")
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            @Html.LabelFor(model => model.LastDateOfFibre, new { @class = "control-label col-md-6" })
+            <div class="col-md-6">
+                @(Model.LastDateOfFibre != null ? Model.LastDateOfFibre.Value.ToString("dd/MM/yyyy") : "No dates")
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label class="control-label col-md-6">Time to installation</label>
+            <div class="col-md-6">
+                @(!string.IsNullOrEmpty(Model.TimeToInstallation) ? Model.TimeToInstallation : "not specified")
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <h4>No zone currently defined for your location</h4>
+}

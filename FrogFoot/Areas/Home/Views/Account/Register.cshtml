@@ -1,0 +1,480 @@
+﻿@using FrogFoot.Resources
+@model FrogFoot.Areas.Home.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<style type="text/css">
+    .stepCircle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50px;
+        font-size: 30px;
+        font-weight: bolder;
+        color: #fff;
+        line-height: 60px;
+        display: inline-block;
+        text-align: center;
+        background: green;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .stepCircleActive {
+        color: gold;
+    }
+
+    .stepContainer {
+        margin-bottom: 15px;
+    }
+
+    .stepLabel {
+        color: grey;
+        font-weight: bolder;
+        margin-top: 10px;
+    }
+
+    .stepLabelActive {
+        color: green;
+    }
+
+    .stepArrow {
+        color: green;
+        margin: 0 20px;
+        font-size: 25px;
+    }
+
+    .stepArrowContainer {
+        margin-top: 15px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .headerContainer {
+        text-align: center;
+    }
+
+    h2 {
+        color: green;
+    }
+
+    .closeLink {
+        color: lightgray;
+        text-decoration: none !important;
+    }
+
+        .closeLink :hover {
+            text-decoration: none !important;
+        }
+
+    #manageISPContactDialog .modal-dialog {
+        width: 700px;
+    }
+
+    #manageISPContactDialog label {
+        cursor: pointer;
+    }
+</style>
+
+@{
+    var regUserFirstName = TempData["RegUserFirstName"] as string;
+    var userExistsMessage = TempData["UserExistsMessage"] as string;
+    var isProdOrder = TempData["IsProdOrder"] as bool?;
+    var isQuickOrder = ViewBag.IsQuickOrder;
+}
+
+@if (isProdOrder == true)
+{
+    <div class="text-center">
+        <h4 style="margin-top: 30px;">Oops! We can't process your order if we don't know who you are.</h4>
+        <h4 style="color:red">Please register, then place your order for a Fibre to the Home product.</h4>
+    </div>
+}
+
+@if (isQuickOrder == true)
+{
+    <div class="row">
+        <div class="col-sm-12" style="margin-top: 30px">
+            <div class="col-md-offset-1 col-md-10" style="text-align: center;">
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle stepCircleActive" data-step="1">1</div>
+                    <div class="stepLabel stepLabelActive">Provide Your Details</div>
+                </div>
+                <div class="stepArrowContainer col-sm-1">
+                    <span class="glyphicon glyphicon-arrow-right stepArrow"></span>
+                </div>
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle">2</div>
+                    <div class="stepLabel">Choose Your Package</div>
+                </div>
+                <div class="stepArrowContainer col-sm-1">
+                    <span class="glyphicon glyphicon-arrow-right stepArrow"></span>
+                </div>
+                <div class="stepContainer col-sm-3">
+                    <div class="stepCircle">3</div>
+                    <div class="stepLabel">Done!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    @if (!string.IsNullOrEmpty(regUserFirstName))
+    {
+        <div id="registerSuccessDialog" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Successfuly registered <a class="closeLink pull-right" href="@Url.Action("Index", "Home")">Close <span class="glyphicon glyphicon-remove-circle"></span></a></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-12 text-center">
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <img src="@Url.Content("~/Content/captainfibre_256.jpg")" class="form-group" />
+                                    <p>
+                                        <b>Thank you</b><br /> for expressing interest in Fibre to the Home, <b>@regUserFirstName!</b>
+                                    </p>
+                                    <p>Please log in to choose your package and place an order.</p>
+                                    <p>
+                                        <a href="@Url.Action("Login")" class="btn btn-success">Log in</a>
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <p>Let others know you're getting fibre!</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <div style="display: inline">
+                                        <a class="share" data-title="Share on Facebook" href="https://facebook.com/sharer.php?u=http://www.frogfootfibre.com/Home/Home/Coverage&title=Check%20if%20you%20are%20covered%20by%20Frogfoot%20Fibre" target="_blank">
+                                            <img src="~/Content/icons/facebook-icon.png" alt="Share with Facebook" width="64" height="64" />
+                                        </a>
+                                        <a class="share" data-title="Share on Twitter" href="http://www.twitter.com/share?url=http://www.frogfootfibre.com/Home/Home/Coverage&title=Check%20if%20you%20are%20covered%20by%20Frogfoot%20Fibre" target="_blank">
+                                            <img src="~/Content/icons/twitter-icon.png" alt="Share with Twitter" width="64" height="64" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(userExistsMessage))
+    {
+        <div class="col-xs-12 form-group" style="margin-top: 30px;">
+            <div class="alert alert-warning" role="alert">@userExistsMessage</div>
+        </div>
+        @Html.ActionLink("Home", "Index", "Home", null, new { @class = "btn btn-success" })
+    }
+    else
+    {
+        if (ViewBag.IsQuickOrder != true)
+        {
+            <div class="row" style="margin-top: 45px;">
+                <div class="headerContainer col-sm-12">
+                    <img src="~/Content/icons/icon-register-white-green-background.png" width="100" />
+                    <h2 style="margin-left: 15px;">Register</h2>
+                    <h4 style="margin-bottom: 30px;">Be the first to have fibre in your suburb.</h4>
+                </div>
+            </div>
+        }
+
+        using (Html.BeginForm("Register", "Account", FormMethod.Post, new { id = "registerForm", role = "form" }))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.AntiForgeryToken()
+
+            <input id="suburbName" name="SuburbName" type="text" style="display: none;" />
+            <input id="estateName" name="EstateName" type="text" style="display: none;" />
+            <input id="EstateId" name="EstateId" style="display: none;" value="" />
+            <input type="text" name="quickOrder" value="@(ViewBag.IsQuickOrder == true ? "True" : "False")" style="display: none;" />
+
+            @Html.HiddenFor(m => m.Latitude)
+            @Html.HiddenFor(m => m.Longitude)
+
+            <select class="form-control" style="display: none;">
+                <option class="estate default" value="-1">Not in estate</option>
+
+                @foreach (var estate in Model.Estates)
+                {
+                    <option class="estate" data-locationid="@estate.LocationId" data-code="@estate.EstateCode" value="@estate.EstateId">@estate.Name</option>
+                }
+            </select>
+
+            <div class="col-md-7">
+                <!-- Map -->
+                <div class="form-group">
+                    <div id="map-canvas" style="height: 450px;"></div>
+                </div>
+                <div id="map-results"></div>
+            </div>
+
+            <div class="col-sm-5">
+                <!--Location filters-->
+                <div class="form-group">
+                    <select id="LocationId" name="LocationId" class="form-control" data-val="true" data-val-required="Please select a suburb.">
+                        <option value="">Select a Suburb</option>
+                        <option value="-1">Other</option>
+                        @foreach (var item in Model.Locations)
+                        {
+                            <option value="@item.LocationId" data-code="@item.PrecinctCode">@item.Name</option>
+                        }
+                    </select>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="LocationId" data-valmsg-replace="true"></span>
+                </div>
+
+                <div class="form-group" style="display: none;">
+                    <select id="estatesSelect" class="form-control" tabindex="2"></select>
+                </div>
+
+                <div class="form-group" style="display: none;">
+                    <select class="form-control" id="pac-select">
+                        <option value="">Select Suburb</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <input id="pac-input" class="form-control" name="Address" type="text" placeholder="Street address" autocomplete="off" data-val="true" data-val-required="Please enter an address.">
+                    <span class="field-validation-valid text-danger" data-valmsg-for="Address" data-valmsg-replace="true"></span>
+                    <span style="color: grey; font-size: 13px;">Move pin to exact location if inaccurate</span>
+                </div>
+                <!--End Location Filters-->
+
+                @Html.Partial("_UserDetails", Model)
+
+                @*<div id="recaptcha_div" style="margin-bottom: 15px;"></div>*@
+
+                @*@Html.GenerateCaptcha(Theme.White)*@
+
+                <input id="registerButton" type="submit" value="Register" class="btn btn-success" tabindex="11" style="margin-bottom: 15px;" />
+            </div>
+
+            //if not quick order then force the client to choose ISPs that can contact them
+            if (isQuickOrder != true)
+            {
+                //this is inside the form so values can be submitted
+                //Dialog: Choose ISPs for contact
+                @Html.Partial("_ManageContactDialog", Model.ISPs)
+            }
+        }
+    }
+</div>
+
+<!-- Dialogs -->
+<div id="otherAreaSelectedDialog" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">"Other" location selected</h4>
+            </div>
+            <div class="modal-body">
+                <p><strong>We’ll have to get back to you on this!</strong></p>
+
+                <p>
+                    We don’t as yet have plans for fibre in your area, however, if you’re prepared
+                    to get your community fired up about attracting fibre to your area, contact us
+                    and we can talk:
+                </p>
+
+                <p><strong><a href="mailto:ftth@frogfoot.com" target="_top">ftth@frogfoot.com</a></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End Dialogs-->
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=@(Globals.GoogleApiKey)&libraries=places"></script>
+    <script src="~/Scripts/map/ftth-embed.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            //open the share window in dialog
+            $('.share').click(function (e) {
+                var title = $(this).data('title');
+                e.preventDefault();
+                window.open($(this).attr('href'), title, 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
+                return false;
+            });
+
+            if ($('#registerSuccessDialog').length) {
+                $('#registerSuccessDialog').modal('show');
+            }
+
+            $('#LocationId').change(function () {
+                var selectedLoc = $('#LocationId').val();
+                $('#suburbName').val($('option:selected', this).text());
+
+                var code = $('option:selected', this).data('code');
+                var optionIndex = $('#pac-select option').filter(function () {
+                    return $(this).data('id') == code;
+                }).val();
+
+                $('#pac-select').val(optionIndex).change();
+
+                if (!selectedLoc) {
+                    $('#suburbName').val('');
+                    $('#estateName').val('');
+                    $("#EstateId").val('');
+                    $("#estatesSelect").empty().parent().hide();
+                    return;
+                } else if (selectedLoc == -1) { //if selected option is "Other"
+                    $('#otherAreaSelectedDialog').modal('show');
+                }
+
+                var estates = $('option.estate.default, option.estate[data-locationid=' + selectedLoc + ']').clone().removeClass('default');
+                $("#estatesSelect").empty().append(estates);
+
+                if (estates.length > 1) {
+                    $('#estatesSelect').parent().show();
+                } else {
+                    $('#estatesSelect').parent().hide();
+                    $("#EstateId").val('');
+                }
+            });
+
+            $('#estatesSelect').change(function () {
+                $("#EstateId").val($(this).val());
+                $("#estateName").val($('option:selected', this).text());
+                var code = $('option:selected', this).data('code');
+                var optionIndex = $('#pac-select option').filter(function () {
+                    return $(this).data('id') == code;
+                }).val();
+
+                $('#pac-select').val(optionIndex).change();
+            });
+
+            $('#registerButton').click(function () {
+                if ($('#estatesSelect').val() == -1) {
+                    $("#EstateId").val('');
+                    $("#estateName").val('');
+                }
+                return true;
+            });
+
+            $('#registerForm').on('submit', function () {
+                if (!$('#confirmCheckbox').is(':checked')) {
+                    alert("Please click the accept checkbox before registering");
+                    return false;
+                }
+                if ($('#Latitude').val().length < 2) {
+                    alert("Please select your address from the address input results" );
+                    return false;
+                }
+                if ($('#Longitude').val().length < 2) {
+                    alert("Please select your address from the address input results");
+                    return false;
+                }
+            });
+
+            @if (isQuickOrder != true)
+            {
+            <text>
+            $('#confirmCheckbox').click(function () {
+                if (this.checked) {
+                    $('#manageISPContactDialog').modal('show');
+                }
+            });
+
+            //contact option radio buttons change
+            $('input[name=contactOption]').change(function () {
+                switch ($(this).val()) {
+                    case "1":
+                        option1();
+                        break;
+                    case "2":
+                        option2();
+                        break;
+                    case "3":
+                        option3();
+                        break;
+                }
+            });
+
+            //validate selected options if they try close
+            $('#okModalBtn').click(function () {
+                if (resolveISPContacts()) {
+                    $('#manageISPContactDialog').modal('toggle');
+                }
+            });
+
+            function option1() {
+                $('#option3').hide();
+                $('#option2').hide();
+                $('#option1').show();
+            }
+
+            function option2() {
+                $('#option3').hide();
+                $('#option1').hide();
+                $('#option2').show();
+            }
+
+            function option3() {
+                $('#option1').hide();
+                $('#option2').hide();
+                $('#option3').show();
+            }
+
+            function resolveISPContacts() {
+                var selectedOption = $('input[name=contactOption]:checked').val();
+
+                //if no options are selected
+                if (!selectedOption.length) {
+                    alert('Please select a contact option.');
+                    return false;
+                }
+
+                //if option 1, clear other dropdowns
+                if (selectedOption == "1") {
+                    $('.option2ISP').val('');
+                    if (!$('#option1ISP').val()) {
+                        alert('Please select an ISP');
+                        return false;
+                    }
+                    return true;
+                }
+
+                //if option 2, clear option 1 dropdown, make sure 3 dropdowns are selected
+                if (selectedOption == "2") {
+                    $('#option1ISP').val('');
+
+                    var invalidItems = $('.option2ISP').filter(function() {
+                        return !this.value;
+                    });
+
+                    if (invalidItems.length) {
+                        alert('Please select three ISPs');
+                        return false;
+                    }
+                    return true;
+                }
+
+                //if option 3, clear other dropdowns
+                if (selectedOption == "3") {
+                    $('#option1ISP').val('');
+                    $('.option2ISP').val('');
+                    return true;
+                }
+
+                //if we get here then block
+                return false;
+            }
+
+            </text>
+            }
+        });
+    </script>
+
+}

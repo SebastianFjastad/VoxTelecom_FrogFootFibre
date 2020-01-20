@@ -1,0 +1,53 @@
+﻿@model FrogFoot.Areas.Admin.Models.ISPViewModel
+
+@{
+    ViewBag.Title = "AddISP";
+}
+
+<h3 style="margin-top: 30px;">Add ISP</h3>
+
+@using (Html.BeginForm("SaveISP", "ManageISP", FormMethod.Post, new { role = "form" }))
+{
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.ISP.Name, new { @class = "form-control", placeholder = "Name" })
+        @Html.ValidationMessageFor(model => model.ISP.Name, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.ISP.EmailAddress, new { @class = "form-control", placeholder = "Email" })
+        @Html.ValidationMessageFor(model => model.ISP.EmailAddress, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.ISP.CellNo, new { @class = "form-control", placeholder = "Cell No" })
+        @Html.ValidationMessageFor(model => model.ISP.CellNo, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.ISP.LandlineNo, new { @class = "form-control", placeholder = "Landline" })
+        @Html.ValidationMessageFor(model => model.ISP.LandlineNo, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.TextBoxFor(n => n.ISP.ISPCode, new { @class = "form-control", placeholder = "ISP Code" })
+        @Html.ValidationMessageFor(model => model.ISP.ISPCode, "", new { @class = "text-danger" })
+    </div>
+    <div class="form-group">
+        @Html.CheckBoxFor(n => n.ISP.ImmediateOrderEmailNotification, new {@class = "checkbox checkbox-inline"})
+        <label class="control-label">Immediate order email notification</label>
+    </div>
+    <div class="form-group">
+        @Html.CheckBoxFor(n => n.ISP.AllowViewLeads, new { @class = "checkbox checkbox-inline" })
+        @Html.LabelFor(n => n.ISP.AllowViewLeads, new { @class = "control-label" })
+    </div>
+    <div class="form-group">
+        @Html.TextAreaFor(n => n.ISP.TermsAndConditions, new { @class = "form-control", placeholder = "terms and conditions" })
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2">
+                <input type="submit" class="btn btn-success" value="Save" />
+            </div>
+        </div>
+    </div>
+}
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

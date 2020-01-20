@@ -1,0 +1,44 @@
+﻿@model FrogFoot.Areas.Admin.Models.SettingsViewModel
+
+@{
+    ViewBag.Title = "Map API";
+}
+
+<h2>Map API</h2>
+<div class="tab-content">
+    <div id="api" class="form-group">
+        <div id="apiResults">
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: 'http://maps.frogfoot.net/ftth/options',
+                success: function (results) {
+                    var resultsHtml = '<hr/>';
+                    $.each(results, function () {
+                        resultsHtml += '<div class="row form-group"><div class="col-sm-4"><label>' + this.name + ' (' + this.id + ')</label></div>'
+                        + '<div class="col-sm-6">';
+
+                        $.each(this.zones, function (i, z) {
+                            resultsHtml += '<span>' + z.name + ', </span>';
+                        });
+                        resultsHtml += '</div></div><hr/>';
+                    });
+
+                    $('#apiResults').html(resultsHtml);
+                }
+            });
+        })
+    </script>
+}
+
+
+
+

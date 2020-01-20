@@ -1,0 +1,69 @@
+﻿@model FrogFoot.Areas.Admin.Models.UserInterestViewModel
+@{
+    ViewBag.Title = "Interest Report";
+}
+
+<style type="text/css">
+    .cellLeft {
+        text-align: left;
+    }
+
+    thead {
+        background-color: green;
+        color: white;
+    }
+
+    td {
+        text-align: right;
+        width: 50px;
+    }
+
+    .precinctHeader {
+        background-color: grey;
+        color: white;
+    }
+
+    .zoneName {
+        width: 200px;
+    }
+</style>
+
+<div class="col-sm-6"><h2>Interest Report</h2></div>
+<div class="col-sm-6" style="margin-top: 18px;">@Html.ActionLink("Generate Excel", "ExportInterestReportToExcel", null, new { @class = "btn btn-primary" })</div>
+
+<table class="table table-bordered table-responsive">
+    <thead>
+        <tr>
+            <th class="zoneName">Precinct/Zone</th>
+            <th>Leads</th>
+            <th>Conversions</th>
+            <th>Residents</th>
+            <th>% Penetration</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var locs in Model.Locations.GroupBy(l => l.PrecinctCode))
+        {
+            var loc = locs.First();
+            <tr><td colspan="5" class="cellLeft precinctHeader">@loc.PrecinctCode</td></tr>
+            foreach (var zone in Model.Zones.Where(z => z.PrecinctCode == loc.PrecinctCode))
+            {
+                var zoneTotalUsers = zone.NoHousesInZone;
+                var usersInZone = Model.UsersAndOrders.Where(u => u.ZoneId == zone.ZoneId);
+                var zoneUsersCount = usersInZone.Count();
+                var zoneUsersWithOrders = usersInZone.Count(u => u.UserHasOrder == true);
+                var zonePenetrationPerc = zoneTotalUsers != 0 ? zoneUsersWithOrders / (decimal)zoneTotalUsers * 100 : 0;
+
+                <tr>
+                    <td class="zoneName cellLeft">@(loc.PrecinctCode + " - " + zone.Code)</td>
+                    <td>@zoneUsersCount</td>
+                    <td>@zoneUsersWithOrders</td>
+                    <td>@zoneTotalUsers</td>
+                    <td>@(zonePenetrationPerc)%</td>
+                </tr>
+            }
+            <tr><td colspan="5"></td></tr>
+        }
+    </tbody>
+</table>
+

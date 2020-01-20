@@ -1,0 +1,245 @@
+﻿@using FrogFoot.Models
+@model FrogFoot.Areas.Client.Models.PostViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit</h2>
+
+@using (Html.BeginForm("Edit", "FibreChamp", FormMethod.Post, new { role = "form" }))
+{
+    @Html.HiddenFor(x => x.Post.PostId)
+    <input id="zoneId" type="hidden" value="@Model.Post.ZoneId"/>
+    <input id="gridType" type="hidden" value="@((Int16)Model.Post.GridType)"/>
+    <input id="postType" type="hidden" value="@((Int16) Model.Post.Type)"/>
+    <input id="Post_PrecinctCode" name="Post.PrecinctCode" value="@Model.Post.PrecinctCode" style="display: none;" />
+
+    <div class="row">
+        <div class="col-xs-4">
+            <h3>Post Gridding</h3>
+
+            <input name="Post.LocationId" type="hidden" value="@Model.User.LocationId" />
+
+            <!-- if the champ can only manage estate then show estate name -->
+            @if (!Model.User.UsePrecinctCodeForChamp && Model.User.Estate != null)
+            {
+                <div class="form-group">
+                    <h4>@Model.User.Estate.Name</h4>
+                </div>
+
+                <!-- jquery checks this to set the value of the Zone dropdown with this ZoneId-->
+                <div id="onlyUseUserZoneId" data-zoneid="@Model.User.ZoneId" style="display: none;"></div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <select id="Post_GridType" name="Post.GridType" class="form-control" data-val="true" data_val_required="Please select Gridding Type">
+                        <option value="0">Select Gridding Type</option>
+                        <option value="1">Zone</option>
+                        @if (Model.User.UsePrecinctCodeForChamp || Model.User.Estate == null)
+                    {
+                            <option value="2">Precinct</option>
+                        }
+                    </select>
+                    <span class="field-validation-valid text-danger" data-valmsg-for="Post.GridType" data-valmsg-replace="true"></span>
+                </div>
+            }
+
+            <!-- if the champ is in an estate but manages suburb too then show zones and suburb -->
+            <!-- if the champ is not in Estate then Estate must be null -->
+            @if (Model.User.UsePrecinctCodeForChamp || Model.User.Estate == null)
+            {
+                var showLocation = Model.Post.GridType == PostGridding.Precinct ? "block" : "none";
+
+                <div id="locationContainer" class="form-group" style="display: @showLocation;">
+                    <select id="Post_LocationId" name="Post.LocationId" class="form-control">
+                        @if (Model.Locations != null && Model.Locations.Count > 1)
+                        {
+                            <option value="-1" data-preccode="@Model.User.Location.PrecinctCode"  @(!string.IsNullOrEmpty(Model.Post.PrecinctCode) ? "selected": "")>Whole Precinct</option>
+                        }
+
+                        @foreach (var pre in Model.Locations)
+                        {
+                            <option value="@pre.LocationId" data-preccode="@pre.PrecinctCode" @(Model.Post.LocationId == pre.LocationId? "selected": "")>@pre.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div id="postZoneContainer" class="form-group" style="display: none;">
+                <select id="Post_ZoneId" name="Post.ZoneId" class="form-control">
+                    <option value="">Select Zone</option>
+                    @foreach (var zone in Model.Zones)
+                    {
+                        <option value="@zone.ZoneId" data-precinctcode="@zone.PrecinctCode">@zone.Code</option>
+                    }
+                </select>
+            </div>
+
+            <h3>Post</h3>
+
+            <div class="form-group">
+                <select id="Post_Type" name="Post.Type" class="form-control">
+                    <option value="0">Select Post Type</option>
+                    <option value="1">Update</option>
+                    <option value="3">Post</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                @Html.TextBoxFor(n => n.Post.Title, new { @class = "form-control", placeholder = "Title" })
+                @Html.ValidationMessageFor(model => model.Post.Title, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Publish Date</label>
+                <div class="input-group date" style="max-width: 280px">
+                    <input type="text" id="publishDate" name="Post.PublishDate" class="form-control" value="@Model.Post.PublishDate" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="form-group" style="width: 800px;">
+                @Html.TextAreaFor(n => n.Post.Body, new { @class = "form-control", placeholder = "Post body" })
+                @Html.ValidationMessageFor(model => model.Post.Body, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <input id="save" type="submit" class="btn btn-success" value="Save" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/moment.min.js"></script>
+    <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+    <script src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+
+            if ($('#zoneId').val()) {
+                $('#Post_ZoneId').val($('#zoneId').val());
+                $('#postZoneContainer').show();
+            }
+
+            if ($('#gridType').val()) {
+                $('#Post_GridType').val($('#gridType').val());
+            }
+
+            if ($('#postType').val()) {
+                $('#Post_Type').val($('#postType').val());
+            }
+
+            tinyMCE.init({
+                mode: "textareas",
+                theme: "modern",
+                plugins: "link",
+                theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+                theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+                theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+                theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+                theme_advanced_toolbar_location: "top",
+                theme_advanced_toolbar_align: "left",
+                theme_advanced_statusbar_location: "bottom",
+                theme_advanced_resizing: true
+            });
+
+            $('#publishDate').datetimepicker({
+            });
+
+            function Zone() {
+                $('#postZoneContainer').show();
+                $('#locationContainer').hide();
+            }
+
+            function Precinct() {
+                $('#postZoneContainer').hide();
+                $('#locationContainer').show();
+            }
+
+            //show different inputs depending on the type selected
+            $("#Post_GridType").change(function () {
+                switch (this.value) {
+                    case "1":
+                        Zone();
+                        break;
+                    case "2":
+                        Precinct();
+                        break;
+                    default:
+                        Precinct();
+                }
+            });
+
+            //clear out the image if it was selected then post type was changed so it's not visible but still has img value
+            $('#save').click(function () {
+                //if champ is only managin an Estate then set the Zone dropdown to his ZoneId
+
+                if ($('#onlyUseUserZoneId').length) {
+                    $("#Post_GridType").val(1); //1 is zone gridtype
+                    $("#Post_ZoneId").val(this.data('zoneid'));
+                }
+
+                //if the Location dropdown is set to "All" then save precinct code
+                if ($('#Post_LocationId').val() == "-1") {
+                    $('#Post_LocationId').val('');
+                    $('#Post_ZoneId').val('');
+                } 
+                else {
+                    $('#Post_PrecinctCode').val('');
+                }
+
+                //if Gridding type != Precinct then remove ZoneId
+                if ($('#Post_GridType').val() != "1") {
+                    $('#Post_ZoneId').val('');
+                }
+
+                //if the gridding is by Zone remove PrecinctCode 
+                //or location AND LocationId != -1, which is All Precincts 
+                if ($('#Post_GridType').val() == "1" || $('#Post_GridType').val() == "2" && $('#Post_LocationId').val() == "-1") {
+                    $('#Post_LocationId').val('');
+                }
+
+                //Gridding type validation
+                if ($('#Post_GridType').val() == "0") {
+                    alert("Please select Gridding Type");
+                    return false;
+                }
+
+                //Zone validation
+                var $zonedd = $('#Post_ZoneId');
+                if ($zonedd.is(':visible') && $zonedd.val() == "") {
+                    alert("Please select a Zone");
+                    return false;
+                }
+
+                //Post type validation
+                if ($('#Post_Type').val() == "0") {
+                    alert("Please select Post Type");
+                    return false;
+                }
+
+                //Post Body validation
+                if (tinyMCE.get('Post_Body').getContent() == "") {
+                    alert("Please enter a Post Body");
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+}

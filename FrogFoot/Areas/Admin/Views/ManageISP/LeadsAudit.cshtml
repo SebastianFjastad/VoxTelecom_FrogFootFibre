@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "LeadsAudit";
+}
+
+<h2>Leads Audit</h2>
+
+<div class="row form-group">
+    <div class="col-xs-3">
+        <input id="email" class="form-control" type="email" placeholder="Email"/>
+    </div>
+    <div class="col-xs-2">
+        <input id="cellNo" class="form-control" type="tel" placeholder="Cell No."/>
+    </div>
+    <div class="col-xs-2">
+        <input id="landline" class="form-control" type="tel" placeholder="Landline"/>
+    </div>
+    <div class="col-xs-2">
+        <input id="search" class="btn btn-primary" type="button" value="Search"/>
+    </div>
+</div>
+
+<hr/>
+
+<div id="auditResults">
+    <!-- Ajax results: client ISP audit -->
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#search').click(function() {
+                $.ajax({
+                    url: '@Url.Action("FindUserForISPAudit")',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    data: {
+                        email: $('#email').val(),
+                        cellNo: $('#cellNo').val(),
+                        landline: $('#landline').val()
+                    },
+                    success: function (data) {
+                        $('#auditResults').html(data);
+                    }
+                });
+            });
+        })
+    </script>
+}
+
